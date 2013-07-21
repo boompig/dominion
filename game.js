@@ -36,13 +36,17 @@ Game.prototype.makePlayers = function () {
 	this.players = Array(this.numPlayers);
 	
 	// TODO temporary names
-	var names = Array("me", "Curly", "Larry", "Joe");
+	var names = Array("Smithies Only", "Smithies + Duchies", "Big Money 1", "Big Money 2");
 	
 	for (var i = 0; i < this.numPlayers; i++) {
 		var p = new Player(names[i], this.stash);
 		
-		if (names[i] == "me") {
+		if (i == 0) {
 			p.strategy = p.bigMoneyDraw;
+		} else if (i == 1) {
+			p.strategy = p.bigMoneyDrawFinalGreen;
+		} else {
+			p.strategy = p.bigMoney;
 		}
 		
 		this.players[i] = p;
@@ -121,8 +125,13 @@ Game.prototype.doTurn = function () {
 		}
 		
 		// now show the entire hand
-		var me = this.getPlayer("me");
-		console.log(me.statAllCards());
+		// var me = this.getPlayer("me");
+		var p;
+		for (var i = 0; i < this.numPlayers; i++) {
+			p = this.players[i];
+			console.log("stats for player '" + p.name +"'");
+			console.log(p.statAllCards());	
+		}
 	}
 	
 	return gameOver;

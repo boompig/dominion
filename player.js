@@ -28,7 +28,8 @@ function Player (name, stash) {
 	this.getNewHand();
 	
 	/**
-	 * What sort of AI this player will be using
+	 * What sort of AI this player will be using.
+	 * This function should set the functions this.strategyPlayAction and this.strategyBuy
 	 * @returns {Function}
 	 */
 	this.strategy = this.bigMoney;
@@ -128,14 +129,21 @@ Player.prototype.getFunds = function () {
 Player.prototype.buyCard = function (name) {
 	var card = null;
 	
-	if (this.stash.hasCard(name)) {
+	if (this.buys === 0) {
+		return null;
+	}
+	
+	this.buys--;
+	
+	if (this.stash.hasCard(name) && this.stash.peekCard(name).cost <= this.funds) {
 		card = this.stash.getCard(name);
+		this.funds -= card.cost;
 		this.discard.push(card);
 		
-		this.writeConsole("Bought " + card.name, Game.V_MAX);
+		this.writeConsole("Bought " + card.name, Game.V_MAX - 1);
 		
 		if (card.name == "province") {
-			this.writeConsole(this.stash.countCard("province") + " Provinces left", Game.V_MAX);
+			this.writeConsole(this.stash.countCard("province") + " Provinces left", Game.V_MAX - 1);
 		}
 	} else {
 		card = null;
@@ -183,6 +191,35 @@ Player.prototype.doTurn = function (game) {
 	this.funds = 0;
 	this.actions = 1;
 	this.buys = 1;
+	
+	var actionCards = this.getActionCards();
+	var card = true, name = true;
+	
+	while (actionCards.length > 0 && this.actions > 0 && card) {
+		card = this.strategyPlayAction(actionCards, game);
+		
+		if (card) {
+			// auto-decrement this.actions here
+			this.playCard(card);
+			
+			// remove from actionCards and from hand in general
+			actionCards.splice(actionCards.indexOf(card), 1);
+			this.hand.splice(this.hand.indexOf(card), 1);
+		}
+	}
+	
+	this.funds += this.getFunds();
+	
+	while (this.buys > 0 && name) {
+		name = this.strategyBuy(this.funds, game);
+		
+		if (name) {
+			// auto-decrements this.buys here
+			// auto-decrements this.funds here
+			this.buyCard(name);
+		}
+	}
+	
 	return result = this.strategy (game);
 };
 
@@ -227,7 +264,7 @@ Player.prototype.playCard = function (card) {
 		return false;
 	}
 	
-	this.actions -= 1;
+	this.actions --;
 	
 	this.writeConsole("Played " + card.name);
 	
@@ -290,38 +327,87 @@ Player.prototype.getNumCards = function () {
 };
 
 /**
+ * Given an array of action cards, return the card to play.
+ * @param {Array} actionCards
+ */
+Player.prototype.strategyPlayAction = function (actionCards, game) {
+	// this is a stub method
+};
+
+/**
+ * Given number of funds available, return name of card to buy.
+ * @param {Number} funds
+ */
+Player.prototype.strategyBuy = function (funds, game) {
+	// this is a stub method
+};
+
+Player.prototype.setStrategy = function () {
+	this.strategy();
+};
+
+/**
+ * Same as Big Money, except start buying only point cards at the end.
+ */
+Player.prototype.bigMoneyDrawFinalGreen = function (game) {
+	"use strict";
+	
+	this.strategyPlayAction = function (actionCards, game) {
+		if (actionCards.length > 0) {
+			return actionCards[0];
+		}
+	};
+	
+	this.strategyBuy = function (funds, game) {
+		if (this.stash.countCard("province") <= 6) {
+			if (funds >= 8) {
+				return "province";
+			} else if (funds >= 5) {
+				return "duchy";
+			} else if (funds >= 2) {
+				return "estate";
+			} 
+			
+			// do nothing when funds < 2
+		} else {
+			if (funds >= 8) {
+				// buy province
+				return "province";
+			} else if (funds >= 6) {
+				return "gold";
+			} else if (funds >= 4 && this.statCard("action") / this.getNumCards() <= 5) {
+				return "smithy";
+			} else if (funds >= 3) {
+				return "silver";
+			}
+		}
+	};
+};
+
+/**
  * Modified big money, where Smithy is bought when # cards in the deck % # smithies < 5
  */
 Player.prototype.bigMoneyDraw = function (game) {
 	"use strict";
 	
-	// TODO for now, actions are not played, only bought
+	this.strategyPlayAction = function (actionCards, game) {
+		if (actionCards.length > 0) {
+			return actionCards[0];
+		}
+	};
 	
-	var actions = this.getActionCards();
-	if (actions.length > 0) {
-		// play the first action, which is a smithy
-		this.playCard(actions[0]);
-	}
-	
-	this.funds += this.getFunds(); 
-	var card;
-	
-	this.writeConsole("funds = " + this.funds);
-	
-	if (this.funds >= 8) {
-		// buy province
-		card = this.buyCard ("province");
-	} else if (this.funds >= 6) {
-		card = this.buyCard ("gold");
-	} else if (this.funds >= 4 && this.statCard("action") / this.getNumCards() <= 5) {
-		this.writeConsole("cards in deck = " + this.getNumCards());
-		this.writeConsole("number of action cards = " + this.statCard("action"));
-		card = this.buyCard("smithy");
-	} else if (this.funds >= 3) {
-		card = this.buyCard("silver");
-	} else {
-		this.writeConsole("Passed with funds=" + this.funds, Game.V_MAX);
-	}
+	this.strategyBuy = function (funds, game) {
+		if (funds >= 8) {
+			// buy province
+			return "province";
+		} else if (funds >= 6) {
+			return "gold";
+		} else if (funds >= 4 && this.statCard("action") / this.getNumCards() <= 5) {
+			return "smithy";
+		} else if (funds >= 3) {
+			return "silver";
+		}
+	};
 };
 
 /**
@@ -330,17 +416,14 @@ Player.prototype.bigMoneyDraw = function (game) {
 Player.prototype.bigMoney = function (game) {
 	"use strict";
 	
-	this.funds += this.getFunds(); 
-	var card;
-	
-	if (this.funds >= 8) {
-		// buy province
-		card = this.buyCard ("province");
-	} else if (this.funds >= 6) {
-		card = this.buyCard ("gold");
-	} else if (this.funds >= 3) {
-		card = this.buyCard("silver");
-	} else {
-		this.writeConsole("Passed with funds=" + this.funds, Game.V_MAX);
-	}
+	this.strategyBuy = function (funds, game) {
+		if (funds >= 8) {
+			// buy province
+			return "province";
+		} else if (funds >= 6) {
+			return "gold";
+		} else if (funds >= 3) {
+			return "silver";
+		}
+	};
 };

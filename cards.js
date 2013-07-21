@@ -48,9 +48,10 @@ Point.cards = [
 
 function Action (name, args) {
 	this.name = name;
-	
 	this.args = args;
 	this.type = "action";
+	
+	this.cost = this.args["cost"];
 };
 
 Action.cards = [
@@ -89,9 +90,9 @@ Action.prototype.getBuyBonus = function () {
  */
 Action.getCard = function (name) {
 	var cards = {
-		"smithy" : {"draw" : 3},
-		"laboratory" : {"draw" : 2, "action" : 1},
-		"market" : {"draw" : 1, "action" : 1, "buy" : 1},
+		"smithy" : {"draw" : 3, "cost" : 4},
+		"laboratory" : {"draw" : 2, "action" : 1, "cost" : 5},
+		"market" : {"draw" : 1, "action" : 1, "buy" : 1, "cost" : 5},
 	};
 	
 	return new Action(name, cards[name]);

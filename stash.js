@@ -37,14 +37,46 @@ Stash.prototype.gameOver = function () {
 	return this.hasCard("province") == 0 || this.numEmpties === 3;
 };
 
+/**
+ * Return true iff this card remains in the stash.
+ * @param {String} name
+ */
 Stash.prototype.hasCard = function (name) {
 	return name in this.stash && this.stash[name] > 0;
 };
 
+/**
+ * Return number of occurrences of this card in the stash.
+ * @param {Object} name
+ */
 Stash.prototype.countCard = function (name) {
 	return this.stash[name];
 };
 
+/**
+ * Return the card with the given name WITHOUT removing it from the stash.
+ * @param {String} name
+ * @returns {Card}
+ */
+Stash.prototype.peekCard = function (name) {
+	if (Coin.cards.indexOf(name) >= 0) {
+		return new Coin(name);
+	} else if (Point.cards.indexOf(name) >= 0) {
+		return new Point(name);
+	} else if (Action.cards.indexOf(name) >= 0) {
+		return Action.getCard(name);
+	} else {
+		console.log("unknown card: " + name);
+		return null;
+	}
+};
+
+/**
+ * Process removing card with given name from the stash.
+ * Return the card
+ * @param {String} name
+ * @returns {Carrd}
+ */
 Stash.prototype.getCard = function (name) {
 	if (this.hasCard (name)) {
 		this.stash[name]--;
@@ -53,16 +85,7 @@ Stash.prototype.getCard = function (name) {
 			this.numEmpties++;
 		}
 		
-		if (Coin.cards.indexOf(name) >= 0) {
-			return new Coin(name);
-		} else if (Point.cards.indexOf(name) >= 0) {
-			return new Point(name);
-		} else if (Action.cards.indexOf(name) >= 0) {
-			return Action.getCard(name);
-		} else {
-			console.log("unknown card: " + name);
-			return null;
-		}
+		return this.peekCard(name);
 	} else {
 		return null;
 	}

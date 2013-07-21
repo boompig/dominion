@@ -36,12 +36,14 @@ GameUI.prototype.reset = function () {
 };
 
 GameUI.prototype.createUI = function () {
-	var div;
+	var div, p;
 	
 	for (var i = 0; i < this.model.numPlayers; i++) {
+		p = this.model.players[i];
+		
 		div = $(".hand.template").clone().removeClass("template").attr("id", "player" + i);
 		
-		$(div).append($("<h3>Hand for Player " + (i + 1) + "</h1>"));
+		$(div).append($("<h3>Hand for '" + p.name + "'</h1>"));
 		
 		$("#content").append(div);
 	}
