@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>Dominion</title>
+		<meta charset="UTF-8" />
+		<meta http-equiv="cache-control" content="no-cache" />
+		<meta http-equiv="expires" content="0" />
+		
+		<!-- Google-hosted JQuery -->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		
+		<!-- Google-hosted JQuery UI -->
+		<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+		
+		<!-- JQuery UI theme -->
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/redmond/jquery-ui.css" />
+		
+		<script src="utils.js"></script>
+		<script src="cards.js"></script>
+		<script src="stash.js"></script>
+		<script src="player.js"></script>
+		<script src="game.js"></script>
+		<script src="game_ui.js"></script>
+		
+		<link rel="stylesheet" href="style.css" />
+		
+		<script>
+			function clear(ui) {
+				// clear some weird, latent values
+				$("#console").val("");
+				$("#nextTurnButton").removeAttr("disabled");
+				ui.reset();
+			}
+		
+			$(function() {
+				"use strict";
+				
+				var textarea = $("#console")[0];
+				textarea.scrollTop = textarea.scrollHeight;
+				
+				var ui = GameUI.getInstance();
+				clear(ui);
+				
+				ui.createUI();
+				
+				var clicked = false, end = false;
+				
+				$("#nextTurnButton").click(function () {
+					if (! clicked) {
+						$(this).html("Next Turn");
+						clicked = true;
+					}
+					
+					end = ui.doTurn();
+					
+					if (end) {
+						$(this).attr("disabled", "disabled");
+					}
+				});
+				
+				$("#simButton").click(function() {
+					$("#nextTurnButton").attr("disabled", "disabled");
+					clear(ui);
+					
+					while (! ui.doTurn()) {
+						// do nothing
+					}
+				});
+				
+				$(document).keypress(function(e){
+				    if (e.which == 13) {
+				    	if (! $("#nextTurnButton").is(":disabled")) {
+				        	$("#nextTurnButton").click();
+				       }
+				    }
+				});
+			});
+		</script>
+	</head>
+	
+	<body>
+		<h1>Dominion</h1>
+		
+		<div id="content">
+			<div class="hand template">
+			</div>
+		</div>
+		
+		<div id="buttonContainer">
+			<button type="button" id="nextTurnButton">Start Game / First Turn</button>
+			<button type="button" id="simButton">Run Simulation</button>
+		</div>
+		
+		<footer id="consoleContainer">
+			<h3>Output</h3>
+			<textarea id="console" cols="80" rows="10">
+				<!-- auto-gen text goes here -->
+			</textarea>
+		</footer>
+	</body>
+</html>
