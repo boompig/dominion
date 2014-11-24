@@ -43,6 +43,64 @@ angular.module("dominionApp", [])
         };
     };
 
+    $scope.smartSmithy = function () {
+        this.avgValue = 0.7;
+        this.numCards = 10;
+
+        this.addValue = function (v) {
+            this.avgValue = (this.numCards * this.avgValue + v) / (this.numCards + 1);
+            this.numCards++;
+        };
+
+        this.actionTurn = function (p) {
+            // if I have an action card, play it
+            var hand = $scope.players[p].hand;
+            for (var i = 0; i < hand.length; i++) {
+                if (hand[i].type === "action") return hand[i];
+            }
+
+            return null;
+        };
+
+        this.buyTurn = function (p) {
+            var money = $scope.moneyInHand(p);
+            var card = this.buyTurnWrapper(p, money);
+            if (card !== null) {
+                console.log("avgValue = %f", this.avgValue);
+                console.log("Player 'smart smithy' buys %s with %d", card, money);
+            }
+            return card;
+        };
+
+        this.buyTurnWrapper = function (p, money) {
+            // calculate the avg value of coins in my deck
+            // if the avg value is > (let's say 2)
+            //
+            var valueDrawThree = this.avgValue * 3;
+            //var valueWithGold = (this.avgValue * this.numCards + 3) / (this.numCards + 1);
+            //var valueWithSilver = (this.avgValue * this.numCards + 2) / (this.numCards + 1);
+
+            if (money >= 8) {
+                this.addValue(0);
+                return "province";
+            } else if (money >= 6 && 3 >= valueDrawThree) {
+                this.addValue(3);
+                return "gold";
+            } else if (money >= 4 && 2 >= valueDrawThree) {
+                this.addValue(2);
+                return "silver";
+            } else if (money >= 4) {
+                this.addValue(0);
+                return "smithy";
+            } else if (money >= 3) {
+                this.addValue(2);
+                return "silver";
+            } else {
+                return null;
+            }
+        };
+    };
+
     $scope.bigMoneySmithy = function () {
         this.numSmithy = 0;
 
@@ -58,7 +116,7 @@ angular.module("dominionApp", [])
 
         this.buyTurn = function (p) {
             var money = $scope.moneyInHand(p);
-            console.log("On round %d, I hold %d cards in hand", $scope.round, $scope.players[p].hand.length);
+            //console.log("On round %d, I hold %d cards in hand", $scope.round, $scope.players[p].hand.length);
 
             // should make sure that these piles exist first, but whatevs...
             if (money >= 8) {
@@ -164,7 +222,7 @@ angular.module("dominionApp", [])
     };
 
     $scope.initPlayers = function () {
-        $scope.numPlayers = 3;
+        $scope.numPlayers = 4;
 
         // create generic player objects
         for (var i = 0; i < $scope.numPlayers; i++) {
@@ -185,6 +243,9 @@ angular.module("dominionApp", [])
 
         $scope.players[2].strategy = new $scope.bigMoneySmithy();
         $scope.players[2].name = "Big Money with Smithy";
+
+        $scope.players[3].strategy = new $scope.smartSmithy();
+        $scope.players[3].name = "Smart Smithy";
 
         // give them their initial cards
         for (var p = 0; p < $scope.numPlayers; p++) {
@@ -267,6 +328,8 @@ angular.module("dominionApp", [])
         $scope.round = 0;
         $scope.gameOver = false;
         $scope.simMode = false;
+
+        $scope.winArr = [];
     };
 
     $scope.moneyInHand = function(player) {
@@ -305,11 +368,32 @@ angular.module("dominionApp", [])
         return $scope.deck["province"] === 0;
     };
 
+    $scope.runRounds = function () {
+        var numRounds = 200;
+
+        var winners = {};
+        for (var p = 0; p < $scope.numPlayers; p++) {
+            winners[$scope.players[p].name] = 0;
+        }
+
+        for (var r = 0; r < numRounds; r++) {
+            $scope.resetSim();
+            $scope.doSim();
+
+            for (var i = 0; i < $scope.winArr.length; i++) {
+                winners[$scope.winArr[i].name] += 1;
+            }
+        }
+
+        console.log(winners);
+    };
+
     $scope.doSim = function () {
         $scope.simMode = true;
         while (! $scope.gameOver) {
             $scope.doTurn();
         }
+        $scope.simMode = false;
     };
 
     $scope.doTurn = function () {
@@ -352,7 +436,23 @@ angular.module("dominionApp", [])
 
         if ($scope.checkGameEnd()) {
             $scope.gameOver = true;
-            $scope.simMode = false;
+
+            var bestScore = 0;
+
+            for (var i = 0; i < $scope.numPlayers; i++) {
+                bestScore = Math.max($scope.players[i].points, bestScore);
+            }
+
+            console.log("bestScore = %d", bestScore);
+
+            $scope.winArr = [];
+
+            for (var i = 0; i < $scope.numPlayers; i++) {
+                if ($scope.players[i].points === bestScore) {
+                    $scope.winArr.push($scope.players[i]);
+                }
+            }
+
             console.log("done");
         } else {
             $scope.turn = ($scope.turn + 1) % $scope.numPlayers;

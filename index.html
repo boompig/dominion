@@ -14,7 +14,13 @@
     <body ng-app="dominionApp">
         <div class="container" ng-controller="handController">
             <h1 class="title">Dominion Simulation</h1>
-            <h5>Round {{ round }}</h5>
+            <h4>Round {{ round }}</h4>
+            <div ng-show="gameOver">
+                <h4>Winners ({{ winArr.length}})</h4>
+                <ul ng-repeat="player in winArr">
+                    <li>{{ player.name }}</li>
+                </ul>
+            </div>
 
             <div class="sim-container">
                 <h3>Common Piles</h3>
@@ -38,7 +44,8 @@
 
             <div id="btn-container">
                 <button class="btn btn-primary" type="button" ng-click="doTurn()" ng-disabled="gameOver || simMode">Start Game / First Turn</button>
-                <button class="btn btn-primary" type="button" ng-click="doSim()" ng-disabled="gameOver || simMode">Run Simulation</button>
+                <button class="btn btn-primary" type="button" ng-click="doSim()" ng-disabled="gameOver || simMode">Run Simulation (1 Round)</button>
+                <button class="btn btn-primary" type="button" ng-click="runRounds()" ng-disabled="gameOver || simMode">Run Simulation (Many Rounds)</button>
                 <button class="btn btn-danger" type="button" ng-click="resetSim()" ng-disabled="simMode">Reset</button>
             </div>
         </div>
