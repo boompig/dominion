@@ -43,9 +43,79 @@ angular.module("dominionApp", [])
         };
     };
 
+    /**
+     * Same as big money, but buy dutchies near the end
+     */
+    $scope.smartBigMoney = function () {
+        this.actionTurn = function (p) {
+            return null;
+        };
+
+        this.buyTurn = function (p) {
+            var money = $scope.moneyInHand(p);
+
+            // should make sure that these piles exist first, but whatevs...
+            if (money >= 8) {
+                return "province";
+            } else if (money >= 6) {
+                if ($scope.deck["province"] >= 5) {
+                    return "gold";
+                } else {
+                    return "dutchy";
+                }
+            } else if (money >= 3) {
+                return "silver";
+            } else {
+                return null;
+            }
+        };
+    };
+
+    /**
+     * Always go for province when you have 8
+     * Always go for dutchy when you have 5
+     * Always go for smithy when you have 4
+     * Always go for silver when you have 3
+     * Go for gold when you have 6, if there are 4 or more provinces left, otherwise buy a dutchy
+     */
+    $scope.smartDutchy = function () {
+        this.actionTurn = function (p) {
+            // if I have an action card, play it
+            var hand = $scope.players[p].hand;
+            for (var i = 0; i < hand.length; i++) {
+                if (hand[i].type === "action") return hand[i];
+            }
+
+            return null;
+        };
+
+        this.buyTurn = function (p) {
+            var money = $scope.moneyInHand(p);
+
+            if (money >= 8) {
+                return "province";
+            } else if (money >= 6) {
+                if ($scope.deck["province"] >= 4) {
+                    return "gold";
+                } else {
+                    return "dutchy";
+                }
+            } else if (money >= 5) {
+                return "dutchy";
+            } else if (money >= 4) {
+                return "smithy";
+            } else if (money >= 3) {
+                return "silver";
+            } else {
+                return null;
+            }
+        };
+    };
+
     $scope.smartSmithy = function () {
         this.avgValue = 0.7;
         this.numCards = 10;
+        this.provinceCutoff = 4;
 
         this.addValue = function (v) {
             this.avgValue = (this.numCards * this.avgValue + v) / (this.numCards + 1);
@@ -66,8 +136,8 @@ angular.module("dominionApp", [])
             var money = $scope.moneyInHand(p);
             var card = this.buyTurnWrapper(p, money);
             if (card !== null) {
-                console.log("avgValue = %f", this.avgValue);
-                console.log("Player 'smart smithy' buys %s with %d", card, money);
+                //console.log("avgValue = %f", this.avgValue);
+                //console.log("Player 'smart smithy' buys %s with %d", card, money);
             }
             return card;
         };
@@ -84,8 +154,13 @@ angular.module("dominionApp", [])
                 this.addValue(0);
                 return "province";
             } else if (money >= 6 && 3 >= valueDrawThree) {
-                this.addValue(3);
-                return "gold";
+                if ($scope.deck["province"] >= this.provinceCutoff) {
+                    this.addValue(3);
+                    return "gold";
+                } else {
+                    this.addValue(0);
+                    return "dutchy";
+                }
             } else if (money >= 4 && 2 >= valueDrawThree) {
                 this.addValue(2);
                 return "silver";
@@ -222,7 +297,7 @@ angular.module("dominionApp", [])
     };
 
     $scope.initPlayers = function () {
-        $scope.numPlayers = 4;
+        $scope.numPlayers = 5;
 
         // create generic player objects
         for (var i = 0; i < $scope.numPlayers; i++) {
@@ -238,14 +313,19 @@ angular.module("dominionApp", [])
         $scope.players[0].strategy = new $scope.bigMoney();
         $scope.players[0].name = "Big Money";
 
-        $scope.players[1].strategy = new $scope.pointsOnly();
-        $scope.players[1].name = "Points Only";
+        //$scope.players[1].strategy = new $scope.pointsOnly();
+        //$scope.players[1].name = "Points Only";
+        $scope.players[1].strategy = new $scope.smartBigMoney();
+        $scope.players[1].name = "Smart Big Money";
 
         $scope.players[2].strategy = new $scope.bigMoneySmithy();
         $scope.players[2].name = "Big Money with Smithy";
 
         $scope.players[3].strategy = new $scope.smartSmithy();
         $scope.players[3].name = "Smart Smithy";
+
+        $scope.players[4].strategy = new $scope.smartDutchy();
+        $scope.players[4].name = "Smart Dutchy";
 
         // give them their initial cards
         for (var p = 0; p < $scope.numPlayers; p++) {
