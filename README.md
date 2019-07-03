@@ -33,6 +33,13 @@ Same as "Big Money", but buy Duchies near the end.
 
 ???
 
+## Lint & Test
+
+```
+yarn install
+yarn lint
+```
+
 ## Run
 
 Start up a web server from this directory, for example run `http-server`
