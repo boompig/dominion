@@ -44,7 +44,7 @@ angular.module("dominionApp", [])
     };
 
     /**
-     * Same as big money, but buy dutchies near the end
+     * Same as big money, but buy duchies near the end
      */
     $scope.smartBigMoney = function () {
         this.actionTurn = function (p) {
@@ -61,7 +61,7 @@ angular.module("dominionApp", [])
                 if ($scope.deck["province"] >= 5) {
                     return "gold";
                 } else {
-                    return "dutchy";
+                    return "duchy";
                 }
             } else if (money >= 3) {
                 return "silver";
@@ -73,12 +73,12 @@ angular.module("dominionApp", [])
 
     /**
      * Always go for province when you have 8
-     * Always go for dutchy when you have 5
+     * Always go for duchy when you have 5
      * Always go for smithy when you have 4
      * Always go for silver when you have 3
-     * Go for gold when you have 6, if there are 4 or more provinces left, otherwise buy a dutchy
+     * Go for gold when you have 6, if there are 4 or more provinces left, otherwise buy a duchy
      */
-    $scope.smartDutchy = function () {
+    $scope.smartDuchy = function () {
         this.actionTurn = function (p) {
             // if I have an action card, play it
             var hand = $scope.players[p].hand;
@@ -98,10 +98,10 @@ angular.module("dominionApp", [])
                 if ($scope.deck["province"] >= 4) {
                     return "gold";
                 } else {
-                    return "dutchy";
+                    return "duchy";
                 }
             } else if (money >= 5) {
-                return "dutchy";
+                return "duchy";
             } else if (money >= 4) {
                 return "smithy";
             } else if (money >= 3) {
@@ -159,7 +159,7 @@ angular.module("dominionApp", [])
                     return "gold";
                 } else {
                     this.addValue(0);
-                    return "dutchy";
+                    return "duchy";
                 }
             } else if (money >= 4 && 2 >= valueDrawThree) {
                 this.addValue(2);
@@ -221,7 +221,7 @@ angular.module("dominionApp", [])
             if (money >= 8) {
                 return "province";
             } else if (money >= 5) {
-                return "dutchy";
+                return "duchy";
             } else if (money >= 2) {
                 return "estate";
             } else {
@@ -262,8 +262,8 @@ angular.module("dominionApp", [])
             type: "point",
             points: 1
         };
-        $scope.cards["dutchy"] = {
-            name: "dutchy",
+        $scope.cards["duchy"] = {
+            name: "duchy",
             cost: 5,
             type: "point",
             points: 3
@@ -290,7 +290,7 @@ angular.module("dominionApp", [])
         $scope.deck["gold"] = 30;
 
         $scope.deck["estate"] = 20;
-        $scope.deck["dutchy"] = 12;
+        $scope.deck["duchy"] = 12;
         $scope.deck["province"] = 12;
 
         $scope.deck["smithy"] = 10;
@@ -324,8 +324,8 @@ angular.module("dominionApp", [])
         $scope.players[3].strategy = new $scope.smartSmithy();
         $scope.players[3].name = "Smart Smithy";
 
-        $scope.players[4].strategy = new $scope.smartDutchy();
-        $scope.players[4].name = "Smart Dutchy";
+        $scope.players[4].strategy = new $scope.smartDuchy();
+        $scope.players[4].name = "Smart Duchy";
 
         // give them their initial cards
         for (var p = 0; p < $scope.numPlayers; p++) {
