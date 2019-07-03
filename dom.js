@@ -1,4 +1,4 @@
-/* global angular, _, BigMoneyStrategy */
+/* global angular, _, BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy */
 
 class Player {
 	/**
@@ -60,206 +60,26 @@ angular.module("dominionApp", [])
 		};
 		/** ********************************************* */
 
-		/** **************** PLAYER STRATEGIES ********** */
-
-		/**
-		 * Same as big money, but buy duchies near the end
-		 */
-		$scope.smartBigMoney = function () {
-			this.actionTurn = function () {
-				return null;
-			};
-
-			this.buyTurn = function (p) {
-				const money = $scope.moneyInHand(p);
-
-				// should make sure that these piles exist first, but whatevs...
-				if (money >= 8) {
-					return "province";
-				} if (money >= 6) {
-					if ($scope.deck.province >= 5) {
-						return "gold";
-					}
-					return "duchy";
-				} if (money >= 3) {
-					return "silver";
-				}
-				return null;
-			};
-		};
-
-		/**
-		 * Always go for province when you have 8
-		 * Always go for duchy when you have 5
-		 * Always go for smithy when you have 4
-		 * Always go for silver when you have 3
-		 * Go for gold when you have 6, if there are 4 or more provinces left, otherwise buy a duchy
-		 */
-		$scope.smartDuchy = function () {
-			this.actionTurn = function (p) {
-				// if I have an action card, play it
-				const { hand } = $scope.players[p];
-				for (let i = 0; i < hand.length; i++) {
-					if (hand[i].type === "action") {return hand[i];}
-				}
-
-				return null;
-			};
-
-			this.buyTurn = function (p) {
-				const money = $scope.moneyInHand(p);
-
-				if (money >= 8) {
-					return "province";
-				} if (money >= 6) {
-					if ($scope.deck.province >= 4) {
-						return "gold";
-					}
-					return "duchy";
-				} if (money >= 5) {
-					return "duchy";
-				} if (money >= 4) {
-					return "smithy";
-				} if (money >= 3) {
-					return "silver";
-				}
-				return null;
-			};
-		};
-
-		$scope.smartSmithy = function () {
-			this.avgValue = 0.7;
-			this.numCards = 10;
-			this.provinceCutoff = 4;
-
-			this.addValue = function (v) {
-				this.avgValue = (this.numCards * this.avgValue + v) / (this.numCards + 1);
-				this.numCards++;
-			};
-
-			this.actionTurn = function (p) {
-				// if I have an action card, play it
-				const { hand } = $scope.players[p];
-				for (let i = 0; i < hand.length; i++) {
-					if (hand[i].type === "action") {return hand[i];}
-				}
-
-				return null;
-			};
-
-			this.buyTurn = function (p) {
-				const money = $scope.moneyInHand(p);
-				const card = this.buyTurnWrapper(p, money);
-				if (card !== null) {
-					// console.log("avgValue = %f", this.avgValue);
-					// console.log("Player 'smart smithy' buys %s with %d", card, money);
-				}
-				return card;
-			};
-
-			this.buyTurnWrapper = function (p, money) {
-				// calculate the avg value of coins in my deck
-				// if the avg value is > (let's say 2)
-				//
-				const valueDrawThree = this.avgValue * 3;
-				// var valueWithGold = (this.avgValue * this.numCards + 3) / (this.numCards + 1);
-				// var valueWithSilver = (this.avgValue * this.numCards + 2) / (this.numCards + 1);
-
-				if (money >= 8) {
-					this.addValue(0);
-					return "province";
-				} if (money >= 6 && valueDrawThree <= 3) {
-					if ($scope.deck.province >= this.provinceCutoff) {
-						this.addValue(3);
-						return "gold";
-					}
-					this.addValue(0);
-					return "duchy";
-				} if (money >= 4 && valueDrawThree <= 2) {
-					this.addValue(2);
-					return "silver";
-				} if (money >= 4) {
-					this.addValue(0);
-					return "smithy";
-				} if (money >= 3) {
-					this.addValue(2);
-					return "silver";
-				}
-				return null;
-			};
-		};
-
-		$scope.bigMoneySmithy = function () {
-			this.numSmithy = 0;
-
-			this.actionTurn = function (p) {
-				// if I have an action card, play it
-				const { hand } = $scope.players[p];
-				for (let i = 0; i < hand.length; i++) {
-					if (hand[i].type === "action") {return hand[i];}
-				}
-
-				return null;
-			};
-
-			this.buyTurn = function (p) {
-				const money = $scope.moneyInHand(p);
-				// console.log("On round %d, I hold %d cards in hand", $scope.round, $scope.players[p].hand.length);
-
-				// should make sure that these piles exist first, but whatevs...
-				if (money >= 8) {
-					return "province";
-				} if (money >= 6) {
-					return "gold";
-				} if (money >= 4 && this.numSmithy < 3) {
-					this.numSmithy++;
-
-					return "smithy";
-				} if (money >= 3) {
-					return "silver";
-				}
-				return null;
-			};
-		};
-
-		$scope.pointsOnly = function () {
-			this.actionTurn = function () {
-				return null;
-			};
-
-			this.buyTurn = function (p) {
-				const money = $scope.moneyInHand(p);
-
-				if (money >= 8) {
-					return "province";
-				} if (money >= 5) {
-					return "duchy";
-				} if (money >= 2) {
-					return "estate";
-				}
-				return null;
-			};
-		};
-		/** ********************************************* */
-
 		/**
 		 * Initialize mapping of card names to cards.
 		 */
 		$scope.initCards = function () {
+			const cards = {};
+
 			// treasures
-			$scope.cards.copper = {
+			cards.copper = {
 				name: "copper",
 				cost: 0,
 				type: "treasure",
 				value: 1,
 			};
-			$scope.cards.silver = {
+			cards.silver = {
 				name: "silver",
 				cost: 3,
 				type: "treasure",
 				value: 2,
 			};
-			$scope.cards.gold = {
+			cards.gold = {
 				name: "gold",
 				cost: 6,
 				type: "treasure",
@@ -267,46 +87,58 @@ angular.module("dominionApp", [])
 			};
 
 			// point cards
-			$scope.cards.estate = {
+			cards.estate = {
 				name: "estate",
 				cost: 2,
 				type: "point",
 				points: 1,
 			};
-			$scope.cards.duchy = {
+			cards.duchy = {
 				name: "duchy",
 				cost: 5,
 				type: "point",
 				points: 3,
 			};
-			$scope.cards.province = {
+			cards.province = {
 				name: "province",
 				cost: 8,
 				type: "point",
 				points: 6,
 			};
 
-			$scope.cards.smithy = {
+			cards.smithy = {
 				name: "smithy",
 				cost: 4,
 				type: "action",
 				effect: $scope.smithy,
 			};
+
+			return cards;
 		};
 
+		/**
+		 * Initialize mapping of card names to their quantity
+		 */
 		$scope.initDeck = function () {
+			const deck = {};
 			// just some numbers...
-			$scope.deck.copper = 60;
-			$scope.deck.silver = 40;
-			$scope.deck.gold = 30;
+			deck.copper = 60;
+			deck.silver = 40;
+			deck.gold = 30;
 
-			$scope.deck.estate = 20;
-			$scope.deck.duchy = 12;
-			$scope.deck.province = 12;
+			deck.estate = 20;
+			deck.duchy = 12;
+			deck.province = 12;
 
-			$scope.deck.smithy = 10;
+			deck.smithy = 10;
+			return deck;
 		};
 
+		/**
+		 * 1. Set numPlayers
+		 * 2. Initialize player array with AI and strategies
+		 * 3. Give players their initial cards (3 estates and 7 coppers) - shuffled
+		 */
 		$scope.initPlayers = function () {
 			$scope.numPlayers = 5;
 
@@ -326,25 +158,24 @@ angular.module("dominionApp", [])
 				new BigMoneyStrategy()
 			);
 
-
 			$scope.players[1] = new Player(
 				"Smart Big Money",
-				new $scope.smartBigMoney()
+				new SmartBigMoneyStrategy()
 			);
 
 			$scope.players[2] = new Player(
 				"Big Money with Smithy",
-				new $scope.bigMoneySmithy()
+				new BigMoneySmithyStrategy()
 			);
 
 			$scope.players[3] = new Player(
 				"Smart Smithy",
-				new $scope.smartSmithy()
+				new SmartSmithyStrategy()
 			);
 
 			$scope.players[4] = new Player(
 				"Smart Duchy",
-				new $scope.smartDuchy()
+				new SmartDuchyStrategy()
 			);
 
 			console.log($scope.players);
@@ -368,38 +199,49 @@ angular.module("dominionApp", [])
 
 		/**
 		 * Remove card from deck.
-		 * Return null on failure, card on success
+		 * @param {string} cardName
+		 * @param {number} playerIndex
+		 * @returns {string | null} Return null on failure, card on success
 		 */
-		$scope.takeCard = function (cardName, player) {
-			// console.log("Taking card %s", cardName);
-			if ($scope.deck[cardName] === 0) {return null;}
+		$scope.takeCard = function (cardName, playerIndex) {
+			if ($scope.deck[cardName] === 0) {
+				return null;
+			}
+			const player = $scope.players[playerIndex];
 
 			$scope.deck[cardName]--;
 			const card = $scope.cards[cardName];
 
 			// points are added on here
 			if (card.type === "point") {
-				$scope.players[player].points += card.points;
+				player.points += card.points;
 			}
 
 			return card;
 		};
 
 		/**
-		 * Draw a card from the deck.
+		 * Draw a card from the player's deck deck.
 		 * If the deck is empty, shuffle in cards from discard pile
-		 * Return false iff discard and deck are both empty
+		 * @param {number} playerIndex
+		 * @returns {boolean} Return false iff discard and deck are both empty
 		 */
-		$scope.drawCard = function (player) {
-			if ($scope.players[player].cards.length === 0) {
-				$scope.players[player].cards = _.shuffle($scope.players[player].discard);
-				$scope.players[player].discard = [];
+		$scope.drawCard = function (playerIndex) {
+			const player = $scope.players[playerIndex];
+			if (player.cards.length === 0) {
+				// the player has run out of cards
+				// set the player's cards as a shuffled version of their discard pile
+				player.cards = _.shuffle(player.discard);
+				player.discard = [];
 			}
 
-			if ($scope.players[player].cards.length === 0) {return false;}
+			if (player.cards.length === 0) {
+				return false;
+			}
 
-			const card = $scope.players[player].cards.pop();
-			$scope.players[player].hand.push(card);
+			const card = player.cards.pop();
+			player.hand.push(card);
+
 			return true;
 		};
 
@@ -414,8 +256,8 @@ angular.module("dominionApp", [])
 		$scope.resetSim = function () {
 			console.log("reset");
 
-			$scope.initCards();
-			$scope.initDeck();
+			$scope.cards = $scope.initCards();
+			$scope.deck = $scope.initDeck();
 
 			$scope.initPlayers();
 			$scope.dealHands();
@@ -427,21 +269,10 @@ angular.module("dominionApp", [])
 			$scope.winArr = [];
 		};
 
-		$scope.moneyInHand = function (player) {
-			const { hand } = $scope.players[player];
-			let money = 0;
-			for (let i = 0; i < hand.length; i++) {
-				if (hand[i].type === "treasure") {
-					money += hand[i].value;
-				}
-			}
-			return money;
-		};
-
 		/**
-     * Return true iff successful (enough cards remaining)
-     * No honesty check
-     */
+		 * Return true iff successful (enough cards remaining)
+		 * No honesty check
+		 */
 		$scope.buyCard = function (cardName, player) {
 			// console.log("Player %d trying to buy card %s", player, cardName);
 
@@ -501,15 +332,15 @@ angular.module("dominionApp", [])
 
 			// action phase
 			const player = $scope.players[p];
-			const action = player.strategy.actionTurn(p);
+			const action = player.strategy.actionTurn(player);
 			if (action != null) {
 				console.log(`Player ${p} played action card ${action.name} on round ${$scope.round}`);
 				action.effect(p);
 			}
 
 			// buy phase
-			const cardName = player.strategy.buyTurn(p, player);
-			if (cardName != null) {
+			const cardName = player.strategy.buyTurn(player, $scope.deck);
+			if (cardName) {
 				// const money = $scope.moneyInHand(p);
 				// console.log("Player %d bought card %s on round %d (money %d)", p, cardName, $scope.round, money);
 				$scope.buyCard(cardName, p);
