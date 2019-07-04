@@ -1,37 +1,49 @@
-/* global angular, Game */
+/* global Vue, Game */
 
-angular.module("dominionApp", [])
-	.controller("dominionCtrl", ($scope) => {
-		$scope.game = null;
-
-		$scope.simMode = false;
-
-		$scope.doTurn = function() {
-			$scope.game.doTurn();
-		};
-
-		/**
-		 * Run until the end of this round
-		 */
-		$scope.doRound = function () {
-			const round = $scope.game.round;
-			while(($scope.game.round === round) && !$scope.game.gameOver) {
-				$scope.game.doTurn();
+new Vue({
+	el: "#app-container",
+	data: {
+		game: null,
+		simMode: false,
+	},
+	methods: {
+		doTurn: function() {
+			this.game.doTurn();
+		},
+		doRound: function() {
+			const round = this.game.round;
+			while((this.game.round === round) && !this.game.gameOver) {
+				this.game.doTurn();
 			}
-		};
-
-		$scope.doSim = function () {
-			$scope.simMode = true;
-			while (!$scope.game.gameOver) {
-				$scope.game.doTurn();
+		},
+		doSim: function() {
+			this.simMode = true;
+			while (!this.game.gameOver) {
+				this.game.doTurn();
 			}
-			$scope.simMode = false;
-		};
-
-		$scope.resetSim = function () {
-			$scope.simMode = false;
-			$scope.game = new Game();
-		};
-
-		$scope.resetSim();
-	});
+			this.simMode = false;
+		},
+		resetSim: function () {
+			this.simMode = false;
+			this.game = new Game();
+		},
+	},
+	beforeMount: function () {
+		this.resetSim();
+	},
+	computed: {
+		cardClasses: function() {
+			return card => {
+				const classes = {
+					"card": true
+				};
+				classes[card.type] = true;
+				classes[card.name] = true;
+				return classes;
+			};
+		},
+		buttonDisabled: function() {
+			return this.game.gameOver || this.simMode;
+		}
+	}
+});

@@ -10,13 +10,13 @@
         <link rel="stylesheet" href="style.css" />
     </head>
 
-    <body ng-app="dominionApp">
-        <div class="container container-fluid" ng-controller="dominionCtrl">
+    <body>
+        <div class="container container-fluid" id="app-container">
             <h1 class="title">Dominion Simulation</h1>
             <h4>Round {{ game.round }}</h4>
-            <div ng-show="game.gameOver">
+            <div v-show="game.gameOver">
                 <h4>Winners ({{ game.winArr.length}})</h4>
-                <ul ng-repeat="player in game.winArr">
+                <ul v-for="player in game.winArr">
                     <li>{{ player.name }}</li>
                 </ul>
             </div>
@@ -24,19 +24,20 @@
             <div class="sim-container">
                 <h3>Common Piles</h3>
                 <div class="deck-container">
-                    <div ng-repeat="(cardName, numLeft) in game.deck">
+                    <div v-for="(cardName, numLeft) in game.deck">
                         <div class="deck-card">{{cardName}} ({{numLeft}})</div>
                     </div>
                 </div>
 
                 <div class="player-container">
-                    <div class="player" ng-repeat="player in game.players">
+                    <div class="player" v-for="player in game.players">
                         <div class="player-name">{{ player.name }}</div>
                         <div>Deck size: <span>{{ player.cards.length }}</span></div>
                         <div>Discard size: <span>{{ player.discard.length }}</span></div>
                         <div>Points: <span>{{ player.points }}</span></div>
 
-                        <div ng-repeat="card in player.hand track by $index" class="card {{ card.type }} {{ card.name }}">
+                        <div v-for="card in player.hand"
+                             v-bind:class="cardClasses(card)">
                             <div class="card-name">{{ card.name }}</div>
                         </div>
                     </div>
@@ -44,17 +45,16 @@
             </div>
 
             <div id="btn-container">
-                <button class="btn btn-primary" type="button" ng-click="doTurn()" ng-disabled="game.gameOver || simMode">Start Game / First Turn</button>
-                <button class="btn btn-primary" type="button" ng-click="doRound()" ng-disabled="game.gameOver || simMode">Run Simulation (1 Round)</button>
-                <button class="btn btn-primary" type="button" ng-click="doSim()" ng-disabled="game.gameOver || simMode">Run Simulation (Full Game)</button>
-                <button class="btn btn-danger" type="button" ng-click="resetSim()" ng-disabled="simMode">Reset</button>
+                <button class="btn btn-primary" type="button" v-on:click="doTurn()" :disabled="buttonDisabled">Start Game / First Turn</button>
+                <button class="btn btn-primary" type="button" v-on:click="doRound()" :disabled="buttonDisabled">Run Simulation (1 Round)</button>
+                <button class="btn btn-primary" type="button" v-on:click="doSim()" :disabled="buttonDisabled">Run Simulation (Full Game)</button>
+                <button class="btn btn-danger" type="button" v-on:click="resetSim()" :disabled="simMode">Reset</button>
             </div>
         </div>
 
         <!-- Javascript at bottom for faster loading -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js" integrity="sha256-7/yoZS3548fXSRXqc/xYzjsmuW3sFKzuvOCHd06Pmps=" crossorigin="anonymous"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.8/angular.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js" integrity="sha256-ufGElb3TnOtzl5E4c/qQnZFGP+FYEZj5kbSEdJNrw0A=" crossorigin="anonymous"></script>
 
         <script src="player-strategies.js"></script>
         <script src="game.js"></script>
