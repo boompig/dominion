@@ -287,30 +287,20 @@ angular.module("dominionApp", [])
 		};
 
 		/**
-     * For now, this only checks the province pile
-     */
+		 * For now, this only checks the province pile
+		 */
 		$scope.checkGameEnd = function () {
 			return $scope.deck.province === 0;
 		};
 
-		$scope.runRounds = function () {
-			const numRounds = 200;
-
-			const winners = {};
-			for (let p = 0; p < $scope.numPlayers; p++) {
-				winners[$scope.players[p].name] = 0;
+		/**
+		 * Run until the end of this round
+		 */
+		$scope.doRound = function () {
+			const round = $scope.round;
+			while(($scope.round === round) && !$scope.gameOver) {
+				$scope.doTurn();
 			}
-
-			for (let r = 0; r < numRounds; r++) {
-				$scope.resetSim();
-				$scope.doSim();
-
-				for (let i = 0; i < $scope.winArr.length; i++) {
-					winners[$scope.winArr[i].name] += 1;
-				}
-			}
-
-			console.log(winners);
 		};
 
 		$scope.doSim = function () {

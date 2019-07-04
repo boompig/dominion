@@ -2,11 +2,11 @@
 
 This is still very much a work-in-progress.
 
-A bare-bones simulator and visualizer for the card game 'Dominion' in JavaScript.
+A bare-bones simulator and visualizer for the card game 'Dominion' in JavaScript. Simulator can be run headless from command-line with node.js or in the browser. Visualizaton powered by Angular (1).
 
 ## Strategies
 
-I hand-coded a few AI strategies to test against the human opponent. Descriptions below.
+I hand-coded a few AI strategies to test against the human opponent. Descriptions below. You can find the code in `player-strategies.js`.
 
 ### Big Money
 
@@ -41,7 +41,15 @@ yarn lint
 
 ## Run
 
-Start up a web server from this directory, for example run `http-server`
+The simulation can be run headless from the command line. Run
+
+```
+node index.js
+```
+
+The `--help` flag will give you available options.
+
+To run the visualization, start up a web server from this directory, for example run `http-server`.
 
 ## Uses
 

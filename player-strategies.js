@@ -31,7 +31,6 @@ class BigMoneyStrategy extends PlayerStrategy {
 	 * @returns {String}
 	 */
 	buyTurn(player) {
-		console.log(player);
 		const money = player.getMoneyInHand();
 
 		if (money >= 8) {
@@ -164,10 +163,6 @@ class SmartSmithyStrategy extends PlayerStrategy {
 	buyTurn(player, deck) {
 		const money = player.getMoneyInHand();
 		const card = this.buyTurnWrapper(money, player, deck);
-		if (card !== null) {
-			// console.log("avgValue = %f", this.avgValue);
-			// console.log("Player 'smart smithy' buys %s with %d", card, money);
-		}
 		return card;
 	}
 
@@ -273,4 +268,16 @@ class PointsOnlyStrategy extends PlayerStrategy {
 		}
 		return null;
 	}
+}
+
+if(typeof(module) !== "undefined") {
+	// eslint-disable-next-line
+	module.exports = {
+		BigMoneyStrategy,
+		SmartBigMoneyStrategy,
+		SmartDuchyStrategy,
+		SmartSmithyStrategy,
+		BigMoneySmithyStrategy,
+		PointsOnlyStrategy
+	};
 }
