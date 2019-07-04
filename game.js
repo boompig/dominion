@@ -1,7 +1,11 @@
-/* eslint-env node */
+/* global BigMoneyStrategy, SmartBigMoneyStrategy, BigMoneySmithyStrategy, SmartSmithyStrategy, SmartDuchyStrategy, _ */
 
-const _ = require("lodash");
-const { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy } = require("./player-strategies");
+if(typeof(module) !== "undefined" && typeof(require) !== "undefined") {
+	// eslint-disable-next-line
+	const _ = require("lodash");
+	// eslint-disable-next-line
+	const { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy } = require("./player-strategies");
+}
 
 console.debug = function() {};
 
@@ -378,4 +382,7 @@ class Game {
 	}
 }
 
-module.exports = Game;
+if(typeof(module) !== "undefined") {
+	// eslint-disable-next-line
+	module.exports = Game;
+}
