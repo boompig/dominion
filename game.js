@@ -192,6 +192,12 @@ export class Game {
 			type: "point",
 			points: 6,
 		};
+		cards.curse = {
+			name: "curse",
+			cost: 0,
+			type: "point",
+			points: -1,
+		};
 
 		// action cards
 		const smithy = this.smithyCardEffect.bind(this);
@@ -277,6 +283,13 @@ export class Game {
 			cost: 4,
 			type: "action",
 			attack: true,
+			effect: () => {}
+		};
+
+		cards.mine = {
+			name: "mine",
+			cost: 5,
+			type: "action",
 			effect: () => {}
 		};
 

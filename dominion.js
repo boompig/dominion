@@ -49,6 +49,18 @@ new Vue({
 		},
 		buttonDisabled: function() {
 			return this.game.gameOver || this.simMode;
+		},
+		standardDeckCards: function() {
+			return Object.keys(this.game.deck).filter((cardName) => {
+				console.log(cardName);
+				return this.game.cards[cardName].type !== "action";
+			});
+		},
+		kingdomDeckCards: function() {
+			return Object.keys(this.game.deck).filter((cardName) => {
+				console.log(cardName);
+				return this.game.cards[cardName].type === "action";
+			});
 		}
 	}
 });

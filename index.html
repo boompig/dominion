@@ -12,8 +12,7 @@
 
     <body>
         <div class="container container-fluid" id="app-container">
-            <h1 class="title">Dominion Simulation</h1>
-            <h4>Round {{ game.round }}</h4>
+            <h1 class="title">Dominion Simulation - Round {{ game.round }}</h1>
             <div v-show="game.gameOver">
                 <h4>Winners ({{ game.winArr.length}})</h4>
                 <ul v-for="player in game.winArr">
@@ -24,8 +23,15 @@
             <div class="sim-container">
                 <h3>Common Piles</h3>
                 <div class="deck-container">
-                    <div v-for="(cardName, numLeft) in game.deck">
-                        <div class="deck-card">{{cardName}} ({{numLeft}})</div>
+                    <div class="deck-inner-container">
+                        <div v-for="cardName in standardDeckCards">
+                            <div class="deck-card">{{cardName}} ({{ game.deck[cardName] }})</div>
+                        </div>
+                    </div>
+                    <div class="deck-inner-container">
+                        <div v-for="cardName in kingdomDeckCards">
+                            <div class="deck-card">{{cardName}} ({{ game.deck[cardName] }})</div>
+                        </div>
                     </div>
                 </div>
 
