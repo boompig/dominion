@@ -13,7 +13,9 @@
     "lint": "yarn eslint *.js"
   },
   "dependencies": {
+    "esm": "^3.2.25",
     "flags": "^0.1.3",
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "lodash-es": "^4.17.11"
   }
 }

@@ -38,7 +38,7 @@
 
                         <div v-for="card in player.hand"
                              v-bind:class="cardClasses(card)">
-                            <div class="card-name">{{ card.name }}</div>
+                            <div class="card-name">{{ card ? card.name : "null" }}</div>
                         </div>
                     </div>
                 </div>
@@ -53,11 +53,7 @@
         </div>
 
         <!-- Javascript at bottom for faster loading -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js" integrity="sha256-7/yoZS3548fXSRXqc/xYzjsmuW3sFKzuvOCHd06Pmps=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js" integrity="sha256-ufGElb3TnOtzl5E4c/qQnZFGP+FYEZj5kbSEdJNrw0A=" crossorigin="anonymous"></script>
-
-        <script src="player-strategies.js"></script>
-        <script src="game.js"></script>
-        <script src="dominion.js"></script>
+        <script src="dominion.js" type="module" async defer></script>
     </body>
 </html>

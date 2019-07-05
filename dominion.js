@@ -1,4 +1,6 @@
-/* global Vue, Game */
+/* global Vue */
+
+import { Game } from "./game.js";
 
 new Vue({
 	el: "#app-container",
@@ -38,8 +40,10 @@ new Vue({
 				const classes = {
 					"card": true
 				};
-				classes[card.type] = true;
-				classes[card.name] = true;
+				if(card) {
+					classes[card.type] = true;
+					classes[card.name] = true;
+				}
 				return classes;
 			};
 		},

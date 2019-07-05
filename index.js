@@ -1,6 +1,6 @@
 /* eslint-env node */
 
-const Game = require("./game");
+const { Game } = require("./game");
 const flags = require("flags");
 const utils = require("./utils");
 

@@ -1,18 +1,10 @@
-/* global BigMoneyStrategy, SmartBigMoneyStrategy, BigMoneySmithyStrategy, SmartSmithyStrategy, SmartDuchyStrategy, _ */
-
-if(typeof(module) !== "undefined" && typeof(require) !== "undefined") {
-	// using var here because we want this to work both in browser and in command-line mode
-	// var allows these variables to move out of the scope of this if-statement
-
-	// eslint-disable-next-line
-	var _ = require("lodash");
-	// eslint-disable-next-line
-	var { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy } = require("./player-strategies");
-}
+// import _ from "https://cdn.jsdelivr.net/npm/lodash-es@4.17.11/lodash.min.js";
+import shuffle from "./node_modules/lodash-es/shuffle.js";
+import { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy } from "./player-strategies.js";
 
 console.debug = function() {};
 
-class Player {
+export class Player {
 	/**
 	 * @param {String} name
 	 * @param {PlayerStrategy} strategy
@@ -40,7 +32,7 @@ class Player {
 	}
 }
 
-class Game {
+export class Game {
 	constructor() {
 		// array of player objects
 		this.players = [];
@@ -51,7 +43,7 @@ class Game {
 		// map from card names to their properties
 		this.cards = {};
 
-		this.numPlayers = 0;
+		this.numPlayers = 5;
 
 		// index into this.players
 		this.turn = 0;
@@ -61,7 +53,7 @@ class Game {
 
 		this.winArr = [];
 
-		this.setup();
+		this.setup(this.numPlayers);
 	}
 
 	/** *************** CARD EFFECTS **************** */
@@ -250,26 +242,107 @@ class Game {
 			effect: market
 		};
 
+		// TODO unfinished cards
+		cards.cellar = {
+			name: "cellar",
+			cost: 2,
+			type: "action",
+			effect: () => {}
+		};
+
+		cards.chapel = {
+			name: "chapel",
+			cost: 2,
+			type: "action",
+			effect: () => {}
+		};
+
+		cards.moat = {
+			name: "moat",
+			cost: 2,
+			type: "action",
+			reaction: true,
+			effect: () => {}
+		};
+
+		cards.merchant = {
+			name: "merchant",
+			cost: 3,
+			type: "action",
+			effect: () => {}
+		};
+
+		cards.militia = {
+			name: "militia",
+			cost: 4,
+			type: "action",
+			attack: true,
+			effect: () => {}
+		};
+
+		cards.remodel = {
+			name: "remodel",
+			cost: 4,
+			type: "action",
+			effect: () => {}
+		};
+
+		cards.workshop = {
+			name: "workshop",
+			cost: 3,
+			type: "action",
+			effect: () => {}
+		};
+
 		return cards;
 	}
 
 	/**
 	 * Initialize mapping of card names to their quantity
+	 * @param {number} numPlayers
 	 * @returns {object}
 	 */
-	initDeck() {
+	initDeck(numPlayers) {
 		const deck = {};
 
-		deck.copper = 60;
+		// treasure cards
+		deck.copper = 60 + numPlayers * 7;
 		deck.silver = 40;
 		deck.gold = 30;
 
-		deck.estate = 20;
-		deck.duchy = 12;
-		deck.province = 12;
+		// victory cards
+		// they have different numbers depending on # of players
+		let numVictoryCards;
+		if (numPlayers === 2) {
+			numVictoryCards = 8;
+		} else {
+			numVictoryCards = 12;
+		}
+		let numProvinces = numVictoryCards;
+		if (numPlayers === 5) {
+			numProvinces = 15;
+		} else if (numPlayers === 6) {
+			numProvinces = 18;
+		}
 
+		deck.estate = numVictoryCards + numPlayers * 3;
+		deck.duchy = numVictoryCards;
+		deck.province = numProvinces;
+		deck.curse = (numPlayers - 1) * 10;
+
+		// kingdom cards - use the Dominion Only initial set
+		deck.cellar = 10;
+		deck.market = 10;
+		deck.merchant = 10;
+		deck.militia = 10;
+		deck.mine = 10;
+		deck.moat = 10;
+		deck.remodel = 10;
 		deck.smithy = 10;
-		deck.laboratory = 10;
+		// deck.festival = 10;
+		// deck.laboratory = 10;
+		deck.village = 10;
+		deck.woodcutter = 10;
 
 		return deck;
 	}
@@ -280,8 +353,6 @@ class Game {
 	 * 3. Give players their initial cards (3 estates and 7 coppers) - shuffled
 	 */
 	initPlayers() {
-		this.numPlayers = 5;
-
 		// create generic player objects
 		for (let i = 0; i < this.numPlayers; i++) {
 			this.players[i] = {
@@ -323,15 +394,21 @@ class Game {
 			// 3 estates and 7 coppers
 			for (let i = 0; i < 3; i++) {
 				let card = this.takeCard("estate", p);
+				if(!card) {
+					throw new Error("took null estate card");
+				}
 				this.players[p].cards.push(card);
 			}
 			for (let j = 0; j < 7; j++) {
 				let card = this.takeCard("copper", p);
+				if(!card) {
+					throw new Error("took null copper card");
+				}
 				this.players[p].cards.push(card);
 			}
 
 			// and shuffle
-			this.players[p].cards = _.shuffle(this.players[p].cards);
+			this.players[p].cards = shuffle(this.players[p].cards);
 		}
 	}
 
@@ -369,7 +446,7 @@ class Game {
 		if (player.cards.length === 0) {
 			// the player has run out of cards
 			// set the player's cards as a shuffled version of their discard pile
-			player.cards = _.shuffle(player.discard);
+			player.cards = shuffle(player.discard);
 			player.discard = [];
 		}
 
@@ -378,6 +455,9 @@ class Game {
 		}
 
 		const card = player.cards.pop();
+		if(!card) {
+			throw new Error("Drew null card from the deck");
+		}
 		player.hand.push(card);
 
 		return true;
@@ -391,9 +471,12 @@ class Game {
 		}
 	}
 
-	setup() {
+	/**
+	 * @param {number} numPlayers
+	 */
+	setup(numPlayers) {
 		this.cards = this.initCards();
-		this.deck = this.initDeck();
+		this.deck = this.initDeck(numPlayers);
 		this.initPlayers();
 		this.dealHands();
 	}
@@ -516,9 +599,4 @@ class Game {
 			this.turn = (this.turn + 1) % this.numPlayers;
 		}
 	}
-}
-
-if(typeof(module) !== "undefined") {
-	// eslint-disable-next-line
-	module.exports = Game;
 }

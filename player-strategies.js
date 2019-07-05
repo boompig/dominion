@@ -1,6 +1,4 @@
-/* exported BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy, PointsOnlyStrategy */
-
-class PlayerStrategy {
+export class PlayerStrategy {
 	/**
 	 * @param {String} name
 	 */
@@ -20,7 +18,7 @@ class PlayerStrategy {
 	}
 }
 
-class BigMoneyStrategy extends PlayerStrategy {
+export class BigMoneyStrategy extends PlayerStrategy {
 
 	actionTurn() {
 		return null;
@@ -47,7 +45,7 @@ class BigMoneyStrategy extends PlayerStrategy {
 /**
  * Same as big money, but buy duchies near the end
  */
-class SmartBigMoneyStrategy extends PlayerStrategy {
+export class SmartBigMoneyStrategy extends PlayerStrategy {
 
 	actionTurn() {
 		return null;
@@ -83,7 +81,7 @@ class SmartBigMoneyStrategy extends PlayerStrategy {
  * Always go for silver when you have 3
  * Go for gold when you have 6, if there are 4 or more provinces left, otherwise buy a duchy
  */
-class SmartDuchyStrategy extends PlayerStrategy {
+export class SmartDuchyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
@@ -126,7 +124,7 @@ class SmartDuchyStrategy extends PlayerStrategy {
 	}
 }
 
-class SmartSmithyStrategy extends PlayerStrategy {
+export class SmartSmithyStrategy extends PlayerStrategy {
 	constructor() {
 		super();
 
@@ -203,7 +201,7 @@ class SmartSmithyStrategy extends PlayerStrategy {
 	}
 }
 
-class BigMoneySmithyStrategy extends PlayerStrategy {
+export class BigMoneySmithyStrategy extends PlayerStrategy {
 	constructor() {
 		super();
 
@@ -247,7 +245,7 @@ class BigMoneySmithyStrategy extends PlayerStrategy {
 	}
 }
 
-class PointsOnlyStrategy extends PlayerStrategy {
+export class PointsOnlyStrategy extends PlayerStrategy {
 	actionTurn() {
 		return null;
 	}
@@ -268,16 +266,4 @@ class PointsOnlyStrategy extends PlayerStrategy {
 		}
 		return null;
 	}
-}
-
-if(typeof(module) !== "undefined") {
-	// eslint-disable-next-line
-	module.exports = {
-		BigMoneyStrategy,
-		SmartBigMoneyStrategy,
-		SmartDuchyStrategy,
-		SmartSmithyStrategy,
-		BigMoneySmithyStrategy,
-		PointsOnlyStrategy
-	};
 }
