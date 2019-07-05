@@ -42,10 +42,10 @@ yarn lint
 The simulation can be run headless from the command line. Run
 
 ```
-node index.js
+node -r esm index.js
 ```
 
-The `--help` flag will give you available options.
+The `--help` flag will give you available options. We use `-r esm` due to the use of ES6 imports.
 
 To run the visualization, start up a web server from this directory, for example run `http-server`.
 
