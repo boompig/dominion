@@ -111,6 +111,48 @@ class Game {
 			gold: 2
 		};
 	}
+
+	/**
+	 * +2 actions
+	 * +1 card
+	 */
+	villageCardEffect(playerIndex) {
+		for (let i = 0; i < 1; i++) {
+			this.drawCard(playerIndex);
+		}
+		return {
+			actions: 2,
+			buys: 0,
+			gold: 0
+		};
+	}
+
+	/**
+	 * +1 buy, +2 gold
+	 * @param {number} playerIndex
+	 */
+	woodcutterCardEffect() {
+		return {
+			actions: 0,
+			buys: 0,
+			gold: 2
+		};
+	}
+
+	/**
+	 * +1 card, +1 action, +1 buy, +1 gold
+	 * @param {number} playerIndex
+	 */
+	marketCardEffect(playerIndex) {
+		for (let i = 0; i < 1; i++) {
+			this.drawCard(playerIndex);
+		}
+		return {
+			actions: 1,
+			buys: 1,
+			gold: 1
+		};
+	}
 	/** ********************************************* */
 
 	/**
@@ -159,29 +201,53 @@ class Game {
 			points: 6,
 		};
 
-		let f = this.smithyCardEffect.bind(this);
-
+		// action cards
+		const smithy = this.smithyCardEffect.bind(this);
 		cards.smithy = {
 			name: "smithy",
 			cost: 4,
 			type: "action",
-			effect: f,
+			effect: smithy,
 		};
 
-		let g = this.laboratoryCardEffect.bind(this);
+		const laboratory = this.laboratoryCardEffect.bind(this);
 		cards.laboratory = {
 			name: "laboratory",
 			cost: 5,
 			type: "action",
-			effect: g
+			effect: laboratory
 		};
 
-		let festival = this.festivalCardEffect.bind(this);
+		const festival = this.festivalCardEffect.bind(this);
 		cards.festival = {
 			name: "festival",
 			cost: 5,
 			type: "action",
 			effect: festival,
+		};
+
+		const village = this.villageCardEffect.bind(this);
+		cards.village = {
+			name: "village",
+			cost: 3,
+			type: "action",
+			effect: village,
+		};
+
+		const woodcutter = this.woodcutterCardEffect.bind(this);
+		cards.woodcutter = {
+			name: "woodcutter",
+			cost: 3,
+			type: "action",
+			effect: woodcutter
+		};
+
+		const market = this.marketCardEffect.bind(this);
+		cards.market = {
+			name: "market",
+			cost: 5,
+			type: "action",
+			effect: market
 		};
 
 		return cards;
@@ -397,7 +463,7 @@ class Game {
 				let cardEffect = action.effect(p);
 				numActions += cardEffect.actions;
 				numBuys += cardEffect.buys;
-				bonusMoney += cardEffect.money;
+				bonusMoney += cardEffect.gold;
 			}
 			numActions--;
 		}
