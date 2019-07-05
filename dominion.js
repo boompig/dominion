@@ -29,6 +29,7 @@ new Vue({
 		},
 	},
 	beforeMount: function () {
+		console.log("beforeMount");
 		this.resetSim();
 	},
 	computed: {

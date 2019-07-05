@@ -1,10 +1,13 @@
 /* global BigMoneyStrategy, SmartBigMoneyStrategy, BigMoneySmithyStrategy, SmartSmithyStrategy, SmartDuchyStrategy, _ */
 
 if(typeof(module) !== "undefined" && typeof(require) !== "undefined") {
+	// using var here because we want this to work both in browser and in command-line mode
+	// var allows these variables to move out of the scope of this if-statement
+
 	// eslint-disable-next-line
-	const _ = require("lodash");
+	var _ = require("lodash");
 	// eslint-disable-next-line
-	const { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy } = require("./player-strategies");
+	var { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy } = require("./player-strategies");
 }
 
 console.debug = function() {};
