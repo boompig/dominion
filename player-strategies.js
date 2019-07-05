@@ -30,8 +30,8 @@ class BigMoneyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {String}
 	 */
-	buyTurn(player) {
-		const money = player.getMoneyInHand();
+	buyTurn(player, deck, bonusMoney) {
+		const money = player.getMoneyInHand() + bonusMoney;
 
 		if (money >= 8) {
 			return "province";
@@ -58,8 +58,8 @@ class SmartBigMoneyStrategy extends PlayerStrategy {
 	 * @param {object} deck Map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
-	buyTurn(player, deck) {
-		const money = player.getMoneyInHand();
+	buyTurn(player, deck, bonusMoney) {
+		const money = player.getMoneyInHand() + bonusMoney;
 
 		// should make sure that these piles exist first, but whatevs...
 		if (money >= 8) {
@@ -105,8 +105,8 @@ class SmartDuchyStrategy extends PlayerStrategy {
 	 * @param {object} deck Map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
-	buyTurn(player, deck) {
-		const money = player.getMoneyInHand();
+	buyTurn(player, deck, bonusMoney) {
+		const money = player.getMoneyInHand() + bonusMoney;
 
 		if (money >= 8) {
 			return "province";
@@ -160,8 +160,8 @@ class SmartSmithyStrategy extends PlayerStrategy {
 	 * @param {object} deck Map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
-	buyTurn(player, deck) {
-		const money = player.getMoneyInHand();
+	buyTurn(player, deck, bonusMoney) {
+		const money = player.getMoneyInHand() + bonusMoney;
 		const card = this.buyTurnWrapper(money, player, deck);
 		return card;
 	}
@@ -229,8 +229,8 @@ class BigMoneySmithyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {string | null}
 	 */
-	buyTurn(player) {
-		const money = player.getMoneyInHand();
+	buyTurn(player, deck, bonusMoney) {
+		const money = player.getMoneyInHand() + bonusMoney;
 		// should make sure that these piles exist first, but whatevs...
 		if (money >= 8) {
 			return "province";
@@ -256,8 +256,8 @@ class PointsOnlyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {string | null}
 	 */
-	buyTurn(player) {
-		const money = player.getMoneyInHand();
+	buyTurn(player, deck, bonusMoney) {
+		const money = player.getMoneyInHand() + bonusMoney;
 
 		if (money >= 8) {
 			return "province";

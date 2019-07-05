@@ -69,26 +69,47 @@ class Game {
 	/**
 	 * Draw 3 cards
 	 * @param {number} playerIndex
-	 * @returns {number} number of actions to add
+	 * [+number of actions to add, +number of buys to add, +money]
 	 */
 	smithyCardEffect(playerIndex) {
 		for (let i = 0; i < 3; i++) {
 			this.drawCard(playerIndex);
 		}
-		return 0;
+		return {
+			actions: 0,
+			buys: 0,
+			money: 0
+		};
 	}
 
 	/**
 	 * +2 cards
 	 * +1 action
 	 * @param {number} playerIndex
-	 * @returns {number} number of actions to add
+	 * [+number of actions to add, +number of buys to add, +money]
 	 */
 	laboratoryCardEffect(playerIndex) {
 		for (let i = 0; i < 2; i++) {
 			this.drawCard(playerIndex);
 		}
-		return 1;
+		return {
+			actions: 1,
+			buys: 0,
+			money: 0
+		};
+	}
+
+	/**
+	 * +2 actions
+	 * +1 buy
+	 * +2 gold
+	 */
+	festivalCardEffect() {
+		return {
+			actions: 2,
+			buys: 1,
+			gold: 2
+		};
 	}
 	/** ********************************************* */
 
@@ -153,6 +174,14 @@ class Game {
 			cost: 5,
 			type: "action",
 			effect: g
+		};
+
+		let festival = this.festivalCardEffect.bind(this);
+		cards.festival = {
+			name: "festival",
+			cost: 5,
+			type: "action",
+			effect: festival,
 		};
 
 		return cards;
@@ -358,25 +387,33 @@ class Game {
 
 		// action phase
 		let numActions = 1;
+		let bonusMoney = 0;
+		let numBuys = 1;
 
 		while (numActions > 0) {
 			const action = player.strategy.actionTurn(player);
 			if (action != null) {
 				console.debug(`Player ${player.name} played action card ${action.name} on round ${this.round}`);
-				numActions += action.effect(p);
+				let cardEffect = action.effect(p);
+				numActions += cardEffect.actions;
+				numBuys += cardEffect.buys;
+				bonusMoney += cardEffect.money;
 			}
 			numActions--;
 		}
 
-
+		// TODO: pass numBuys as paramter to strategy?
 		// buy phase
-		const cardName = player.strategy.buyTurn(player, this.deck);
-		if (cardName) {
-			const money = player.getMoneyInHand();
-			console.debug(`Player ${player.name} bought card ${cardName} on round ${this.round} (money ${money})`);
-			this.buyCard(cardName, p);
-		} else {
-			console.debug(`Player ${player.name} does not buy anything this turn`);
+		while (numBuys > 0) {
+			let cardName = player.strategy.buyTurn(player, this.deck, bonusMoney);
+			if (cardName) {
+				const money = player.getMoneyInHand();
+				console.debug(`Player ${player.name} bought card ${cardName} on round ${this.round} (money ${money})`);
+				this.buyCard(cardName, p);
+			} else {
+				console.debug(`Player ${player.name} does not buy anything this turn`);
+			}
+			numBuys--;
 		}
 
 		// cleanup phase: discard whole hand
