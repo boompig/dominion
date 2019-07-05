@@ -69,13 +69,26 @@ class Game {
 	/**
 	 * Draw 3 cards
 	 * @param {number} playerIndex
+	 * @returns {number} number of actions to add
 	 */
 	smithyCardEffect(playerIndex) {
-		// draw 3 cards
-
 		for (let i = 0; i < 3; i++) {
 			this.drawCard(playerIndex);
 		}
+		return 0;
+	}
+
+	/**
+	 * +2 cards
+	 * +1 action
+	 * @param {number} playerIndex
+	 * @returns {number} number of actions to add
+	 */
+	laboratoryCardEffect(playerIndex) {
+		for (let i = 0; i < 2; i++) {
+			this.drawCard(playerIndex);
+		}
+		return 1;
 	}
 	/** ********************************************* */
 
@@ -134,6 +147,14 @@ class Game {
 			effect: f,
 		};
 
+		let g = this.laboratoryCardEffect.bind(this);
+		cards.laboratory = {
+			name: "laboratory",
+			cost: 5,
+			type: "action",
+			effect: g
+		};
+
 		return cards;
 	}
 
@@ -143,7 +164,7 @@ class Game {
 	 */
 	initDeck() {
 		const deck = {};
-		// just some numbers...
+
 		deck.copper = 60;
 		deck.silver = 40;
 		deck.gold = 30;
@@ -153,6 +174,8 @@ class Game {
 		deck.province = 12;
 
 		deck.smithy = 10;
+		deck.laboratory = 10;
+
 		return deck;
 	}
 
@@ -331,13 +354,20 @@ class Game {
 		// draw a card
 		this.drawCard(p);
 
-		// action phase
 		const player = this.players[p];
-		const action = player.strategy.actionTurn(player);
-		if (action != null) {
-			console.debug(`Player ${player.name} played action card ${action.name} on round ${this.round}`);
-			action.effect(p);
+
+		// action phase
+		let numActions = 1;
+
+		while (numActions > 0) {
+			const action = player.strategy.actionTurn(player);
+			if (action != null) {
+				console.debug(`Player ${player.name} played action card ${action.name} on round ${this.round}`);
+				numActions += action.effect(p);
+			}
+			numActions--;
 		}
+
 
 		// buy phase
 		const cardName = player.strategy.buyTurn(player, this.deck);
