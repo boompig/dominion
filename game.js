@@ -1,6 +1,7 @@
 // import _ from "https://cdn.jsdelivr.net/npm/lodash-es@4.17.11/lodash.min.js";
 import shuffle from "./node_modules/lodash-es/shuffle.js";
-import { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy } from "./player-strategies.js";
+import random from "./node_modules/lodash-es/random.js";
+import { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy, PointsOnlyStrategy } from "./player-strategies.js";
 
 console.debug = function() {};
 
@@ -33,7 +34,15 @@ export class Player {
 }
 
 export class Game {
-	constructor() {
+	/**
+	 * @param {any} options Some options to initialize the game
+	 * 		- numPlayers: # of players
+	 * 		- humanPlayerIndex: index of human player
+	 * 		- humanPlayerName: name of human player
+	 */
+	constructor(options) {
+		options = options || {};
+
 		// array of player objects
 		this.players = [];
 
@@ -43,7 +52,17 @@ export class Game {
 		// map from card names to their properties
 		this.cards = {};
 
-		this.numPlayers = 5;
+		this.numPlayers = options.numPlayers || 5;
+		this.humanPlayerName = options.humanPlayerName || null;
+
+		// humanPlayerIndex may be 0
+		if ("humanPlayerIndex" in options) {
+			this.humanPlayerIndex = options.humanPlayerIndex;
+			this.hasHumanPlayer = true;
+		} else {
+			this.humanPlayerIndex = -1;
+			this.hasHumanPlayer = false;
+		}
 
 		// index into this.players
 		this.turn = 0;
@@ -53,7 +72,7 @@ export class Game {
 
 		this.winArr = [];
 
-		this.setup(this.numPlayers);
+		this.setup();
 	}
 
 	/** *************** CARD EFFECTS **************** */
@@ -361,46 +380,58 @@ export class Game {
 	}
 
 	/**
-	 * 1. Set numPlayers
-	 * 2. Initialize player array with AI and strategies
-	 * 3. Give players their initial cards (3 estates and 7 coppers) - shuffled
+	 * 1. Initialize player array with AI and strategies
+	 * 2. Give players their initial cards (3 estates and 7 coppers) - shuffled
 	 */
 	initPlayers() {
+		// not all of these will play
+		const aiPlayers = [
+			new Player(
+				"Big Money",
+				new BigMoneyStrategy()
+			),
+
+			new Player(
+				"Smart Big Money",
+				new SmartBigMoneyStrategy()
+			),
+
+			new Player(
+				"Big Money with Smithy",
+				new BigMoneySmithyStrategy()
+			),
+
+			new Player(
+				"Smart Smithy",
+				new SmartSmithyStrategy()
+			),
+
+			new Player(
+				"Smart Duchy",
+				new SmartDuchyStrategy()
+			),
+
+			new Player(
+				"Points Only",
+				new PointsOnlyStrategy()
+			)
+		];
+
 		// create generic player objects
 		for (let i = 0; i < this.numPlayers; i++) {
-			this.players[i] = {
-				cards: [],
-				hand: [],
-				discard: [],
-				points: 0,
-			};
+			let p;
+			if(this.hasHumanPlayer && this.humanPlayerIndex === i) {
+				p = new Player(
+					this.humanPlayerName,
+					null
+				);
+			} else {
+				// inclusive
+				let j = random(0, aiPlayers.length - 1);
+				p = aiPlayers.splice(j, 1)[0];
+			}
+			this.players[i] = p;
 		}
-
-		// specialize them with strategy
-		this.players[0] = new Player(
-			"Big Money",
-			new BigMoneyStrategy()
-		);
-
-		this.players[1] = new Player(
-			"Smart Big Money",
-			new SmartBigMoneyStrategy()
-		);
-
-		this.players[2] = new Player(
-			"Big Money with Smithy",
-			new BigMoneySmithyStrategy()
-		);
-
-		this.players[3] = new Player(
-			"Smart Smithy",
-			new SmartSmithyStrategy()
-		);
-
-		this.players[4] = new Player(
-			"Smart Duchy",
-			new SmartDuchyStrategy()
-		);
 
 		// give them their initial cards
 		for (let p = 0; p < this.numPlayers; p++) {
@@ -484,12 +515,9 @@ export class Game {
 		}
 	}
 
-	/**
-	 * @param {number} numPlayers
-	 */
-	setup(numPlayers) {
+	setup() {
 		this.cards = this.initCards();
-		this.deck = this.initDeck(numPlayers);
+		this.deck = this.initDeck(this.numPlayers);
 		this.initPlayers();
 		this.dealHands();
 	}
@@ -533,6 +561,10 @@ export class Game {
 	doTurn() {
 		if (this.gameOver) {
 			return;
+		}
+
+		if(this.turn === this.humanPlayerIndex) {
+			throw new Error("Cannot automate human player turn");
 		}
 
 		const p = this.turn;
