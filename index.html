@@ -36,8 +36,8 @@
                 </div>
 
                 <div class="player-container">
-                    <div class="player" v-for="player in game.players">
-                        <div class="player-name">{{ player.name }}</div>
+                    <div class="player" v-for="(player, index) in game.players" v-bind:class="{active: index === game.turn }">
+                        <div class="player-name">{{ player.name }} ({{ player.isHuman ? "Human" : "AI" }})</div>
                         <div>Deck size: <span>{{ player.cards.length }}</span></div>
                         <div>Discard size: <span>{{ player.discard.length }}</span></div>
                         <div>Points: <span>{{ player.points }}</span></div>
@@ -53,7 +53,7 @@
             <div id="btn-container">
                 <button class="btn btn-primary" type="button" v-on:click="doTurn()" :disabled="buttonDisabled">Start Game / First Turn</button>
                 <button class="btn btn-primary" type="button" v-on:click="doRound()" :disabled="buttonDisabled">Run Simulation (1 Round)</button>
-                <button class="btn btn-primary" type="button" v-on:click="doSim()" :disabled="buttonDisabled">Run Simulation (Full Game)</button>
+                <!-- <button class="btn btn-primary" type="button" v-on:click="doSim()" :disabled="buttonDisabled">Run Simulation (Full Game)</button> -->
                 <button class="btn btn-danger" type="button" v-on:click="resetSim()" :disabled="simMode">Reset</button>
             </div>
         </div>

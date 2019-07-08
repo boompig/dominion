@@ -9,14 +9,16 @@ export class Player {
 	/**
 	 * @param {String} name
 	 * @param {PlayerStrategy} strategy
+	 * @param {boolean} isHuman
 	 */
-	constructor(name, strategy) {
+	constructor(name, strategy, isHuman) {
 		this.name = name;
 		this.strategy = strategy;
 		this.cards = [];
 		this.hand = [];
 		this.discard = [];
 		this.points = 0;
+		this.isHuman = isHuman || false;
 	}
 
 	/**
@@ -423,7 +425,8 @@ export class Game {
 			if(this.hasHumanPlayer && this.humanPlayerIndex === i) {
 				p = new Player(
 					this.humanPlayerName,
-					null
+					null,
+					true
 				);
 			} else {
 				// inclusive

@@ -24,6 +24,10 @@ html, body {
     min-width: 200px;
 }
 
+.player.active .player-name {
+    color: red;
+}
+
 .player-name {
     font-weight: bold;
     font-size: 1.2em;

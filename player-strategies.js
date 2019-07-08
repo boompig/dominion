@@ -18,10 +18,41 @@ class PlayerStrategy {
 	}
 }
 
+/**
+ * Manual implementation
+ * @param {number} numCards
+ * @param {Player} player
+ * @returns {Card[]} which cards to trash
+ */
+const trashCardsFromHandHelper = function(numCards, player) {
+	const handCopy = player.hand.slice(0);
+	// first step - get the correct # of cards to trash
+	numCards = numCards > player.hand.length ? player.hand.length : numCards;
+
+	// second step - randomly choose cards to trash
+	const trash = [];
+	while(trash.length < numCards) {
+		let i = Math.floor(Math.random() * handCopy.length);
+		let card = handCopy.splice(i, 1)[0];
+		trash.push(card);
+	}
+
+	return trash;
+};
+
 export class BigMoneyStrategy extends PlayerStrategy {
 
 	actionTurn() {
 		return null;
+	}
+
+	/**
+	 * @param {number} numCards
+	 * @param {Player} player
+	 * @returns {Card[]} which cards to trash
+	 */
+	trashCardsFromHand(numCards, player) {
+		return trashCardsFromHandHelper(numCards, player);
 	}
 
 	/**

@@ -1,3 +1,8 @@
+/**
+ * This file controls the in-browser visualization of a game of Dominion
+ * The human player is always inserted as the first player
+ */
+
 /* global Vue */
 
 import { Game } from "./game.js";
@@ -7,17 +12,29 @@ new Vue({
 	data: {
 		game: null,
 		simMode: false,
+
+		// game parameters
+		numPlayers: 4,
+		// TODO
+		humanPlayerIndex: -1,
+		humanPlayerName: "Joe America",
 	},
 	methods: {
 		doTurn: function() {
-			this.game.doTurn();
-		},
-		doRound: function() {
-			const round = this.game.round;
-			while((this.game.round === round) && !this.game.gameOver) {
+			if(this.game.turn === this.humanPlayerIndex) {
+				throw new Error("cannot automate human turn");
+			} else {
 				this.game.doTurn();
 			}
 		},
+		doRound: function() {
+			const round = this.game.round;
+			while((this.game.round === round) && !this.game.gameOver &&
+				(this.game.turn !== this.humanPlayerIndex)) {
+				this.game.doTurn();
+			}
+		},
+		/*
 		doSim: function() {
 			this.simMode = true;
 			while (!this.game.gameOver) {
@@ -25,9 +42,14 @@ new Vue({
 			}
 			this.simMode = false;
 		},
+		*/
 		resetSim: function () {
 			this.simMode = false;
-			this.game = new Game();
+			this.game = new Game({
+				// humanPlayerIndex: this.humanPlayerIndex,
+				// humanPlayerName: this.humanPlayerName,
+				numPlayers: this.numPlayers
+			});
 		},
 	},
 	beforeMount: function () {
@@ -48,17 +70,15 @@ new Vue({
 			};
 		},
 		buttonDisabled: function() {
-			return this.game.gameOver || this.simMode;
+			return this.game.gameOver || this.simMode || (this.game.turn === this.humanPlayerIndex);
 		},
 		standardDeckCards: function() {
 			return Object.keys(this.game.deck).filter((cardName) => {
-				console.log(cardName);
 				return this.game.cards[cardName].type !== "action";
 			});
 		},
 		kingdomDeckCards: function() {
 			return Object.keys(this.game.deck).filter((cardName) => {
-				console.log(cardName);
 				return this.game.cards[cardName].type === "action";
 			});
 		}
