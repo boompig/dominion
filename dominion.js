@@ -15,8 +15,7 @@ new Vue({
 
 		// game parameters
 		numPlayers: 4,
-		// TODO
-		humanPlayerIndex: -1,
+		humanPlayerIndex: 0,
 		humanPlayerName: "Joe America",
 	},
 	methods: {
@@ -46,10 +45,85 @@ new Vue({
 		resetSim: function () {
 			this.simMode = false;
 			this.game = new Game({
-				// humanPlayerIndex: this.humanPlayerIndex,
-				// humanPlayerName: this.humanPlayerName,
+				humanPlayerIndex: this.humanPlayerIndex,
+				humanPlayerName: this.humanPlayerName,
 				numPlayers: this.numPlayers
 			});
+		},
+
+		/*** human player functions start here ****/
+		drawCard: function() {
+			if(this.game.turn !== this.humanPlayerIndex) {
+				throw new Error("can only draw on your turn");
+			}
+			if(this.game.phase !== "draw") {
+				throw new Error("cannot draw card outside of draw phase using this method");
+			}
+
+			this.game.drawPhase();
+		},
+
+		endActionPhase: function() {
+			if(this.game.turn !== this.humanPlayerIndex) {
+				throw new Error("can only end action phase on your turn");
+			}
+			if(this.game.phase !== "action") {
+				throw new Error("cannot end action phase outside of action phase using this method");
+			}
+
+			this.game.endActionPhase();
+		},
+
+		playCard(player, playerIndex, card, cardIndex) {
+			if(playerIndex !== this.humanPlayerIndex) {
+				// throw new Error("can only play cards on behalf of human player");
+				console.warn("can only play cards on behalf of human player");
+				return;
+			}
+
+			if (this.game.turn !== this.humanPlayerIndex) {
+				console.warn("can only play cards on your turn");
+				return;
+			}
+
+			if(card.type === "treasure") {
+				try {
+					return this.game.playTreasureCard(cardIndex);
+				} catch (e) {
+					alert(e.message);
+					return;
+				}
+			} else {
+				throw new Error("not implemented");
+			}
+		},
+
+		buyCard: function(cardName) {
+			if (this.game.turn !== this.humanPlayerIndex) {
+				console.warn("can only buy on your turn");
+				return;
+			}
+			if(this.game.phase !== "buy") {
+				console.warn("cannot buy card outside buy phase using this method");
+			}
+			try {
+				this.game.buyCard(cardName, this.humanPlayerIndex);
+				return true;
+			} catch (e) {
+				alert(e.message);
+				return false;
+			}
+		},
+
+		endHumanPlayerTurn: function() {
+			if (this.game.turn !== this.humanPlayerIndex) {
+				console.warn("can only end turn on your turn");
+				return;
+			}
+			if(this.game.phase !== "buy") {
+				console.warn(`cannot end turn in ${this.game.phase} phase`);
+			}
+			this.game.endTurn();
 		},
 	},
 	beforeMount: function () {
@@ -62,13 +136,21 @@ new Vue({
 				const classes = {
 					"card": true
 				};
+				if(typeof card === "string") {
+					card = this.game.cards[card];
+				}
 				if(card) {
 					classes[card.type] = true;
 					classes[card.name] = true;
 				}
+
 				return classes;
 			};
 		},
+
+		/**
+		 * for AI buttons
+		 */
 		buttonDisabled: function() {
 			return this.game.gameOver || this.simMode || (this.game.turn === this.humanPlayerIndex);
 		},
@@ -81,6 +163,9 @@ new Vue({
 			return Object.keys(this.game.deck).filter((cardName) => {
 				return this.game.cards[cardName].type === "action";
 			});
+		},
+		isHumanPlayerTurn: function() {
+			return this.game.turn === this.humanPlayerIndex;
 		}
 	}
 });

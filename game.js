@@ -14,11 +14,31 @@ export class Player {
 	constructor(name, strategy, isHuman) {
 		this.name = name;
 		this.strategy = strategy;
+
+		/**
+		 * Array of Card objects
+		 * The player's draw pile
+		 */
 		this.cards = [];
+
+		/**
+		 * Array of Card objects
+		 * The player's current hand
+		 */
 		this.hand = [];
+
+		/**
+		 * Array of Card objects
+		 * The player's discard pile
+		 */
 		this.discard = [];
+
 		this.points = 0;
 		this.isHuman = isHuman || false;
+
+		/* reset each turn */
+		this.numBuys = 0;
+		this.numActions = 0;
 	}
 
 	/**
@@ -69,6 +89,16 @@ export class Game {
 		// index into this.players
 		this.turn = 0;
 
+		this.treasurePot = 0;
+
+		/**
+		 * There are 4 phases:
+		 * - draw
+		 * - action
+		 * - buy
+		 * - cleanup
+		 */
+		this.phase = "draw";
 		this.round = 0;
 		this.gameOver = false;
 
@@ -463,11 +493,12 @@ export class Game {
 	 * Remove card from deck.
 	 * @param {string} cardName
 	 * @param {number} playerIndex
-	 * @returns {string | null} Return null on failure, card on success
+	 * @returns {Card} card object on success
+	 * @throws Error when pile empty
 	 */
 	takeCard(cardName, playerIndex) {
 		if (this.deck[cardName] === 0) {
-			return null;
+			throw new Error(`Cannot take ${cardName} from deck, pile empty`);
 		}
 		const player = this.players[playerIndex];
 
@@ -480,6 +511,40 @@ export class Game {
 		}
 
 		return card;
+	}
+
+	/**
+	 * Draw a card from the current player's deck
+	 * If the deck is empty, shuffle in cards from discard pile
+	 * Transition to the next phase
+	 * Initialize numBuys to 1
+	 * Initialize numActions to 1
+	 * @returns {boolean} Return false iff discard and deck are both empty
+	 */
+	drawPhase() {
+		if(this.phase !== "draw") {
+			throw new Error("can only call drawPhase in draw phase");
+		}
+		const res = this.drawCard(this.turn);
+		const player = this.players[this.turn];
+		// start out with 1 buy
+		player.numBuys = 1;
+		player.numActions = 1;
+		this.treasurePot = 0;
+		this.phase = "action";
+		return res;
+	}
+
+	/**
+	 * End the action phase for the current player
+	 * Transition to buy phase
+	 * Initializes treasure pot
+	 */
+	endActionPhase() {
+		if(this.phase !== "action") {
+			throw new Error("can only end action phase in action phase");
+		}
+		this.phase = "buy";
 	}
 
 	/**
@@ -526,21 +591,53 @@ export class Game {
 	}
 
 	/**
-	 * Return true iff successful (enough cards remaining)
-	 * No honesty check
+	 * Buy a card with treasure pot and place it into discard pile
+	 * Deduct its cost from treasure pot
+	 * Reduce player.numBuys
 	 * @param {string} cardName
 	 * @param {number} playerIndex
-	 * @returns {boolean}
+	 * @throws An error on various failures {boolean}
 	 */
 	buyCard(cardName, playerIndex) {
-		// TODO for now assume players are honest and have enough money to buy
-
-		const card = this.takeCard(cardName, playerIndex);
-		if (card === null) {
-			return false;
+		if(this.phase !== "buy") {
+			throw new Error("cannot buy cards outside of buy phase");
 		}
-		this.players[playerIndex].discard.push(card);
-		return true;
+		const card = this.cards[cardName];
+		if(this.treasurePot < card.cost) {
+			throw new Error(`you cannot afford this card. card costs ${card.cost} but treasure pot only contains ${this.treasurePot}`);
+		}
+
+		const player = this.players[playerIndex];
+		if(player.numBuys === 0) {
+			throw new Error("You have no more buys left!");
+		}
+
+		this.treasurePot -= card.cost;
+
+		const c = this.takeCard(cardName, playerIndex);
+		if (c === null) {
+			throw new Error("Failed to take the card from the deck while buying");
+		}
+		player.discard.push(c);
+		player.numBuys--;
+	}
+
+	/**
+	 * Current player plays a treasure card
+	 * @param {number} cardIndex
+	 */
+	playTreasureCard(cardIndex) {
+		if(this.phase !== "buy") {
+			throw new Error("cannot play treasure cards outside the buy phase");
+		}
+		const player = this.players[this.turn];
+		const card = player.hand.splice(cardIndex, 1)[0];
+		if(card.type !== "treasure") {
+			throw new Error(`Card type must be treasure, got ${card.type}`);
+		}
+		this.treasurePot += card.value;
+		console.debug(`Player ${player.name} played treasure ${card.name}. Treasure pot now ${this.treasurePot}`);
+		player.discard.push(card);
 	}
 
 	/**
@@ -561,67 +658,27 @@ export class Game {
 		return this.winArr;
 	}
 
-	doTurn() {
-		if (this.gameOver) {
-			return;
+	/**
+	 * Change the phase to cleanup, then to buy
+	 * Perform the cleanup phase for the current player
+	 * Change the turn to the next player
+	 */
+	endTurn() {
+		if(this.phase !== "buy") {
+			console.warn(`cannot end turn in ${this.phase} phase`);
 		}
 
-		if(this.turn === this.humanPlayerIndex) {
-			throw new Error("Cannot automate human player turn");
-		}
-
-		const p = this.turn;
-		if (p === 0) {
-			this.round++;
-			console.debug("");
-			console.debug(`******** starting round ${this.round } *************`);
-		}
-
-		// draw a card
-		this.drawCard(p);
-
-		const player = this.players[p];
-
-		// action phase
-		let numActions = 1;
-		let bonusMoney = 0;
-		let numBuys = 1;
-
-		while (numActions > 0) {
-			const action = player.strategy.actionTurn(player);
-			if (action != null) {
-				console.debug(`Player ${player.name} played action card ${action.name} on round ${this.round}`);
-				let cardEffect = action.effect(p);
-				numActions += cardEffect.actions;
-				numBuys += cardEffect.buys;
-				bonusMoney += cardEffect.gold;
-			}
-			numActions--;
-		}
-
-		// TODO: pass numBuys as paramter to strategy?
-		// buy phase
-		while (numBuys > 0) {
-			let cardName = player.strategy.buyTurn(player, this.deck, bonusMoney);
-			if (cardName) {
-				const money = player.getMoneyInHand();
-				console.debug(`Player ${player.name} bought card ${cardName} on round ${this.round} (money ${money})`);
-				this.buyCard(cardName, p);
-			} else {
-				console.debug(`Player ${player.name} does not buy anything this turn`);
-			}
-			numBuys--;
-		}
+		this.phase = "cleanup";
 
 		// cleanup phase: discard whole hand
-		while (this.players[p].hand.length > 0) {
-			const c = this.players[p].hand.pop();
-			this.players[p].discard.push(c);
+		while (this.players[this.turn].hand.length > 0) {
+			const c = this.players[this.turn].hand.pop();
+			this.players[this.turn].discard.push(c);
 		}
 
 		// draw 5 new cards
 		for (let i = 0; i < 5; i++) {
-			this.drawCard(p);
+			this.drawCard(this.turn);
 		}
 
 		if (this.checkGameEnd()) {
@@ -646,5 +703,72 @@ export class Game {
 		} else {
 			this.turn = (this.turn + 1) % this.numPlayers;
 		}
+
+		this.phase = "draw";
+	}
+
+	doTurn() {
+		if (this.gameOver) {
+			return;
+		}
+
+		if(this.turn === this.humanPlayerIndex) {
+			throw new Error("Cannot automate human player turn");
+		}
+
+		if(this.phase !== "draw") {
+			throw new Error(`Cannot call doTurn in phase ${this.phase}`);
+		}
+
+		const p = this.turn;
+		if (p === 0) {
+			this.round++;
+			console.debug("");
+			console.debug(`******** starting round ${this.round } *************`);
+		}
+
+		// draw a card and automatically transition to next phase
+		this.drawPhase();
+
+		const player = this.players[p];
+
+		while (player.numActions > 0) {
+			const action = player.strategy.actionTurn(player);
+			if (action != null) {
+				console.debug(`Player ${player.name} played action card ${action.name} on round ${this.round}`);
+				let cardEffect = action.effect(p);
+				player.numActions += cardEffect.actions;
+				player.numBuys += cardEffect.buys;
+				this.treasurePot += cardEffect.gold;
+			}
+			player.numActions--;
+		}
+
+		this.endActionPhase();
+
+		// buy phase
+		while (player.numBuys > 0) {
+			let treasureCards = player.strategy.playTreasures(player, this.deck, this.treasurePot);
+			// sort in reverse order, in place
+			// reverse order to keep indexes valid
+			treasureCards.sort((a, b) => {
+				return b - a;
+			});
+			for(let cardIndex of treasureCards) {
+				this.playTreasureCard(cardIndex);
+			}
+
+			let cardName = player.strategy.buyTurn(player, this.deck, this.treasurePot);
+			if (cardName) {
+				// numBuys deducted here
+				this.buyCard(cardName, p);
+				console.debug(`Player ${player.name} bought card ${cardName} on round ${this.round} (treasure pot now ${this.treasurePot})`);
+			} else {
+				console.debug(`Player ${player.name} does not buy anything this turn`);
+				break;
+			}
+		}
+
+		this.endTurn();
 	}
 }

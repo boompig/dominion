@@ -3,8 +3,17 @@ html, body {
 }
 
 .deck-inner-container {
-    display: inline-block;
-    margin-left: 1rem;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    margin-bottom: .5rem;
+}
+
+.deck-container.active .card {
+    cursor: pointer;
+    margin-top: .3rem;
 }
 
 .player-container {
@@ -20,8 +29,12 @@ html, body {
 .player {
     display: inline-block;
     border: 1px solid black;
-    padding: 1rem;
+    padding: 1rem .5rem;
     min-width: 200px;
+}
+
+.player.active .player-card {
+    cursor: pointer;
 }
 
 .player.active .player-name {

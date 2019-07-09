@@ -2,8 +2,11 @@ class PlayerStrategy {
 	/**
 	 * @param {String} name
 	 */
-	constructor(name) {
-		this.name = name;
+	constructor() {
+		/*
+		 * card name
+		 */
+		this.buyGoalCard = null;
 	}
 
 	actionTurn() {
@@ -11,34 +14,45 @@ class PlayerStrategy {
 	}
 
 	/**
+	 * @param {Player} player
+	 * @param {object} deck
+	 * @param {number} treasurePot
+	 * @returns {number[]} array of card indexes
+	 */
+	playTreasures(player, deck, treasurePot) {
+		const cardName = this.getBuyGoal(player, deck, treasurePot);
+		this.buyGoalCard = cardName;
+		const treasures = [];
+
+		if (this.buyGoalCard) {
+			const buyGoalCost = deck[cardName].cost;
+			let total = 0;
+			for(let i = 0; i < player.hand.length; i++) {
+				let card = player.hand[i];
+				if (card.type === "treasure") {
+					total += card.value;
+					treasures.push(i);
+				}
+				if (total >= buyGoalCost) {
+					break;
+				}
+			}
+		}
+		return treasures;
+	}
+
+	/**
 	 * @returns {String}
 	 */
 	buyTurn() {
+		return this.buyGoalCard;
+	}
+
+	getBuyGoal() {
 		throw new Error("must subclass");
 	}
 }
 
-/**
- * Manual implementation
- * @param {number} numCards
- * @param {Player} player
- * @returns {Card[]} which cards to trash
- */
-const trashCardsFromHandHelper = function(numCards, player) {
-	const handCopy = player.hand.slice(0);
-	// first step - get the correct # of cards to trash
-	numCards = numCards > player.hand.length ? player.hand.length : numCards;
-
-	// second step - randomly choose cards to trash
-	const trash = [];
-	while(trash.length < numCards) {
-		let i = Math.floor(Math.random() * handCopy.length);
-		let card = handCopy.splice(i, 1)[0];
-		trash.push(card);
-	}
-
-	return trash;
-};
 
 export class BigMoneyStrategy extends PlayerStrategy {
 
@@ -47,20 +61,11 @@ export class BigMoneyStrategy extends PlayerStrategy {
 	}
 
 	/**
-	 * @param {number} numCards
-	 * @param {Player} player
-	 * @returns {Card[]} which cards to trash
-	 */
-	trashCardsFromHand(numCards, player) {
-		return trashCardsFromHandHelper(numCards, player);
-	}
-
-	/**
 	 * @param {Player} player
 	 * @returns {String}
 	 */
-	buyTurn(player, deck, bonusMoney) {
-		const money = player.getMoneyInHand() + bonusMoney;
+	getBuyGoal(player, deck, treasurePot) {
+		const money = player.getMoneyInHand() + treasurePot;
 
 		if (money >= 8) {
 			return "province";
@@ -73,11 +78,11 @@ export class BigMoneyStrategy extends PlayerStrategy {
 	}
 }
 
+
 /**
  * Same as big money, but buy duchies near the end
  */
 export class SmartBigMoneyStrategy extends PlayerStrategy {
-
 	actionTurn() {
 		return null;
 	}
@@ -85,10 +90,11 @@ export class SmartBigMoneyStrategy extends PlayerStrategy {
 	/**
 	 * @param {Player} player
 	 * @param {object} deck Map from card name to number of cards of that type left
+	 * @param {number} treasurePot
 	 * @returns {string | null}
 	 */
-	buyTurn(player, deck, bonusMoney) {
-		const money = player.getMoneyInHand() + bonusMoney;
+	getBuyGoal(player, deck, treasurePot) {
+		const money = player.getMoneyInHand() + treasurePot;
 
 		// should make sure that these piles exist first, but whatevs...
 		if (money >= 8) {
@@ -97,7 +103,9 @@ export class SmartBigMoneyStrategy extends PlayerStrategy {
 			if (deck.province >= 5) {
 				return "gold";
 			}
-			return "duchy";
+			if (deck.duchy > 0) {
+				return "duchy";
+			}
 		} if (money >= 3) {
 			return "silver";
 		}
@@ -134,19 +142,20 @@ export class SmartDuchyStrategy extends PlayerStrategy {
 	 * @param {object} deck Map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
-	buyTurn(player, deck, bonusMoney) {
-		const money = player.getMoneyInHand() + bonusMoney;
+	getBuyGoal(player, deck, treasurePot) {
+		const money = player.getMoneyInHand() + treasurePot;
 
-		if (money >= 8) {
+		if (money >= 8 && deck.province > 0) {
 			return "province";
 		} if (money >= 6) {
 			if (deck.province >= 4) {
 				return "gold";
+			} else if (deck.duchy > 0) {
+				return "duchy";
 			}
+		} if (money >= 5 && deck.duchy > 0) {
 			return "duchy";
-		} if (money >= 5) {
-			return "duchy";
-		} if (money >= 4) {
+		} if (money >= 4 && deck.smithy > 0) {
 			return "smithy";
 		} if (money >= 3) {
 			return "silver";
@@ -189,8 +198,8 @@ export class SmartSmithyStrategy extends PlayerStrategy {
 	 * @param {object} deck Map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
-	buyTurn(player, deck, bonusMoney) {
-		const money = player.getMoneyInHand() + bonusMoney;
+	getBuyGoal(player, deck, treasurePot) {
+		const money = player.getMoneyInHand() + treasurePot;
 		const card = this.buyTurnWrapper(money, player, deck);
 		return card;
 	}
@@ -217,13 +226,17 @@ export class SmartSmithyStrategy extends PlayerStrategy {
 				return "gold";
 			}
 			this.addValue(0);
-			return "duchy";
+			if(deck.duchy > 0) {
+				return "duchy";
+			}
 		} if (money >= 4 && valueDrawThree <= 2) {
 			this.addValue(2);
 			return "silver";
 		} if (money >= 4) {
 			this.addValue(0);
-			return "smithy";
+			if(deck.smithy > 0) {
+				return "smithy";
+			}
 		} if (money >= 3) {
 			this.addValue(2);
 			return "silver";
@@ -258,8 +271,8 @@ export class BigMoneySmithyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {string | null}
 	 */
-	buyTurn(player, deck, bonusMoney) {
-		const money = player.getMoneyInHand() + bonusMoney;
+	getBuyGoal(player, deck, treasurePot) {
+		const money = player.getMoneyInHand() + treasurePot;
 		// should make sure that these piles exist first, but whatevs...
 		if (money >= 8) {
 			return "province";
@@ -285,14 +298,14 @@ export class PointsOnlyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {string | null}
 	 */
-	buyTurn(player, deck, bonusMoney) {
-		const money = player.getMoneyInHand() + bonusMoney;
+	getBuyGoal(player, deck, treasurePot) {
+		const money = player.getMoneyInHand() + treasurePot;
 
 		if (money >= 8) {
 			return "province";
-		} if (money >= 5) {
+		} if (money >= 5 && deck.duchy > 0) {
 			return "duchy";
-		} if (money >= 2) {
+		} if (money >= 2 && deck.estate > 0) {
 			return "estate";
 		}
 		return null;
