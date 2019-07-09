@@ -2,6 +2,14 @@
 
 A bare-bones simulator and visualizer for the card game [Dominion](https://boardgamegeek.com/boardgame/36218/dominion) in JavaScript. Simulator can be run headless from command-line with node.js or in the browser. Visualizaton powered by Vue (v2).
 
+## Building
+
+Shared files (between browser and Node) can be found in the `/src` directory. Build the bundle for browser with browserify.
+
+```
+yarn build
+```
+
 ## Strategies
 
 I hand-coded a few AI strategies to test against the human opponent. Descriptions below. You can find the code in `player-strategies.js`.
@@ -42,12 +50,13 @@ yarn lint
 The simulation can be run headless from the command line. Run
 
 ```
-node -r esm index.js
+node index.js
 ```
 
-The `--help` flag will give you available options. We use `-r esm` due to the use of ES6 imports.
+The `--help` flag will give you available options.
 
 To run the visualization, start up a web server from this directory, for example run `http-server`.
+See building instructions on building the bundle first.
 
 ## Uses
 

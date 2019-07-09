@@ -35,4 +35,4 @@ Utils.printResults = (results) => {
 	}
 };
 
-export default Utils;
+module.exports = Utils;

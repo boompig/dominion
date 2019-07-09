@@ -1,8 +1,8 @@
 /* eslint-env node */
 
-import flags from "flags";
-import { Game } from "./game.js";
-import utils from "./utils.js";
+const flags = require("flags");
+const Game = require("./src/game.js");
+const Utils = require("./utils.js");
 
 flags.defineNumber(
 	"num-games",
@@ -35,4 +35,4 @@ for(let i = 0; i < numGames; i++) {
 	}
 }
 
-utils.printResults(results);
+Utils.printResults(results);

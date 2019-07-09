@@ -3,9 +3,8 @@
  * The human player is always inserted as the first player
  */
 
-/* global Vue */
-
-import { Game } from "./game.js";
+/* global Vue, alert */
+const Game = require("./game.js");
 
 new Vue({
 	el: "#app-container",

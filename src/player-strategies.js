@@ -57,7 +57,7 @@ class PlayerStrategy {
 }
 
 
-export class BigMoneyStrategy extends PlayerStrategy {
+class BigMoneyStrategy extends PlayerStrategy {
 
 	/**
 	 * @returns {Card}
@@ -88,7 +88,7 @@ export class BigMoneyStrategy extends PlayerStrategy {
 /**
  * Same as big money, but buy duchies near the end
  */
-export class SmartBigMoneyStrategy extends PlayerStrategy {
+class SmartBigMoneyStrategy extends PlayerStrategy {
 
 	/**
 	 * @returns {Card}
@@ -130,7 +130,7 @@ export class SmartBigMoneyStrategy extends PlayerStrategy {
  * Always go for silver when you have 3
  * Go for gold when you have 6, if there are 4 or more provinces left, otherwise buy a duchy
  */
-export class SmartDuchyStrategy extends PlayerStrategy {
+class SmartDuchyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
@@ -174,7 +174,7 @@ export class SmartDuchyStrategy extends PlayerStrategy {
 	}
 }
 
-export class SmartSmithyStrategy extends PlayerStrategy {
+class SmartSmithyStrategy extends PlayerStrategy {
 	constructor() {
 		super();
 
@@ -255,7 +255,7 @@ export class SmartSmithyStrategy extends PlayerStrategy {
 	}
 }
 
-export class BigMoneySmithyStrategy extends PlayerStrategy {
+class BigMoneySmithyStrategy extends PlayerStrategy {
 	constructor() {
 		super();
 
@@ -299,7 +299,7 @@ export class BigMoneySmithyStrategy extends PlayerStrategy {
 	}
 }
 
-export class PointsOnlyStrategy extends PlayerStrategy {
+class PointsOnlyStrategy extends PlayerStrategy {
 	/**
 	 * @returns {Card}
 	 */
@@ -324,3 +324,12 @@ export class PointsOnlyStrategy extends PlayerStrategy {
 		return null;
 	}
 }
+
+module.exports = {
+	PointsOnlyStrategy,
+	SmartBigMoneyStrategy,
+	SmartDuchyStrategy,
+	SmartSmithyStrategy,
+	BigMoneyStrategy,
+	BigMoneySmithyStrategy
+};

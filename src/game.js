@@ -1,61 +1,11 @@
-// import _ from "https://cdn.jsdelivr.net/npm/lodash-es@4.17.11/lodash.min.js";
-import shuffle from "./node_modules/lodash-es/shuffle.js";
-import random from "./node_modules/lodash-es/random.js";
-import { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy, PointsOnlyStrategy } from "./player-strategies.js";
+const _ = require("lodash");
+const { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy, PointsOnlyStrategy } = require("./player-strategies.js");
 
 console.debug = function() {};
 
-export class Player {
-	/**
-	 * @param {String} name
-	 * @param {PlayerStrategy} strategy
-	 * @param {boolean} isHuman
-	 */
-	constructor(name, strategy, isHuman) {
-		this.name = name;
-		this.strategy = strategy;
+const Player = require("./player.js");
 
-		/**
-		 * Array of Card objects
-		 * The player's draw pile
-		 */
-		this.cards = [];
-
-		/**
-		 * Array of Card objects
-		 * The player's current hand
-		 */
-		this.hand = [];
-
-		/**
-		 * Array of Card objects
-		 * The player's discard pile
-		 */
-		this.discard = [];
-
-		this.points = 0;
-		this.isHuman = isHuman || false;
-
-		/* reset each turn */
-		this.numBuys = 0;
-		this.numActions = 0;
-	}
-
-	/**
-	 * @returns {number}
-	 */
-	getMoneyInHand() {
-		let money = 0;
-		for (let i = 0; i < this.hand.length; i++) {
-			if (this.hand[i].type === "treasure") {
-				money += this.hand[i].value;
-			}
-		}
-		return money;
-	}
-}
-
-export class Game {
+class Game {
 	/**
 	 * @param {any} options Some options to initialize the game
 	 * 		- numPlayers: # of players
@@ -460,7 +410,7 @@ export class Game {
 				);
 			} else {
 				// inclusive
-				let j = random(0, aiPlayers.length - 1);
+				let j = _.random(0, aiPlayers.length - 1);
 				p = aiPlayers.splice(j, 1)[0];
 			}
 			this.players[i] = p;
@@ -485,7 +435,7 @@ export class Game {
 			}
 
 			// and shuffle
-			this.players[p].cards = shuffle(this.players[p].cards);
+			this.players[p].cards = _.shuffle(this.players[p].cards);
 		}
 	}
 
@@ -558,7 +508,7 @@ export class Game {
 		if (player.cards.length === 0) {
 			// the player has run out of cards
 			// set the player's cards as a shuffled version of their discard pile
-			player.cards = shuffle(player.discard);
+			player.cards = _.shuffle(player.discard);
 			player.discard = [];
 		}
 
@@ -715,6 +665,9 @@ export class Game {
 	 * @param {Card} card
 	 */
 	playActionCard(player, playerIndex, card) {
+		if(this.phase !== "action") {
+			throw new Error("cannot play action cards outside of action phase");
+		}
 		const cardEffect = card.effect(playerIndex);
 		player.numActions += cardEffect.actions;
 		player.numBuys += cardEffect.buys;
@@ -785,3 +738,5 @@ export class Game {
 		this.endTurn();
 	}
 }
+
+module.exports = Game;
