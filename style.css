@@ -43,12 +43,17 @@ h1 {
     min-width: 200px;
 }
 
-.player.active .player-card {
+.player.active .player-card.active {
     cursor: pointer;
 }
 
-.player.active .player-name {
+.num-trash-cards {
     color: red;
+    font-weight: bold;
+}
+
+.player.active .player-name {
+    color: orange;
 }
 
 .player-name {

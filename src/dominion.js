@@ -11,6 +11,7 @@ new Vue({
 	data: {
 		game: null,
 		simMode: false,
+		cardsToTrash: 0,
 
 		// game parameters
 		numPlayers: 4,
@@ -85,17 +86,26 @@ new Vue({
 				return;
 			}
 
-			if(card.type === "treasure") {
+
+			if (this.cardsToTrash > 0) {
+				console.debug(`Trying to trash card ${card.name}...`);
+				this.trashCard(card, cardIndex);
+			} else if (card.type === "treasure") {
 				try {
 					return this.game.playTreasureCard(cardIndex);
 				} catch (e) {
+					console.error(e);
 					alert(e.message);
 					return;
 				}
 			} else {
 				try {
-					return this.game.playActionCard(player, playerIndex, card);
+					const cardEffect = this.game.playActionCard(player, playerIndex, card);
+					if (cardEffect.trash) {
+						this.cardsToTrash = cardEffect.trash;
+					}
 				} catch (e) {
+					console.error(e);
 					alert(e.message);
 					return;
 				}
@@ -119,6 +129,19 @@ new Vue({
 			}
 		},
 
+		trashCard: function(card, cardIndex) {
+			if (this.cardsToTrash === 0) {
+				throw new Error("Cannot trash cards right now");
+			}
+			const player = this.game.players[this.game.turn];
+			this.game.trashCards(player, [cardIndex]);
+			this.cardsToTrash--;
+		},
+
+		stopTrashingCards: function() {
+			this.cardsToTrash = 0;
+		},
+
 		endHumanPlayerTurn: function() {
 			if (this.game.turn !== this.humanPlayerIndex) {
 				console.warn("can only end turn on your turn");
@@ -136,7 +159,11 @@ new Vue({
 	},
 	computed: {
 		cardClasses: function() {
-			return card => {
+			/**
+			 * @param {Card | string} card can be either a string or Card object
+			 * @param {string} source - either "hand" or "deck"
+			 */
+			return (card, source) => {
 				const classes = {
 					"card": true
 				};
@@ -146,6 +173,12 @@ new Vue({
 				if(card) {
 					classes[card.type] = true;
 					classes[card.name] = true;
+				}
+
+				if(source === "hand" && card.type === "action") {
+					classes["active"] = (this.game.turn === this.humanPlayerIndex) && this.game.phase === "action";
+				} else if(source === "deck" || card.type === "treasure") {
+					classes["active"] = (this.game.turn === this.humanPlayerIndex && this.game.phase === "buy");
 				}
 
 				return classes;

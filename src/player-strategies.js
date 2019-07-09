@@ -10,6 +10,30 @@ class PlayerStrategy {
 	}
 
 	/**
+	 * A basic implementation of trashing cards
+	 *
+	 * TODO for now, treat this as "up to"
+	 *
+	 * @param {Player}
+	 * @param {number} numCards
+	 * @returns {number[]} indices
+	 */
+	trashCards(player, numCards) {
+		const trash = [];
+
+		for(let i = 0; i < player.hand.length; i++) {
+			if(player.hand[i].type === "treasure" && player.hand[i].points < 0 && trash.length < numCards) {
+				trash.push(i);
+			}
+			if(player.hand[i].name === "copper" && trash.length < numCards) {
+				trash.push(i);
+			}
+		}
+
+		return trash;
+	}
+
+	/**
 	 * @returns {Card}
 	 */
 	actionTurn() {

@@ -24,6 +24,9 @@ class Game {
 		// map from card names to their properties
 		this.cards = {};
 
+		// array of cards that have been trashed
+		this.trash = [];
+
 		this.numPlayers = options.numPlayers || 5;
 		this.humanPlayerName = options.humanPlayerName || null;
 
@@ -71,7 +74,7 @@ class Game {
 		return {
 			actions: 0,
 			buys: 0,
-			money: 0
+			gold: 0
 		};
 	}
 
@@ -88,7 +91,7 @@ class Game {
 		return {
 			actions: 1,
 			buys: 0,
-			money: 0
+			gold: 0
 		};
 	}
 
@@ -249,14 +252,22 @@ class Game {
 			effect: market
 		};
 
-		// TODO unfinished cards
 		cards.cellar = {
 			name: "cellar",
 			cost: 2,
 			type: "action",
-			effect: () => {}
+			effect: () => {
+				return {
+					actions: 0,
+					buys: 0,
+					gold: 0,
+					// trash up to 4 cards from your hand
+					trash: 4
+				};
+			}
 		};
 
+		// TODO unfinished cards
 		cards.chapel = {
 			name: "chapel",
 			cost: 2,
@@ -658,21 +669,58 @@ class Game {
 	}
 
 	/**
+	 * Trash the given cards from that player
+	 *
+	 * @param {Player} player
+	 * @param {number[]} cardIndexes
+	 */
+	trashCards(player, cardIndexes) {
+		// sort in reverse order to not mess up indexing
+		cardIndexes.sort((a, b) => {
+			return b - a;
+		});
+		for(let cardIndex of cardIndexes) {
+			const card = player.hand.splice(cardIndex, 1)[0];
+			console.debug(`Player ${player.name} trashed card ${card.name}`);
+			this.trash.push(card);
+		}
+	}
+
+	/**
 	 * Processes the effect of the card
+	 * Puts the card in the discard pile
 	 * -- numActions for the player
 	 * @param {Player} player
 	 * @param {number} playerIndex
 	 * @param {Card} card
+	 * @returns {any} Effect of the card
 	 */
 	playActionCard(player, playerIndex, card) {
 		if(this.phase !== "action") {
 			throw new Error("cannot play action cards outside of action phase");
 		}
 		const cardEffect = card.effect(playerIndex);
+		if(!cardEffect) {
+			console.log(card);
+			console.error("Failed to find effect for card ^");
+		}
 		player.numActions += cardEffect.actions;
 		player.numBuys += cardEffect.buys;
 		this.treasurePot += cardEffect.gold;
+
+		// remove element from hand and place it on the discard pile
+		let cardIndex;
+		for(let i = 0; i < player.hand.length; i++) {
+			if(card === player.hand[i]) {
+				cardIndex = i;
+				break;
+			}
+		}
+		player.hand.splice(cardIndex, 1)[0];
+		player.discard.push(card);
+
 		player.numActions--;
+		return cardEffect;
 	}
 
 	doTurn() {
@@ -704,7 +752,11 @@ class Game {
 			const card = player.strategy.actionTurn(player);
 			if (card) {
 				console.debug(`Player ${player.name} played action card ${card.name} on round ${this.round}`);
-				this.playActionCard(player, p, card);
+				const effect = this.playActionCard(player, p, card);
+				if(effect.trash) {
+					const trashCards = player.strategy.trashCards(player, effect.trash);
+					this.trashCards(player, trashCards);
+				}
 			} else {
 				break;
 			}

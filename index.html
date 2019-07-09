@@ -25,7 +25,7 @@
                 <div class="deck-container" v-bind:class="{active: isHumanPlayerTurn && game.phase === 'buy'}">
                     <div class="deck-inner-container">
                         <div v-for="cardName in standardDeckCards">
-                            <div class="deck-card" v-bind:class="cardClasses(cardName)"
+                            <div class="deck-card" v-bind:class="cardClasses(cardName, 'deck')"
                                 v-on:click="buyCard(cardName)">
                                 {{cardName}} ({{ game.cards[cardName].cost }}) - {{ game.deck[cardName] }} left
                             </div>
@@ -33,7 +33,7 @@
                     </div>
                     <div class="deck-inner-container">
                         <div v-for="cardName in kingdomDeckCards">
-                            <div class="deck-card" v-bind:class="cardClasses(cardName)"
+                            <div class="deck-card" v-bind:class="cardClasses(cardName, 'deck')"
                                 v-on:click="buyCard(cardName)">
                                 {{cardName}} ({{ game.cards[cardName].cost }}) - {{ game.deck[cardName] }} left
                             </div>
@@ -41,8 +41,9 @@
                     </div>
                 </div>
 
-                <div>Phase: {{ this.game.phase }}</div>
-                <div>Treasure Pot: {{ this.game.treasurePot }}</div>
+                <div>Phase: {{ game.phase }}</div>
+                <div>Treasure Pot: {{ game.treasurePot }}</div>
+                <div class="num-trash-cards" v-show="cardsToTrash > 0"># cards to trash: {{ cardsToTrash }}</div>
 
                 <div class="player-container">
                     <div class="player" v-for="(player, playerIndex) in game.players" v-bind:class="{active: playerIndex === game.turn }">
@@ -53,7 +54,7 @@
 
                         <div v-for="(card, cardIndex) in player.hand"
                              class="player-card"
-                             v-bind:class="cardClasses(card)"
+                             v-bind:class="cardClasses(card, 'hand')"
                              v-on:click="playCard(player, playerIndex, card, cardIndex)">
                             <div class="card-name">{{ card ? card.name : "null" }}</div>
                         </div>
@@ -65,6 +66,8 @@
                 <!-- buttons for human player -->
                 <button class="btn btn-info" type="button" v-on:click="drawCard()"
                     v-show="game.phase === 'draw' && isHumanPlayerTurn">Draw Card</button>
+                <button class="btn btn-info" type="button" v-on:click="stopTrashingCards()"
+                    v-show="cardsToTrash > 0 && isHumanPlayerTurn">Stop Trashing Cards</button>
                 <button class="btn btn-info" type="button" v-on:click="endActionPhase()"
                     v-show="game.phase === 'action' && isHumanPlayerTurn">End Action Phase</button>
                 <button class="btn btn-info" type="button" v-on:click="endHumanPlayerTurn()"
