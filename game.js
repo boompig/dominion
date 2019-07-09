@@ -707,6 +707,21 @@ export class Game {
 		this.phase = "draw";
 	}
 
+	/**
+	 * Processes the effect of the card
+	 * -- numActions for the player
+	 * @param {Player} player
+	 * @param {number} playerIndex
+	 * @param {Card} card
+	 */
+	playActionCard(player, playerIndex, card) {
+		const cardEffect = card.effect(playerIndex);
+		player.numActions += cardEffect.actions;
+		player.numBuys += cardEffect.buys;
+		this.treasurePot += cardEffect.gold;
+		player.numActions--;
+	}
+
 	doTurn() {
 		if (this.gameOver) {
 			return;
@@ -733,15 +748,13 @@ export class Game {
 		const player = this.players[p];
 
 		while (player.numActions > 0) {
-			const action = player.strategy.actionTurn(player);
-			if (action != null) {
-				console.debug(`Player ${player.name} played action card ${action.name} on round ${this.round}`);
-				let cardEffect = action.effect(p);
-				player.numActions += cardEffect.actions;
-				player.numBuys += cardEffect.buys;
-				this.treasurePot += cardEffect.gold;
+			const card = player.strategy.actionTurn(player);
+			if (card) {
+				console.debug(`Player ${player.name} played action card ${card.name} on round ${this.round}`);
+				this.playActionCard(player, p, card);
+			} else {
+				break;
 			}
-			player.numActions--;
 		}
 
 		this.endActionPhase();

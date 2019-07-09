@@ -1,9 +1,11 @@
 /* eslint-env node */
 
+const Utils = {};
+
 /**
  * @param {Game} game
  */
-module.exports.printWinners = (game) => {
+Utils.printWinners = (game) => {
 	const l = game.players.sort((p1, p2) => {
 		p2.points - p1.points;
 	});
@@ -17,7 +19,7 @@ module.exports.printWinners = (game) => {
  * Print results with best strategies first
  * @param {results} Map from player name to how often they won
  */
-module.exports.printResults = (results) => {
+Utils.printResults = (results) => {
 	const l = Object.keys(results).map((name) => {
 		return [name, results[name]];
 	});
@@ -32,3 +34,5 @@ module.exports.printResults = (results) => {
 		console.log(`${i + 1}. ${playerName} -> ${freq}`);
 	}
 };
+
+export default Utils;

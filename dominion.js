@@ -94,7 +94,12 @@ new Vue({
 					return;
 				}
 			} else {
-				throw new Error("not implemented");
+				try {
+					return this.game.playActionCard(player, playerIndex, card);
+				} catch (e) {
+					alert(e.message);
+					return;
+				}
 			}
 		},
 

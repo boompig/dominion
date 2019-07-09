@@ -9,6 +9,9 @@ class PlayerStrategy {
 		this.buyGoalCard = null;
 	}
 
+	/**
+	 * @returns {Card}
+	 */
 	actionTurn() {
 		throw new Error("must subclass");
 	}
@@ -56,6 +59,9 @@ class PlayerStrategy {
 
 export class BigMoneyStrategy extends PlayerStrategy {
 
+	/**
+	 * @returns {Card}
+	 */
 	actionTurn() {
 		return null;
 	}
@@ -83,6 +89,10 @@ export class BigMoneyStrategy extends PlayerStrategy {
  * Same as big money, but buy duchies near the end
  */
 export class SmartBigMoneyStrategy extends PlayerStrategy {
+
+	/**
+	 * @returns {Card}
+	 */
 	actionTurn() {
 		return null;
 	}
@@ -124,7 +134,7 @@ export class SmartDuchyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @returns {string | null}
+	 * @returns {Card | null}
 	 */
 	actionTurn(player) {
 		// if I have an action card, play it
@@ -180,7 +190,7 @@ export class SmartSmithyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @returns {string | null}
+	 * @returns {Card | null}
 	 */
 	actionTurn(player) {
 		// if I have an action card, play it
@@ -254,7 +264,7 @@ export class BigMoneySmithyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @returns {string | null}
+	 * @returns {Card | null}
 	 */
 	actionTurn(player) {
 		// if I have an action card, play it
@@ -274,11 +284,11 @@ export class BigMoneySmithyStrategy extends PlayerStrategy {
 	getBuyGoal(player, deck, treasurePot) {
 		const money = player.getMoneyInHand() + treasurePot;
 		// should make sure that these piles exist first, but whatevs...
-		if (money >= 8) {
+		if (money >= 8 && deck.province > 0) {
 			return "province";
 		} if (money >= 6) {
 			return "gold";
-		} if (money >= 4 && this.numSmithy < 3) {
+		} if (money >= 4 && this.numSmithy < 3 && deck.smithy > 0) {
 			this.numSmithy++;
 
 			return "smithy";
@@ -290,6 +300,9 @@ export class BigMoneySmithyStrategy extends PlayerStrategy {
 }
 
 export class PointsOnlyStrategy extends PlayerStrategy {
+	/**
+	 * @returns {Card}
+	 */
 	actionTurn() {
 		return null;
 	}
