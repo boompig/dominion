@@ -7,6 +7,8 @@ const Player = require("./player.js");
 
 class Game {
 	/**
+	 * Game will *automatically* be created with random AI unless the human parameters are passed
+	 *
 	 * @param {any} options Some options to initialize the game
 	 * 		- numPlayers: # of players
 	 * 		- humanPlayerIndex: index of human player
@@ -503,13 +505,15 @@ class Game {
 	 */
 	endActionPhase() {
 		if(this.phase !== "action") {
-			throw new Error("can only end action phase in action phase");
+			throw new Error(`can only end action phase in action phase, current phase is ${this.phase}`);
 		}
 		this.phase = "buy";
 	}
 
 	/**
-	 * Draw a card from the player's deck deck.
+	 * NOTE: THIS IS *NOT* THE METHOD TO DRAW CARDS IN THE DRAW PHASE
+	 *
+	 * Draw a card from the player's deck.
 	 * If the deck is empty, shuffle in cards from discard pile
 	 * @param {number} playerIndex
 	 * @returns {boolean} Return false iff discard and deck are both empty
@@ -592,10 +596,10 @@ class Game {
 			throw new Error("cannot play treasure cards outside the buy phase");
 		}
 		const player = this.players[this.turn];
-		const card = player.hand.splice(cardIndex, 1)[0];
-		if(card.type !== "treasure") {
-			throw new Error(`Card type must be treasure, got ${card.type}`);
+		if(player.hand[cardIndex].type !== "treasure") {
+			throw new Error(`Card type must be treasure, got ${player.hand[cardIndex].type}`);
 		}
+		const card = player.hand.splice(cardIndex, 1)[0];
 		this.treasurePot += card.value;
 		console.debug(`Player ${player.name} played treasure ${card.name}. Treasure pot now ${this.treasurePot}`);
 		player.discard.push(card);

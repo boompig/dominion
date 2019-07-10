@@ -43,6 +43,7 @@ Same as "Big Money", but buy Duchies near the end.
 ```
 yarn install
 yarn lint
+yarn test
 ```
 
 ## Run

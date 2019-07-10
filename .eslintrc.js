@@ -2,7 +2,11 @@ module.exports = {
 	"env": {
 		"node": true,
 	},
-	"extends": "eslint:recommended",
+	"extends": [
+		"eslint:recommended",
+		"plugin:jest/recommended"
+	],
+	"plugins": ["jest"],
 	"globals": {
 		"Atomics": "readonly",
 		"SharedArrayBuffer": "readonly"
