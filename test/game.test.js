@@ -229,7 +229,6 @@ describe("game", () => {
 		// +2 cards
 		const card = game.cards.mine;
 		player.hand.push(card);
-		// predictable card index
 		const silver = game.cards.silver;
 		player.hand.push(silver);
 
@@ -251,5 +250,39 @@ describe("game", () => {
 		expect(game.trash.length).toBe(1);
 		// gold and mine
 		expect(player.discard.length).toBe(2);
+	});
+
+	test("implement merchant card 'in code'", () => {
+
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human"
+		});
+		// 5 cards
+		const player = game.players[0];
+
+		// +2 cards
+		const card = game.cards.merchant;
+		player.hand.push(card);
+		const silver = game.cards.silver;
+		player.hand.push(silver);
+
+		// +1 card
+		game.drawPhase();
+
+		expect(player.hand.length).toBe(8);
+
+		const cardEffect = game.playActionCard(player, 0, card);
+		expect(cardEffect.firstPlayBonus).toHaveProperty("silver");
+		const bonusGold = cardEffect.firstPlayBonus.silver.gold;
+
+		game.endActionPhase();
+
+		// 5 because merchant already played
+		expect(player.hand[5]).toBe(silver);
+		game.playTreasureCard(5);
+
+		expect(game.treasurePot).toBe(bonusGold + silver.value);
 	});
 });

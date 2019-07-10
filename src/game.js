@@ -46,6 +46,7 @@ class Game {
 		this.turn = 0;
 
 		this.treasurePot = 0;
+		this.firstPlayBonus = {};
 
 		/**
 		 * There are 4 phases:
@@ -157,6 +158,21 @@ class Game {
 			actions: 1,
 			buys: 1,
 			gold: 1
+		};
+	}
+
+	// +1 card, +1 action, +1 gold if you play a silver this turn
+	merchantCardEffect(playerIndex) {
+		for (let i = 0; i < 1; i++) {
+			this.drawCard(playerIndex);
+		}
+		return {
+			actions: 1,
+			firstPlayBonus: {
+				"silver": {
+					gold: 1
+				}
+			}
 		};
 	}
 
@@ -340,12 +356,12 @@ class Game {
 			effect: () => {}
 		};
 
-		// const merchantEffect = this.merchantCardEffect.bind(this);
+		const merchantEffect = this.merchantCardEffect.bind(this);
 		cards.merchant = {
 			name: "merchant",
 			cost: 3,
 			type: "action",
-			effect: () => {}
+			effect: merchantEffect
 		};
 
 		cards.militia = {
@@ -536,6 +552,7 @@ class Game {
 		player.numBuys = 1;
 		player.numActions = 1;
 		this.treasurePot = 0;
+		this.firstPlayBonus = {};
 		this.phase = "action";
 		return res;
 	}
@@ -664,6 +681,10 @@ class Game {
 			throw new Error(`Card type must be treasure, got ${player.hand[cardIndex].type}`);
 		}
 		const card = player.hand.splice(cardIndex, 1)[0];
+		if(card.name in this.firstPlayBonus) {
+			this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
+			delete this.firstPlayBonus[card.name];
+		}
 		this.treasurePot += card.value;
 		console.debug(`Player ${player.name} played treasure ${card.name}. Treasure pot now ${this.treasurePot}`);
 		player.discard.push(card);
@@ -774,6 +795,11 @@ class Game {
 		if(this.phase !== "action") {
 			throw new Error("cannot play action cards outside of action phase");
 		}
+		if(card.name in this.firstPlayBonus) {
+			this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
+			this.firstPlayBonus.pop(card.name);
+		}
+
 		const cardEffect = card.effect(playerIndex);
 		if(!cardEffect) {
 			console.log(card);
@@ -782,6 +808,10 @@ class Game {
 		player.numActions += cardEffect.actions || 0;
 		player.numBuys += cardEffect.buys || 0;
 		this.treasurePot += cardEffect.gold || 0;
+		let firstPlayBonus = cardEffect.firstPlayBonus || {};
+		for(let cardName in firstPlayBonus) {
+			this.firstPlayBonus[cardName] = firstPlayBonus[cardName];
+		}
 
 		// remove element from hand and place it on the discard pile
 		let cardIndex;
@@ -795,6 +825,9 @@ class Game {
 		player.discard.push(card);
 
 		player.numActions--;
+
+		console.debug(`Player ${player.name} played ${card.name}`);
+
 		return cardEffect;
 	}
 
