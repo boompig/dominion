@@ -179,6 +179,15 @@ class Game {
 			gain: 4
 		};
 	}
+
+	mineCardEffect() {
+		return {
+			gainAction: "trash",
+			gainBonus: 3,
+			trashType: "treasure",
+			gainType: "treasure"
+		};
+	}
 	/** ********************************************* */
 
 	/**
@@ -306,6 +315,14 @@ class Game {
 			effect: remodelEffect
 		};
 
+		const mineEffect = this.mineCardEffect.bind(this);
+		cards.mine = {
+			name: "mine",
+			cost: 5,
+			type: "action",
+			effect: mineEffect
+		};
+
 		// TODO unfinished cards
 
 		cards.cellar = {
@@ -336,13 +353,6 @@ class Game {
 			cost: 4,
 			type: "action",
 			attack: true,
-			effect: () => {}
-		};
-
-		cards.mine = {
-			name: "mine",
-			cost: 5,
-			type: "action",
 			effect: () => {}
 		};
 
@@ -854,7 +864,8 @@ class Game {
 						let o = player.strategy.trashCardForGain(
 							player,
 							effect.gainBonus,
-							effect.gainTrashCategory
+							effect.trashType,
+							effect.gainType
 						);
 						if(o) {
 							let trashedCards = this.trashCards(player, o.trashCards);
