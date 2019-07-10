@@ -675,6 +675,9 @@ class Game {
 
 		this.phase = "cleanup";
 
+		this.players[this.turn].numActions = 0;
+		this.players[this.turn].numBuys = 0;
+
 		// cleanup phase: discard whole hand
 		while (this.players[this.turn].hand.length > 0) {
 			const c = this.players[this.turn].hand.pop();

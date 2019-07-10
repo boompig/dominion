@@ -43,6 +43,8 @@
 
                 <div>Phase: {{ game.phase }}</div>
                 <div>Treasure Pot: {{ game.treasurePot }}</div>
+                <div v-show="game.turn === humanPlayerIndex"># buys: {{ game.players[game.turn].numBuys }}</div>
+                <div v-show="game.turn === humanPlayerIndex"># actions: {{ game.players[game.turn].numActions }}</div>
                 <div class="num-trash-cards" v-show="cardsToTrash > 0"># cards to trash: {{ cardsToTrash }}</div>
 
                 <div class="player-container">
