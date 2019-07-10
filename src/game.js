@@ -13,6 +13,7 @@ class Game {
 	 * 		- numPlayers: # of players
 	 * 		- humanPlayerIndex: index of human player
 	 * 		- humanPlayerName: name of human player
+	 * 		- players: array of players to use; length should == numPlayers
 	 */
 	constructor(options) {
 		options = options || {};
@@ -59,7 +60,7 @@ class Game {
 
 		this.winArr = [];
 
-		this.setup();
+		this.setup(options.players);
 	}
 
 	/** *************** CARD EFFECTS **************** */
@@ -377,8 +378,10 @@ class Game {
 	/**
 	 * 1. Initialize player array with AI and strategies
 	 * 2. Give players their initial cards (3 estates and 7 coppers) - shuffled
+	 *
+	 * @param {Player[] | null} players
 	 */
-	initPlayers() {
+	initPlayers(players) {
 		// not all of these will play
 		const aiPlayers = [
 			new Player(
@@ -415,7 +418,9 @@ class Game {
 		// create generic player objects
 		for (let i = 0; i < this.numPlayers; i++) {
 			let p;
-			if(this.hasHumanPlayer && this.humanPlayerIndex === i) {
+			if (players && players.length > i) {
+				p = players[i];
+			} else if (this.hasHumanPlayer && this.humanPlayerIndex === i) {
 				p = new Player(
 					this.humanPlayerName,
 					null,
@@ -548,10 +553,13 @@ class Game {
 		}
 	}
 
-	setup() {
+	/**
+	 * @param {Player[] | null} players
+	 */
+	setup(players) {
 		this.cards = this.initCards();
 		this.deck = this.initDeck(this.numPlayers);
-		this.initPlayers();
+		this.initPlayers(players);
 		this.dealHands();
 	}
 

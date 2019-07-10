@@ -350,6 +350,7 @@ class PointsOnlyStrategy extends PlayerStrategy {
 }
 
 module.exports = {
+	PlayerStrategy,
 	PointsOnlyStrategy,
 	SmartBigMoneyStrategy,
 	SmartDuchyStrategy,
