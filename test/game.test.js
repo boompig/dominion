@@ -86,4 +86,35 @@ describe("game", () => {
 		// just want the game to run to completion
 		expect(1).toBe(1);
 	});
+
+	test("make sure Cellar works", () => {
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human"
+		});
+
+		const player = game.players[0];
+		expect(player.hand.length).toBe(5);
+
+		game.drawPhase();
+
+		// add cellar card
+		const card = game.cards.cellar;
+		player.hand.push(card);
+
+		expect(player.hand.length).toBe(7);
+
+		// play cellar card
+		const cardEffect = game.playActionCard(player, 0, card);
+		expect(cardEffect.trash).toBe(4);
+
+		// trash 4 cards
+		game.trashCards(player, [0, 1, 2, 3]);
+
+		// now should have 2 cards (-4 cards, -1 cellar card)
+		expect(player.hand.length).toBe(2);
+		expect(game.trash.length).toBe(4);
+		expect(player.discard.length).toBe(1);
+	});
 });
