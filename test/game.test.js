@@ -117,4 +117,43 @@ describe("game", () => {
 		expect(game.trash.length).toBe(4);
 		expect(player.discard.length).toBe(1);
 	});
+
+	test("try the strategy of multiple buys per turn", () => {
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human"
+		});
+
+		// 5 cards
+		const player = game.players[0];
+
+		// +3 cards
+		const labCard = game.cards.laboratory;
+		player.hand.push(labCard);
+		const villageCard = game.cards.village;
+		player.hand.push(villageCard);
+		const marketCard = game.cards.market;
+		player.hand.push(marketCard);
+
+		// +1 card
+		game.drawPhase();
+
+		expect(player.hand.length).toBe(9);
+
+		expect(player.numActions).toBe(1);
+		expect(player.numBuys).toBe(1);
+
+		// +2 cards, +1 action
+		game.playActionCard(player, 0, labCard);
+		// +1 card, +2 actions
+		game.playActionCard(player, 0, villageCard);
+		// +1 card, +1 action, +1 buy, +1 gold
+		game.playActionCard(player, 0, marketCard);
+
+		expect(player.numBuys).toBe(2);
+		expect(player.numActions).toBe(2);
+		expect(game.treasurePot).toBe(1);
+		expect(player.hand.length).toBe(10);
+	});
 });
