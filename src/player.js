@@ -12,7 +12,7 @@ class Player {
 		 * Array of Card objects
 		 * The player's draw pile
 		 */
-		this.cards = [];
+		this.deck = [];
 
 		/**
 		 * Array of Card objects

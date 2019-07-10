@@ -479,18 +479,18 @@ class Game {
 				if(!card) {
 					throw new Error("took null estate card");
 				}
-				this.players[p].cards.push(card);
+				this.players[p].deck.push(card);
 			}
 			for (let j = 0; j < 7; j++) {
 				let card = this.takeCard("copper", p);
 				if(!card) {
 					throw new Error("took null copper card");
 				}
-				this.players[p].cards.push(card);
+				this.players[p].deck.push(card);
 			}
 
 			// and shuffle
-			this.players[p].cards = _.shuffle(this.players[p].cards);
+			this.players[p].deck = _.shuffle(this.players[p].deck);
 		}
 	}
 
@@ -562,22 +562,24 @@ class Game {
 	 */
 	drawCard(playerIndex) {
 		const player = this.players[playerIndex];
-		if (player.cards.length === 0) {
+		if (player.deck.length === 0) {
 			// the player has run out of cards
 			// set the player's cards as a shuffled version of their discard pile
-			player.cards = _.shuffle(player.discard);
+			player.deck = _.shuffle(player.discard);
 			player.discard = [];
 		}
 
-		if (player.cards.length === 0) {
+		if (player.deck.length === 0) {
 			return false;
 		}
 
-		const card = player.cards.pop();
+		const card = player.deck.pop();
 		if(!card) {
 			throw new Error("Drew null card from the deck");
 		}
 		player.hand.push(card);
+
+		console.debug(`Player ${player.name} drew ${card.name}`);
 
 		return true;
 	}
@@ -613,6 +615,7 @@ class Game {
 			throw new Error("Failed to take the card from the deck while buying");
 		}
 		player.discard.push(card);
+		console.debug(`Player ${player.name} gained ${card.name}`);
 		return card;
 	}
 

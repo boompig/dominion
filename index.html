@@ -50,7 +50,7 @@
                 <div class="player-container">
                     <div class="player" v-for="(player, playerIndex) in game.players" v-bind:class="{active: playerIndex === game.turn }">
                         <div class="player-name">{{ player.name }} ({{ player.isHuman ? "Human" : "AI" }})</div>
-                        <div>Deck size: <span>{{ player.cards.length }}</span></div>
+                        <div>Deck size: <span>{{ player.deck.length }}</span></div>
                         <div>Discard size: <span>{{ player.discard.length }}</span></div>
                         <div>Points: <span>{{ player.points }}</span></div>
 
