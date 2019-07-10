@@ -180,4 +180,40 @@ describe("game", () => {
 		// smithy and workshop
 		expect(player.discard.length).toBe(2);
 	});
+
+	test("test trashing a card to gain a better card using remodel", () => {
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human"
+		});
+		// 5 cards
+		const player = game.players[0];
+
+		// +2 cards
+		const card = game.cards.remodel;
+		player.hand.push(card);
+		// predictable card index
+		const estateCard = game.cards.estate;
+		player.hand.push(estateCard);
+
+		// +1 card
+		game.drawPhase();
+
+		expect(player.hand.length).toBe(8);
+
+		const cardEffect = game.playActionCard(player, 0, card);
+		expect(cardEffect.gainAction).toBe("trash");
+
+		// estate has index 6 because remodel has just been spent
+		game.trashCards(player, [6]);
+		// gain a card costing up to 2 more than it
+		// so that's 4
+		game.gainCard("smithy", 0);
+
+		// estate
+		expect(game.trash.length).toBe(1);
+		// smithy and remodel
+		expect(player.discard.length).toBe(2);
+	});
 });

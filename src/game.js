@@ -138,6 +138,13 @@ class Game {
 		};
 	}
 
+	remodelCardEffect() {
+		return {
+			gainAction: "trash",
+			gainBonus: 2
+		};
+	}
+
 	/**
 	 * +1 card, +1 action, +1 buy, +1 gold
 	 * @param {number} playerIndex
@@ -291,6 +298,14 @@ class Game {
 			effect: workshopEffect
 		};
 
+		const remodelEffect = this.remodelCardEffect.bind(this);
+		cards.remodel = {
+			name: "remodel",
+			cost: 4,
+			type: "action",
+			effect: remodelEffect
+		};
+
 		// TODO unfinished cards
 
 		cards.cellar = {
@@ -327,13 +342,6 @@ class Game {
 		cards.mine = {
 			name: "mine",
 			cost: 5,
-			type: "action",
-			effect: () => {}
-		};
-
-		cards.remodel = {
-			name: "remodel",
-			cost: 4,
 			type: "action",
 			effect: () => {}
 		};
@@ -375,18 +383,21 @@ class Game {
 		deck.curse = (numPlayers - 1) * 10;
 
 		// kingdom cards - use the Dominion Only initial set
-		deck.cellar = 10;
+		// add a few and ignore a few based on implementation difficulties
+
+		// deck.cellar = 10;
 		deck.market = 10;
 		deck.merchant = 10;
-		deck.militia = 10;
+		// deck.militia = 10;
 		deck.mine = 10;
-		deck.moat = 10;
+		// deck.moat = 10;
 		deck.remodel = 10;
+		deck.festival = 10;
+		deck.laboratory = 10;
 		deck.smithy = 10;
-		// deck.festival = 10;
-		// deck.laboratory = 10;
 		deck.village = 10;
 		deck.woodcutter = 10;
+		deck.workshop = 10;
 
 		return deck;
 	}
@@ -720,8 +731,10 @@ class Game {
 	 *
 	 * @param {Player} player
 	 * @param {number[]} cardIndexes
+	 * @returns {Card[]} trashed cards
 	 */
 	trashCards(player, cardIndexes) {
+		const trashed = [];
 		// sort in reverse order to not mess up indexing
 		cardIndexes.sort((a, b) => {
 			return b - a;
@@ -730,7 +743,9 @@ class Game {
 			const card = player.hand.splice(cardIndex, 1)[0];
 			console.debug(`Player ${player.name} trashed card ${card.name}`);
 			this.trash.push(card);
+			trashed.push(card);
 		}
+		return trashed;
 	}
 
 	/**
@@ -769,6 +784,25 @@ class Game {
 		player.numActions--;
 		return cardEffect;
 	}
+
+	/**
+	 * @param {Player} player
+	 * @param {string} cardName
+	 * @param {number} maxGainCost
+	 * @returns {boolean}
+	 */
+	/*
+	canGainCard(player, cardName, maxGainCost) {
+		if(this.deck[cardName] === 0) {
+			return false;
+		}
+		let gainCard = this.cards[cardName];
+		if(gainCard.cost > maxGainCost) {
+			// throw new Error(`Card allowed you to gain a card costing up to ${maxGainCost} but you tried to gain a card costing ${gainCard.cost}`);
+			return false;
+		}
+	}
+	*/
 
 	doTurn() {
 		if (this.gameOver) {
@@ -813,6 +847,29 @@ class Game {
 						}
 						console.debug(`Player ${player.name} gained card ${gainCardName}`);
 						this.gainCard(gainCardName, p);
+					}
+				}
+				if(effect.gainAction) {
+					if(effect.gainAction === "trash") {
+						let o = player.strategy.trashCardForGain(
+							player,
+							effect.gainBonus,
+							effect.gainTrashCategory
+						);
+						if(o) {
+							let trashedCards = this.trashCards(player, o.trashCards);
+							let maxGainCost = effect.gainBonus;
+							for(let card of trashedCards) {
+								maxGainCost += card.cost;
+							}
+							let gainCard = this.cards[o.gainCardName];
+							if(gainCard.cost > maxGainCost) {
+								throw new Error(`Card allowed you to gain a card costing up to ${maxGainCost} but you tried to gain a card costing ${gainCard.cost}`);
+							}
+							this.gainCard(o.gainCardName, p);
+						}
+					} else {
+						throw new Error("not implemented");
 					}
 				}
 			} else {
