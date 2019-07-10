@@ -22,7 +22,7 @@ class Game {
 		this.players = [];
 
 		// map from card names to their quantity in the deck
-		this.deck = {};
+		this.supply = {};
 
 		// map from card names to their properties
 		this.cards = {};
@@ -364,13 +364,13 @@ class Game {
 	 * @param {number} numPlayers
 	 * @returns {object}
 	 */
-	initDeck(numPlayers) {
-		const deck = {};
+	initSupply(numPlayers) {
+		const supply = {};
 
 		// treasure cards
-		deck.copper = 60 + numPlayers * 7;
-		deck.silver = 40;
-		deck.gold = 30;
+		supply.copper = 60 + numPlayers * 7;
+		supply.silver = 40;
+		supply.gold = 30;
 
 		// victory cards
 		// they have different numbers depending on # of players
@@ -387,29 +387,29 @@ class Game {
 			numProvinces = 18;
 		}
 
-		deck.estate = numVictoryCards + numPlayers * 3;
-		deck.duchy = numVictoryCards;
-		deck.province = numProvinces;
-		deck.curse = (numPlayers - 1) * 10;
+		supply.estate = numVictoryCards + numPlayers * 3;
+		supply.duchy = numVictoryCards;
+		supply.province = numProvinces;
+		supply.curse = (numPlayers - 1) * 10;
 
 		// kingdom cards - use the Dominion Only initial set
 		// add a few and ignore a few based on implementation difficulties
 
-		// deck.cellar = 10;
-		deck.market = 10;
-		deck.merchant = 10;
-		// deck.militia = 10;
-		deck.mine = 10;
-		// deck.moat = 10;
-		deck.remodel = 10;
-		deck.festival = 10;
-		deck.laboratory = 10;
-		deck.smithy = 10;
-		deck.village = 10;
-		deck.woodcutter = 10;
-		deck.workshop = 10;
+		// supply.cellar = 10;
+		supply.market = 10;
+		supply.merchant = 10;
+		// supply.militia = 10;
+		supply.mine = 10;
+		// supply.moat = 10;
+		supply.remodel = 10;
+		supply.festival = 10;
+		supply.laboratory = 10;
+		supply.smithy = 10;
+		supply.village = 10;
+		supply.woodcutter = 10;
+		supply.workshop = 10;
 
-		return deck;
+		return supply;
 	}
 
 	/**
@@ -495,19 +495,19 @@ class Game {
 	}
 
 	/**
-	 * Remove card from deck.
+	 * Remove card from supply.
 	 * @param {string} cardName
 	 * @param {number} playerIndex
 	 * @returns {Card} card object on success
 	 * @throws Error when pile empty
 	 */
 	takeCard(cardName, playerIndex) {
-		if (this.deck[cardName] === 0) {
+		if (this.supply[cardName] === 0) {
 			throw new Error(`Cannot take ${cardName} from deck, pile empty`);
 		}
 		const player = this.players[playerIndex];
 
-		this.deck[cardName]--;
+		this.supply[cardName]--;
 		const card = this.cards[cardName];
 
 		// points are added on here
@@ -595,7 +595,7 @@ class Game {
 	 */
 	setup(players) {
 		this.cards = this.initCards();
-		this.deck = this.initDeck(this.numPlayers);
+		this.supply = this.initSupply(this.numPlayers);
 		this.initPlayers(players);
 		this.dealHands();
 	}
@@ -671,7 +671,7 @@ class Game {
 	 * @returns {boolean}
 	 */
 	checkGameEnd() {
-		return this.deck.province === 0;
+		return this.supply.province === 0;
 	}
 
 	/**
@@ -803,7 +803,7 @@ class Game {
 	 */
 	/*
 	canGainCard(player, cardName, maxGainCost) {
-		if(this.deck[cardName] === 0) {
+		if(this.supply[cardName] === 0) {
 			return false;
 		}
 		let gainCard = this.cards[cardName];
@@ -851,8 +851,8 @@ class Game {
 				if(effect.gain) {
 					const gainCardName = player.strategy.gainCard(player, effect.gain);
 					if(gainCardName) {
-						let card = this.cards[gainCardName];
-						if(card.cost > effect.gain) {
+						let gainCard = this.cards[gainCardName];
+						if(gainCard.cost > effect.gain) {
 							throw new Error(`Card allowed you to gain a card costing up to ${effect.gain} but you tried to gain a card costing ${gainCard.cost}`);
 						}
 						console.debug(`Player ${player.name} gained card ${gainCardName}`);
@@ -892,7 +892,7 @@ class Game {
 
 		// buy phase
 		while (player.numBuys > 0) {
-			let treasureCards = player.strategy.playTreasures(player, this.deck, this.treasurePot);
+			let treasureCards = player.strategy.playTreasures(player, this.supply, this.treasurePot);
 			// sort in reverse order, in place
 			// reverse order to keep indexes valid
 			treasureCards.sort((a, b) => {
@@ -902,7 +902,7 @@ class Game {
 				this.playTreasureCard(cardIndex);
 			}
 
-			let cardName = player.strategy.buyTurn(player, this.deck, this.treasurePot);
+			let cardName = player.strategy.buyTurn(player, this.supply, this.treasurePot);
 			if (cardName) {
 				// numBuys deducted here
 				this.buyCard(cardName, p);

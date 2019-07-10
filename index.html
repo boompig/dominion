@@ -21,13 +21,13 @@
             </div>
 
             <div class="sim-container">
-                <h5>Common Piles</h5>
+                <h5>Supply</h5>
                 <div class="deck-container" v-bind:class="{active: isHumanPlayerTurn && game.phase === 'buy'}">
                     <div class="deck-inner-container">
                         <div v-for="cardName in standardDeckCards">
                             <div class="deck-card" v-bind:class="cardClasses(cardName, 'deck')"
                                 v-on:click="buyCard(cardName)">
-                                {{cardName}} ({{ game.cards[cardName].cost }}) - {{ game.deck[cardName] }} left
+                                {{cardName}} ({{ game.cards[cardName].cost }}) - {{ game.supply[cardName] }} left
                             </div>
                         </div>
                     </div>
@@ -35,7 +35,7 @@
                         <div v-for="cardName in kingdomDeckCards">
                             <div class="deck-card" v-bind:class="cardClasses(cardName, 'deck')"
                                 v-on:click="buyCard(cardName)">
-                                {{cardName}} ({{ game.cards[cardName].cost }}) - {{ game.deck[cardName] }} left
+                                {{cardName}} ({{ game.cards[cardName].cost }}) - {{ game.supply[cardName] }} left
                             </div>
                         </div>
                     </div>

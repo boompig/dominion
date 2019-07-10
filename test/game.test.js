@@ -49,13 +49,13 @@ describe("game", () => {
 			game.endActionPhase();
 
 			const money = player.getMoneyInHand();
-			if (money >= 8 && game.deck.province > 0) {
+			if (money >= 8 && game.supply.province > 0) {
 				playAllTreasureCards(game, player);
 				game.buyCard("province", game.turn);
-			} else if(money >= 6 && game.deck.gold > 0) {
+			} else if(money >= 6 && game.supply.gold > 0) {
 				playAllTreasureCards(game, player);
 				game.buyCard("gold", game.turn);
-			} else if (money >= 3 && game.deck.silver > 0) {
+			} else if (money >= 3 && game.supply.silver > 0) {
 				playAllTreasureCards(game, player);
 				game.buyCard("silver", game.turn);
 			}

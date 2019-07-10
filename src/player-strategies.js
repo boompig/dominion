@@ -55,17 +55,17 @@ class PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} deck
+	 * @param {object} supply
 	 * @param {number} treasurePot
 	 * @returns {number[]} array of card indexes
 	 */
-	playTreasures(player, deck, treasurePot) {
-		const cardName = this.getBuyGoal(player, deck, treasurePot);
+	playTreasures(player, supply, treasurePot) {
+		const cardName = this.getBuyGoal(player, supply, treasurePot);
 		this.buyGoalCard = cardName;
 		const treasures = [];
 
 		if (this.buyGoalCard) {
-			const buyGoalCost = deck[cardName].cost;
+			const buyGoalCost = supply[cardName].cost;
 			let total = 0;
 			for(let i = 0; i < player.hand.length; i++) {
 				let card = player.hand[i];
@@ -107,7 +107,7 @@ class BigMoneyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {String}
 	 */
-	getBuyGoal(player, deck, treasurePot) {
+	getBuyGoal(player, supply, treasurePot) {
 		const money = player.getMoneyInHand() + treasurePot;
 
 		if (money >= 8) {
@@ -136,21 +136,21 @@ class SmartBigMoneyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} deck Map from card name to number of cards of that type left
+	 * @param {object} supply Map from card name to number of cards of that type left
 	 * @param {number} treasurePot
 	 * @returns {string | null}
 	 */
-	getBuyGoal(player, deck, treasurePot) {
+	getBuyGoal(player, supply, treasurePot) {
 		const money = player.getMoneyInHand() + treasurePot;
 
 		// should make sure that these piles exist first, but whatevs...
 		if (money >= 8) {
 			return "province";
 		} if (money >= 6) {
-			if (deck.province >= 5) {
+			if (supply.province >= 5) {
 				return "gold";
 			}
-			if (deck.duchy > 0) {
+			if (supply.duchy > 0) {
 				return "duchy";
 			}
 		} if (money >= 3) {
@@ -186,23 +186,23 @@ class SmartDuchyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} deck Map from card name to number of cards of that type left
+	 * @param {object} supply Map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
-	getBuyGoal(player, deck, treasurePot) {
+	getBuyGoal(player, supply, treasurePot) {
 		const money = player.getMoneyInHand() + treasurePot;
 
-		if (money >= 8 && deck.province > 0) {
+		if (money >= 8 && supply.province > 0) {
 			return "province";
 		} if (money >= 6) {
-			if (deck.province >= 4) {
+			if (supply.province >= 4) {
 				return "gold";
-			} else if (deck.duchy > 0) {
+			} else if (supply.duchy > 0) {
 				return "duchy";
 			}
-		} if (money >= 5 && deck.duchy > 0) {
+		} if (money >= 5 && supply.duchy > 0) {
 			return "duchy";
-		} if (money >= 4 && deck.smithy > 0) {
+		} if (money >= 4 && supply.smithy > 0) {
 			return "smithy";
 		} if (money >= 3) {
 			return "silver";
@@ -242,22 +242,22 @@ class SmartSmithyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} deck Map from card name to number of cards of that type left
+	 * @param {object} supply Map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
-	getBuyGoal(player, deck, treasurePot) {
+	getBuyGoal(player, supply, treasurePot) {
 		const money = player.getMoneyInHand() + treasurePot;
-		const card = this.buyTurnWrapper(money, player, deck);
+		const card = this.buyTurnWrapper(money, player, supply);
 		return card;
 	}
 
 	/**
 	 * @param {number} money
 	 * @param {Player} player
-	 * @param {object} deck Map from card name to number of cards of that type left
+	 * @param {object} supply Map from card name to number of cards of that type left
 	 */
-	buyTurnWrapper(money, player, deck) {
-		// calculate the avg value of coins in my deck
+	buyTurnWrapper(money, player, supply) {
+		// calculate the avg value of coins in my supply
 		// if the avg value is > (let's say 2)
 		//
 		const valueDrawThree = this.avgValue * 3;
@@ -268,12 +268,12 @@ class SmartSmithyStrategy extends PlayerStrategy {
 			this.addValue(0);
 			return "province";
 		} if (money >= 6 && valueDrawThree <= 3) {
-			if (deck.province >= this.provinceCutoff) {
+			if (supply.province >= this.provinceCutoff) {
 				this.addValue(3);
 				return "gold";
 			}
 			this.addValue(0);
-			if(deck.duchy > 0) {
+			if(supply.duchy > 0) {
 				return "duchy";
 			}
 		} if (money >= 4 && valueDrawThree <= 2) {
@@ -281,7 +281,7 @@ class SmartSmithyStrategy extends PlayerStrategy {
 			return "silver";
 		} if (money >= 4) {
 			this.addValue(0);
-			if(deck.smithy > 0) {
+			if(supply.smithy > 0) {
 				return "smithy";
 			}
 		} if (money >= 3) {
@@ -318,17 +318,17 @@ class BigMoneySmithyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {string | null}
 	 */
-	getBuyGoal(player, deck, treasurePot) {
+	getBuyGoal(player, supply, treasurePot) {
 		const money = player.getMoneyInHand() + treasurePot;
 		// should make sure that these piles exist first, but whatevs...
-		if (money >= 8 && deck.province > 0) {
+		if (money >= 8 && supply.province > 0) {
 			return "province";
-		} if (money >= 6 && deck.gold > 0) {
+		} if (money >= 6 && supply.gold > 0) {
 			return "gold";
-		} if (money >= 4 && this.numSmithy < 3 && deck.smithy > 0) {
+		} if (money >= 4 && this.numSmithy < 3 && supply.smithy > 0) {
 			this.numSmithy++;
 			return "smithy";
-		} if (money >= 3 && deck.silver > 0) {
+		} if (money >= 3 && supply.silver > 0) {
 			return "silver";
 		}
 		return null;
@@ -347,14 +347,14 @@ class PointsOnlyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {string | null}
 	 */
-	getBuyGoal(player, deck, treasurePot) {
+	getBuyGoal(player, supply, treasurePot) {
 		const money = player.getMoneyInHand() + treasurePot;
 
-		if (money >= 8 && deck.province > 0) {
+		if (money >= 8 && supply.province > 0) {
 			return "province";
-		} if (money >= 5 && deck.duchy > 0) {
+		} if (money >= 5 && supply.duchy > 0) {
 			return "duchy";
-		} if (money >= 2 && deck.estate > 0) {
+		} if (money >= 2 && supply.estate > 0) {
 			return "estate";
 		}
 		return null;

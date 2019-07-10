@@ -192,12 +192,12 @@ new Vue({
 			return this.game.gameOver || this.simMode || (this.game.turn === this.humanPlayerIndex);
 		},
 		standardDeckCards: function() {
-			return Object.keys(this.game.deck).filter((cardName) => {
+			return Object.keys(this.game.supply).filter((cardName) => {
 				return this.game.cards[cardName].type !== "action";
 			});
 		},
 		kingdomDeckCards: function() {
-			return Object.keys(this.game.deck).filter((cardName) => {
+			return Object.keys(this.game.supply).filter((cardName) => {
 				return this.game.cards[cardName].type === "action";
 			});
 		},
