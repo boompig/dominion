@@ -87,7 +87,7 @@ describe("game", () => {
 		expect(1).toBe(1);
 	});
 
-	test("make sure Cellar works", () => {
+	test("make sure Chapel works", () => {
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
@@ -99,20 +99,20 @@ describe("game", () => {
 
 		game.drawPhase();
 
-		// add cellar card
-		const card = game.cards.cellar;
+		// add chapel card
+		const card = game.cards.chapel;
 		player.hand.push(card);
 
 		expect(player.hand.length).toBe(7);
 
-		// play cellar card
+		// play chapel card
 		const cardEffect = game.playActionCard(player, 0, card);
 		expect(cardEffect.trash).toBe(4);
 
 		// trash 4 cards
 		game.trashCards(player, [0, 1, 2, 3]);
 
-		// now should have 2 cards (-4 cards, -1 cellar card)
+		// now should have 2 cards (-4 cards, -1 chapel card)
 		expect(player.hand.length).toBe(2);
 		expect(game.trash.length).toBe(4);
 		expect(player.discard.length).toBe(1);
@@ -155,5 +155,29 @@ describe("game", () => {
 		expect(player.numActions).toBe(2);
 		expect(game.treasurePot).toBe(1);
 		expect(player.hand.length).toBe(10);
+	});
+
+	test("test gaining a card using workshop", () => {
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human"
+		});
+
+		const player = game.players[0];
+		const card = game.cards.workshop;
+		player.hand.push(card);
+
+		game.drawPhase();
+
+		expect(player.hand.length).toBe(7);
+
+		const cardEffect = game.playActionCard(player, 0, card);
+		expect(cardEffect.gain).toBe(4);
+
+		game.gainCard("smithy", 0);
+
+		// smithy and workshop
+		expect(player.discard.length).toBe(2);
 	});
 });

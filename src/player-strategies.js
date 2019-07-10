@@ -34,6 +34,19 @@ class PlayerStrategy {
 	}
 
 	/**
+	 * A basic implementation of gaining cards
+	 * @param {Player} player
+	 * @param {number} maxGainCost
+	 * @returns {string}
+	 */
+	gainCard(player, maxGainCost) {
+		if (maxGainCost >= 3) {
+			return "silver";
+		}
+		return null;
+	}
+
+	/**
 	 * @returns {Card}
 	 */
 	actionTurn() {
@@ -310,13 +323,12 @@ class BigMoneySmithyStrategy extends PlayerStrategy {
 		// should make sure that these piles exist first, but whatevs...
 		if (money >= 8 && deck.province > 0) {
 			return "province";
-		} if (money >= 6) {
+		} if (money >= 6 && deck.gold > 0) {
 			return "gold";
 		} if (money >= 4 && this.numSmithy < 3 && deck.smithy > 0) {
 			this.numSmithy++;
-
 			return "smithy";
-		} if (money >= 3) {
+		} if (money >= 3 && deck.silver > 0) {
 			return "silver";
 		}
 		return null;
@@ -338,7 +350,7 @@ class PointsOnlyStrategy extends PlayerStrategy {
 	getBuyGoal(player, deck, treasurePot) {
 		const money = player.getMoneyInHand() + treasurePot;
 
-		if (money >= 8) {
+		if (money >= 8 && deck.province > 0) {
 			return "province";
 		} if (money >= 5 && deck.duchy > 0) {
 			return "duchy";

@@ -152,6 +152,26 @@ class Game {
 			gold: 1
 		};
 	}
+
+	/**
+	 * trash 4 cards
+	 */
+	chapelCardEffect() {
+		return {
+			actions: 0,
+			buys: 0,
+			gold: 0,
+			// trash up to 4 cards from your hand
+			trash: 4
+		};
+	}
+
+	// gain a card costing up to 4 gold
+	workshopCardEffect() {
+		return {
+			gain: 4
+		};
+	}
 	/** ********************************************* */
 
 	/**
@@ -255,24 +275,26 @@ class Game {
 			effect: market
 		};
 
-		cards.cellar = {
-			name: "cellar",
+		const chapelEffect = this.chapelCardEffect.bind(this);
+		cards.chapel = {
+			name: "chapel",
 			cost: 2,
 			type: "action",
-			effect: () => {
-				return {
-					actions: 0,
-					buys: 0,
-					gold: 0,
-					// trash up to 4 cards from your hand
-					trash: 4
-				};
-			}
+			effect: chapelEffect,
+		};
+
+		const workshopEffect = this.workshopCardEffect.bind(this);
+		cards.workshop = {
+			name: "workshop",
+			cost: 3,
+			type: "action",
+			effect: workshopEffect
 		};
 
 		// TODO unfinished cards
-		cards.chapel = {
-			name: "chapel",
+
+		cards.cellar = {
+			name: "cellar",
 			cost: 2,
 			type: "action",
 			effect: () => {}
@@ -286,6 +308,7 @@ class Game {
 			effect: () => {}
 		};
 
+		// const merchantEffect = this.merchantCardEffect.bind(this);
 		cards.merchant = {
 			name: "merchant",
 			cost: 3,
@@ -311,13 +334,6 @@ class Game {
 		cards.remodel = {
 			name: "remodel",
 			cost: 4,
-			type: "action",
-			effect: () => {}
-		};
-
-		cards.workshop = {
-			name: "workshop",
-			cost: 3,
 			type: "action",
 			effect: () => {}
 		};
@@ -564,6 +580,22 @@ class Game {
 	}
 
 	/**
+	 * Remove a card from the supply and add it to the player's discard pile
+	 * @param {string} cardName
+	 * @param {number} playerIndex
+	 * @returns {Card}
+	 */
+	gainCard(cardName, playerIndex) {
+		const player = this.players[playerIndex];
+		const card = this.takeCard(cardName, playerIndex);
+		if (card === null) {
+			throw new Error("Failed to take the card from the deck while buying");
+		}
+		player.discard.push(card);
+		return card;
+	}
+
+	/**
 	 * Buy a card with treasure pot and place it into discard pile
 	 * Deduct its cost from treasure pot
 	 * Reduce player.numBuys
@@ -716,9 +748,9 @@ class Game {
 			console.log(card);
 			console.error("Failed to find effect for card ^");
 		}
-		player.numActions += cardEffect.actions;
-		player.numBuys += cardEffect.buys;
-		this.treasurePot += cardEffect.gold;
+		player.numActions += cardEffect.actions || 0;
+		player.numBuys += cardEffect.buys || 0;
+		this.treasurePot += cardEffect.gold || 0;
 
 		// remove element from hand and place it on the discard pile
 		let cardIndex;
@@ -768,6 +800,17 @@ class Game {
 				if(effect.trash) {
 					const trashCards = player.strategy.trashCards(player, effect.trash);
 					this.trashCards(player, trashCards);
+				}
+				if(effect.gain) {
+					const gainCardName = player.strategy.gainCard(player, effect.gain);
+					if(gainCardName) {
+						let card = this.cards[gainCardName];
+						if(card.cost > effect.gain) {
+							throw new Error(`Card allowed you to gain a card costing up to ${effect.gain} but you tried to gain a card costing ${gainCard.cost}`);
+						}
+						console.debug(`Player ${player.name} gained card ${gainCardName}`);
+						this.gainCard(gainCardName, p);
+					}
 				}
 			} else {
 				break;
