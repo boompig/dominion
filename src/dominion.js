@@ -155,6 +155,11 @@ new Vue({
 	},
 	beforeMount: function () {
 		console.log("beforeMount");
+		// grab the name, if set, from URL params
+		const url = new URL(window.location.href);
+		if(url.searchParams.get("name")) {
+			this.humanPlayerName = url.searchParams.get("name");
+		}
 		this.resetSim();
 	},
 	computed: {

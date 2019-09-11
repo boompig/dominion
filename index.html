@@ -1,90 +1,20 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Dominion Simulation</title>
-        <meta charset="UTF-8" />
-        <meta http-equiv="cache-control" content="no-cache" />
-        <meta http-equiv="expires" content="0" />
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dominion Simulation</title>
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
-        <link rel="stylesheet" href="style.css" />
-    </head>
-
-    <body>
-        <div class="container container-fluid" id="app-container">
-            <h1 class="title">Dominion Simulation - Round {{ game.round }}</h1>
-            <div v-show="game.gameOver">
-                <h4>Winners ({{ game.winArr.length}})</h4>
-                <ul v-for="player in game.winArr">
-                    <li>{{ player.name }}</li>
-                </ul>
-            </div>
-
-            <div class="sim-container">
-                <h5>Supply</h5>
-                <div class="deck-container" v-bind:class="{active: isHumanPlayerTurn && game.phase === 'buy'}">
-                    <div class="deck-inner-container">
-                        <div v-for="cardName in standardDeckCards">
-                            <div class="deck-card" v-bind:class="cardClasses(cardName, 'deck')"
-                                v-on:click="buyCard(cardName)">
-                                {{cardName}} ({{ game.cards[cardName].cost }}) - {{ game.supply[cardName] }} left
-                            </div>
-                        </div>
-                    </div>
-                    <div class="deck-inner-container">
-                        <div v-for="cardName in kingdomDeckCards">
-                            <div class="deck-card" v-bind:class="cardClasses(cardName, 'deck')"
-                                v-on:click="buyCard(cardName)">
-                                {{cardName}} ({{ game.cards[cardName].cost }}) - {{ game.supply[cardName] }} left
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div>Phase: {{ game.phase }}</div>
-                <div>Treasure Pot: {{ game.treasurePot }}</div>
-                <div v-show="game.turn === humanPlayerIndex"># buys: {{ game.players[game.turn].numBuys }}</div>
-                <div v-show="game.turn === humanPlayerIndex"># actions: {{ game.players[game.turn].numActions }}</div>
-                <div class="num-trash-cards" v-show="cardsToTrash > 0"># cards to trash: {{ cardsToTrash }}</div>
-
-                <div class="player-container">
-                    <div class="player" v-for="(player, playerIndex) in game.players" v-bind:class="{active: playerIndex === game.turn }">
-                        <div class="player-name">{{ player.name }} ({{ player.isHuman ? "Human" : "AI" }})</div>
-                        <div>Deck size: <span>{{ player.deck.length }}</span></div>
-                        <div>Discard size: <span>{{ player.discard.length }}</span></div>
-                        <div>Points: <span>{{ player.points }}</span></div>
-
-                        <div v-for="(card, cardIndex) in player.hand"
-                             class="player-card"
-                             v-bind:class="cardClasses(card, 'hand')"
-                             v-on:click="playCard(player, playerIndex, card, cardIndex)">
-                            <div class="card-name">{{ card ? card.name : "null" }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="btn-container">
-                <!-- buttons for human player -->
-                <button class="btn btn-info" type="button" v-on:click="drawCard()"
-                    v-show="game.phase === 'draw' && isHumanPlayerTurn">Draw Card</button>
-                <button class="btn btn-info" type="button" v-on:click="stopTrashingCards()"
-                    v-show="cardsToTrash > 0 && isHumanPlayerTurn">Stop Trashing Cards</button>
-                <button class="btn btn-info" type="button" v-on:click="endActionPhase()"
-                    v-show="game.phase === 'action' && isHumanPlayerTurn">End Action Phase</button>
-                <button class="btn btn-info" type="button" v-on:click="endHumanPlayerTurn()"
-                    v-show="game.phase === 'buy' && isHumanPlayerTurn">End Turn</button>
-
-                <!-- buttons for simulation -->
-                <button class="btn btn-primary" type="button" v-on:click="doTurn()" :disabled="buttonDisabled">AI Turn</button>
-                <button class="btn btn-primary" type="button" v-on:click="doRound()" :disabled="buttonDisabled">Run Simulation (1 Round)</button>
-                <!-- <button class="btn btn-primary" type="button" v-on:click="doSim()" :disabled="buttonDisabled">Run Simulation (Full Game)</button> -->
-                <button class="btn btn-danger" type="button" v-on:click="resetSim()" :disabled="simMode">Reset</button>
-            </div>
-        </div>
-
-        <!-- Javascript at bottom for faster loading -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js" integrity="sha256-ufGElb3TnOtzl5E4c/qQnZFGP+FYEZj5kbSEdJNrw0A=" crossorigin="anonymous"></script>
-        <script src="dist/dominion.bundle.js"></script>
-    </body>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha256-YLGeXaapI0/5IgZopewRJcFXomhRMlYYjugPLSyNjTY=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="css/landing.css" />
+</head>
+<body>
+    <main>
+        <form action="game.vue.html">
+            <input type="text" class="form-control" name="name" placeholder="please enter a name" required="true">
+            <button class="btn btn-success form-control" type="submit">Play!</button>
+        </form>
+    </main>
+</body>
 </html>

@@ -1,0 +1,13 @@
+main {
+    margin-top: 2rem;
+}
+
+form {
+    max-width: 600px;
+    text-align: left;
+    margin: 0 auto;
+}
+
+form button {
+    margin-top: .5rem;
+}

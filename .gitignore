@@ -1,5 +1,5 @@
+# editor
 *.code-workspace
 
+# javascript
 node_modules
-
-dist
