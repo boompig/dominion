@@ -53,7 +53,7 @@ h1 {
 }
 
 .player.active .player-name {
-    color: orange;
+    color: #e63981;
 }
 
 .player-name {
