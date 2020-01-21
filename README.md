@@ -2,6 +2,8 @@
 
 A bare-bones simulator and visualizer for the card game [Dominion](https://boardgamegeek.com/boardgame/36218/dominion) in JavaScript. Simulator can be run headless from command-line with node.js or in the browser. Visualization powered by Vue.js (v2).
 
+Currently only supports standard cards. Card descriptions can be found [here](https://www.ultraboardgames.com/dominion/cards.php).
+
 ## Run
 
 ### Browser
@@ -13,7 +15,7 @@ A bare-bones simulator and visualizer for the card game [Dominion](https://board
 The simulation can be run headless from the command line. Run
 
 ```
-node index.js
+node cli.js
 ```
 
 The `--help` flag will give you available options.
@@ -29,6 +31,10 @@ Shared files (between browser and Node) can be found in the `/src` directory. Bu
 ```
 yarn build
 ```
+
+## Adding New Cards
+
+See `initCards` function in `src/game.js`.
 
 ## Strategies
 
