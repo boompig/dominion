@@ -17377,6 +17377,7 @@ class Game {
 	 * 		- humanPlayerIndex: index of human player
 	 * 		- humanPlayerName: name of human player
 	 * 		- players: array of players to use; length should == numPlayers
+	 * 		- supplyCards: array of strings of cards to include in supply. can be any length and automatically filled to 10 randomly
 	 */
 	constructor(options) {
 		options = options || {};
@@ -17441,7 +17442,7 @@ class Game {
 
 		this.winArr = [];
 
-		this.setup(options.players);
+		this.setup(options.players, options.supplyCards);
 	}
 
 	/** *************** CARD EFFECTS **************** */
@@ -17633,6 +17634,20 @@ class Game {
 	}
 
 	/**
+	 * Trash this card. Gain a card costing up to $5.
+	 * @param {number} playerIndex
+	 */
+	feastCardEffect() {
+		this.changePhaseUsingActionCard("gain", {
+			maxGainCost: 5,
+			gainType: "any"
+		});
+		return {
+			sendToTrash: true
+		};
+	}
+
+	/**
 	 * +1 Action
 	 * Discard any number of cards.
 	 * +1 Card per card discarded.
@@ -17652,6 +17667,17 @@ class Game {
 		});
 		return {};
 	}
+
+	/**
+	 * Worth 1 Victory for every 10 cards in your deck (rounded down).
+	 * @param {number} playerIndex
+	 */
+	gardensCardEffect(playerIndex) {
+		const player = this.players[playerIndex];
+		const playerDeckSize = player.hand.length + player.discard.length;
+		return Math.floor(playerDeckSize / 10);
+	}
+
 	/** ********************************************* */
 
 	/**
@@ -17680,7 +17706,7 @@ class Game {
 			value: 3,
 		};
 
-		// point cards
+		// victory cards
 		cards.estate = {
 			name: "estate",
 			cost: 2,
@@ -17704,6 +17730,15 @@ class Game {
 			cost: 0,
 			type: "victory",
 			points: -1,
+		};
+
+		const gardensEffect = this.gardensCardEffect.bind(this);
+		cards.gardens = {
+			name: "gardens",
+			cost: 4,
+			type: "victory",
+			points: 0,
+			pointsEffect: gardensEffect
 		};
 
 		// action cards
@@ -17796,6 +17831,14 @@ class Game {
 			effect: cellarEffect
 		};
 
+		const feastEffect = this.feastCardEffect.bind(this);
+		cards.feast = {
+			name: "feast",
+			cost: 4,
+			type: "action",
+			effect: feastEffect
+		};
+
 		// TODO unfinished cards
 		cards.moat = {
 			name: "moat",
@@ -17827,10 +17870,12 @@ class Game {
 	/**
 	 * Initialize mapping of card names to their quantity
 	 * @param {number} numPlayers
+	 * @param {string[] | null} kingdomCardPiles
 	 * @returns {object}
 	 */
-	initSupply(numPlayers) {
+	initSupply(numPlayers, kingdomCardPiles) {
 		const supply = {};
+		kingdomCardPiles = kingdomCardPiles || [];
 
 		// treasure cards
 		supply.copper = 60 + numPlayers * 7;
@@ -17845,34 +17890,83 @@ class Game {
 		} else {
 			numVictoryCards = 12;
 		}
-		let numProvinces = numVictoryCards;
-		if (numPlayers === 5) {
-			numProvinces = 15;
-		} else if (numPlayers === 6) {
-			numProvinces = 18;
-		}
 
 		supply.estate = numVictoryCards + numPlayers * 3;
 		supply.duchy = numVictoryCards;
-		supply.province = numProvinces;
+		supply.province = numVictoryCards;
 		supply.curse = (numPlayers - 1) * 10;
 
-		// kingdom cards - use the Dominion Only initial set
-		// add a few and ignore a few based on implementation difficulties
 
-		supply.cellar = 10;
-		supply.market = 10;
-		// supply.merchant = 10;
-		// supply.militia = 10;
-		supply.mine = 10;
-		// supply.moat = 10;
-		supply.remodel = 10;
-		supply.festival = 10;
-		supply.laboratory = 10;
-		supply.smithy = 10;
-		supply.village = 10;
-		supply.woodcutter = 10;
-		supply.workshop = 10;
+		if(kingdomCardPiles.length > 10) {
+			throw new Error("Cannot have more than 10 kingdom card piles");
+		}
+
+		// pick remainder from cards below
+		const baseKingdomCards = [
+			"cellar",
+			"chapel",
+			// chancellor: not implemented
+			"village",
+			"woodcutter",
+			"feast",
+			// militia: not implemented
+			// moneylender: not implemented
+			"workshop",
+			"gardens",
+			"remodel",
+			// spy: not implemented
+			// thief: not implemented
+			// throne room: not implemented
+			// council room: not implemented
+			// library: not implemented
+			// witch: not implemented
+			// adventurer: not implemented
+			"smithy",
+			"festival",
+			"laboratory",
+			"market",
+			"mine",
+		];
+		const implementedKingdomCards = baseKingdomCards.concat([
+			// not part of basic set but implemented:
+			"merchant"
+		]);
+
+		for(let cardName of kingdomCardPiles) {
+			let i = implementedKingdomCards.indexOf(cardName);
+			// find the card
+			if(i === -1) {
+				throw new Error(`Could not find card ${cardName}, possibly not implemented`);
+			}
+			// remove from array
+			implementedKingdomCards.splice(i, 1);
+			let j = baseKingdomCards.indexOf(cardName);
+			if(j >= 0) {
+				baseKingdomCards.splice(j, 1);
+			}
+		}
+
+		// draw only from base cards
+		let p2 = _.sample(baseKingdomCards, 10 - kingdomCardPiles.length);
+		let piles = kingdomCardPiles.concat(p2);
+
+		// if(piles.length != 10) {
+		// 	throw new Error(`Piles must be exactly of size 10 in setup, found ${piles.length}`);
+		// }
+
+		for(let cardName of piles) {
+			const card = this.cards[cardName];
+			if(!card) {
+				throw new Error(`Failed to find card ${cardName}`);
+			}
+			if(card.type === "action") {
+				supply[cardName] = 10;
+			} else if(card.type === "victory") {
+				supply[cardName] = numVictoryCards;
+			} else {
+				throw new Error();
+			}
+		}
 
 		return supply;
 	}
@@ -18103,10 +18197,11 @@ class Game {
 
 	/**
 	 * @param {Player[] | null} players
+	 * @param {String[] | null} supplyCards
 	 */
-	setup(players) {
+	setup(players, supplyCards) {
 		this.cards = this.initCards();
-		this.supply = this.initSupply(this.numPlayers);
+		this.supply = this.initSupply(this.numPlayers, supplyCards);
 		this.initPlayers(players);
 		this.dealHands();
 	}
@@ -18221,6 +18316,39 @@ class Game {
 		return this.winArr;
 	}
 
+	calculateGameEnd() {
+		// trigger all the effects for cards
+		for (let playerIndex = 0; playerIndex < this.numPlayers; playerIndex++) {
+			let player = this.players[playerIndex];
+			let playerDeck = player.hand.concat(player.discard);
+			for(let card of playerDeck) {
+				if(card.type === "victory" && card.pointsEffect) {
+					let bonusPoints = card.pointsEffect(playerIndex);
+					console.log(`Added ${bonusPoints} points to player ${player.name} due to gardens card`);
+					player.points += bonusPoints;
+				}
+			}
+		}
+
+		let bestScore = 0;
+
+		for (let i = 0; i < this.numPlayers; i++) {
+
+			bestScore = Math.max(this.players[i].points, bestScore);
+		}
+
+		console.debug("**** game over ****");
+		console.debug(`best score = ${bestScore}`);
+
+		this.winArr = [];
+
+		for (let i = 0; i < this.numPlayers; i++) {
+			if (this.players[i].points === bestScore) {
+				this.winArr.push(this.players[i]);
+			}
+		}
+	}
+
 	/**
 	 * Change the phase to cleanup, then to buy
 	 * Perform the cleanup phase for the current player
@@ -18249,23 +18377,7 @@ class Game {
 
 		if (this.checkGameEnd()) {
 			this.gameOver = true;
-
-			let bestScore = 0;
-
-			for (let i = 0; i < this.numPlayers; i++) {
-				bestScore = Math.max(this.players[i].points, bestScore);
-			}
-
-			console.debug("**** game over ****");
-			console.debug(`best score = ${bestScore}`);
-
-			this.winArr = [];
-
-			for (let i = 0; i < this.numPlayers; i++) {
-				if (this.players[i].points === bestScore) {
-					this.winArr.push(this.players[i]);
-				}
-			}
+			this.calculateGameEnd();
 		} else {
 			this.turn = (this.turn + 1) % this.numPlayers;
 		}
@@ -18274,17 +18386,20 @@ class Game {
 	}
 
 	/**
-	 * Trash the given cards from that player
+	 * Trash the given cards from that player. Verify phase unless explicitly told not to
 	 *
 	 * @param {Player} player
 	 * @param {number[]} cardIndexes
+	 * @param {boolean} noVerify - whether to run checks
 	 * @returns {Card[]} trashed cards
 	 */
-	trashCards(player, cardIndexes) {
-		if(this.phase !== "trash") {
+	trashCards(player, cardIndexes, noVerify) {
+		noVerify = noVerify || false;
+		const runChecks = !noVerify;
+		if(runChecks && this.phase !== "trash") {
 			throw new Error("Cannot trash cards outside of trash phase");
 		}
-		if(cardIndexes.length > this.numTrash) {
+		if(runChecks && cardIndexes.length > this.numTrash) {
 			throw new Error(`Can trash a max of ${this.numTrash} cards, tried to trash ${cardIndexes.length}`);
 		}
 		const trashed = [];
@@ -18294,7 +18409,7 @@ class Game {
 		});
 		for(let cardIndex of cardIndexes) {
 			const card = player.hand.splice(cardIndex, 1)[0];
-			if(this.trashType !== "any" && card.type !== this.trashType) {
+			if(runChecks && this.trashType !== "any" && card.type !== this.trashType) {
 				throw new Error(`Can only trash cards of type ${this.trashType} but tried to trash card of type ${card.type}`);
 			}
 			console.debug(`Player ${player.name} trashed card ${card.name}`);
@@ -18353,6 +18468,7 @@ class Game {
 		}
 		player.numActions += cardEffect.actions || 0;
 		player.numBuys += cardEffect.buys || 0;
+		let sendToTrash = cardEffect.sendToTrash || false;
 		this.treasurePot += cardEffect.gold || 0;
 		let firstPlayBonus = cardEffect.firstPlayBonus || {};
 		for(let cardName in firstPlayBonus) {
@@ -18368,7 +18484,11 @@ class Game {
 			}
 		}
 		player.hand.splice(cardIndex, 1)[0];
-		player.discard.push(card);
+		if(sendToTrash) {
+			this.trash.push(card);
+		} else {
+			player.discard.push(card);
+		}
 
 		player.numActions--;
 

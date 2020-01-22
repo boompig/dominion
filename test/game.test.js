@@ -381,6 +381,49 @@ describe("game", () => {
 		expect(game.phase).toBe("action");
 	});
 
+	test("test witch - other players gain cards", () => {
+		const supply = ["witch"];
+		const playerIndex = 0;
+		const game = new Game({
+			numPlayers: 4,
+			humanPlayerIndex: playerIndex,
+			humanPlayerName: "test human",
+			supplyCards: supply
+		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+		expect(game.numPlayers).toBe(4);
+
+		// 5 cards
+		const player = game.players[0];
+
+		// +1 card
+		const card = game.cards.witch;
+		player.hand.push(card);
+
+		// +1 card
+		game.drawPhase();
+
+		expect(player.hand.length).toBe(7);
+		expect(game.phase).toBe("action");
+
+		expect(card.name).toBe("witch");
+		game.playActionCard(player, 0, card);
+		expect(game.phase).toBe("action");
+
+		// 7 - 1 (witch played) + 2 (cards drawn)
+		expect(player.hand.length).toBe(8);
+		expect(player.discard.length).toBe(1);
+
+		// verify that all other players have a curse card in discard pile
+		for(let i = 0; i < game.numPlayers; i++) {
+			if(i != playerIndex) {
+				expect(game.players[i].discard.length).toBe(1);
+				const discardedCard = game.players[i].discard[0];
+				expect(discardedCard.name).toBe("curse");
+			}
+		}
+	});
+
 	test("implement merchant card 'in code'", () => {
 		const supply = ["merchant"];
 		const game = new Game({
