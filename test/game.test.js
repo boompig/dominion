@@ -88,11 +88,14 @@ describe("game", () => {
 	});
 
 	test("test chapel - trash n numbers of cards", () => {
+		const supply = ["chapel"];
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
-			humanPlayerName: "test human"
+			humanPlayerName: "test human",
+			supplyCards: supply
 		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
 
 		const player = game.players[0];
 		expect(player.hand.length).toBe(5);
@@ -123,11 +126,15 @@ describe("game", () => {
 	});
 
 	test("test feast - trash self", () => {
+		const supply = ["feast", "festival"];
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
-			humanPlayerName: "test human"
+			humanPlayerName: "test human",
+			supplyCards: supply
 		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
 		// 5 cards
 		const player = game.players[0];
 
@@ -157,12 +164,15 @@ describe("game", () => {
 		expect(player.discard.length).toBe(1);
 	});
 
-	test("try the strategy of multiple buys per turn", () => {
+	test("test lab, village, market - multiple buys per turn", () => {
+		const supply = ["laboratory", "village", "market"];
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
-			humanPlayerName: "test human"
+			humanPlayerName: "test human",
+			supplyCards: supply
 		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
 
 		// 5 cards
 		const player = game.players[0];
@@ -197,11 +207,14 @@ describe("game", () => {
 	});
 
 	test("test workshop - gain card with restrictions", () => {
+		const supply = ["workshop", "smithy"];
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
-			humanPlayerName: "test human"
+			humanPlayerName: "test human",
+			supplyCards: supply
 		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
 
 		const player = game.players[0];
 		const card = game.cards.workshop;
@@ -225,11 +238,15 @@ describe("game", () => {
 	});
 
 	test("test remodel - trash & gain phase", () => {
+		const supply = ["remodel"];
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
-			humanPlayerName: "test human"
+			humanPlayerName: "test human",
+			supplyCards: supply
 		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
 		// 5 cards
 		const player = game.players[0];
 
@@ -278,11 +295,15 @@ describe("game", () => {
 	});
 
 	test("test mine - trash and gain treasure", () => {
+		const supply = ["mine"];
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
-			humanPlayerName: "test human"
+			humanPlayerName: "test human",
+			supplyCards: supply
 		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
 		// 5 cards
 		const player = game.players[0];
 
@@ -321,11 +342,15 @@ describe("game", () => {
 	});
 
 	test("test cellar - discard 5 and draw 5", () => {
+		const supply = ["cellar"];
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
-			humanPlayerName: "test human"
+			humanPlayerName: "test human",
+			supplyCards: supply
 		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
 		// 5 cards
 		const player = game.players[0];
 
@@ -357,12 +382,15 @@ describe("game", () => {
 	});
 
 	test("implement merchant card 'in code'", () => {
-
+		const supply = ["merchant"];
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
-			humanPlayerName: "test human"
+			humanPlayerName: "test human",
+			supplyCards: supply
 		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
 		// 5 cards
 		const player = game.players[0];
 
