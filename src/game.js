@@ -270,6 +270,20 @@ class Game {
 	}
 
 	/**
+	 * Trash this card. Gain a card costing up to $5.
+	 * @param {number} playerIndex
+	 */
+	feastCardEffect() {
+		this.changePhaseUsingActionCard("gain", {
+			maxGainCost: 5,
+			gainType: "any"
+		});
+		return {
+			sendToTrash: true
+		};
+	}
+
+	/**
 	 * +1 Action
 	 * Discard any number of cards.
 	 * +1 Card per card discarded.
@@ -433,6 +447,14 @@ class Game {
 			effect: cellarEffect
 		};
 
+		const feastEffect = this.feastCardEffect.bind(this);
+		cards.feast = {
+			name: "feast",
+			cost: 4,
+			type: "action",
+			effect: feastEffect
+		};
+
 		// TODO unfinished cards
 		cards.moat = {
 			name: "moat",
@@ -498,6 +520,11 @@ class Game {
 		// add a few and ignore a few based on implementation difficulties
 
 		supply.cellar = 10;
+		supply.chapel = 10;
+		// supply.village = 10;
+		supply.woodcutter = 10;
+		supply.feast = 10;
+
 		supply.market = 10;
 		// supply.merchant = 10;
 		// supply.militia = 10;
@@ -506,9 +533,7 @@ class Game {
 		supply.remodel = 10;
 		supply.festival = 10;
 		supply.laboratory = 10;
-		supply.smithy = 10;
-		supply.village = 10;
-		supply.woodcutter = 10;
+		// supply.smithy = 10;
 		supply.workshop = 10;
 
 		return supply;
@@ -911,17 +936,20 @@ class Game {
 	}
 
 	/**
-	 * Trash the given cards from that player
+	 * Trash the given cards from that player. Verify phase unless explicitly told not to
 	 *
 	 * @param {Player} player
 	 * @param {number[]} cardIndexes
+	 * @param {boolean} noVerify - whether to run checks
 	 * @returns {Card[]} trashed cards
 	 */
-	trashCards(player, cardIndexes) {
-		if(this.phase !== "trash") {
+	trashCards(player, cardIndexes, noVerify) {
+		noVerify = noVerify || false;
+		const runChecks = !noVerify;
+		if(runChecks && this.phase !== "trash") {
 			throw new Error("Cannot trash cards outside of trash phase");
 		}
-		if(cardIndexes.length > this.numTrash) {
+		if(runChecks && cardIndexes.length > this.numTrash) {
 			throw new Error(`Can trash a max of ${this.numTrash} cards, tried to trash ${cardIndexes.length}`);
 		}
 		const trashed = [];
@@ -931,7 +959,7 @@ class Game {
 		});
 		for(let cardIndex of cardIndexes) {
 			const card = player.hand.splice(cardIndex, 1)[0];
-			if(this.trashType !== "any" && card.type !== this.trashType) {
+			if(runChecks && this.trashType !== "any" && card.type !== this.trashType) {
 				throw new Error(`Can only trash cards of type ${this.trashType} but tried to trash card of type ${card.type}`);
 			}
 			console.debug(`Player ${player.name} trashed card ${card.name}`);
@@ -990,6 +1018,7 @@ class Game {
 		}
 		player.numActions += cardEffect.actions || 0;
 		player.numBuys += cardEffect.buys || 0;
+		let sendToTrash = cardEffect.sendToTrash || false;
 		this.treasurePot += cardEffect.gold || 0;
 		let firstPlayBonus = cardEffect.firstPlayBonus || {};
 		for(let cardName in firstPlayBonus) {
@@ -1005,7 +1034,11 @@ class Game {
 			}
 		}
 		player.hand.splice(cardIndex, 1)[0];
-		player.discard.push(card);
+		if(sendToTrash) {
+			this.trash.push(card);
+		} else {
+			player.discard.push(card);
+		}
 
 		player.numActions--;
 

@@ -122,6 +122,41 @@ describe("game", () => {
 		expect(player.discard.length).toBe(1);
 	});
 
+	test("test feast - trash self", () => {
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human"
+		});
+		// 5 cards
+		const player = game.players[0];
+
+		// +1 card
+		const card = game.cards.feast;
+		player.hand.push(card);
+
+		// +1 card
+		game.drawPhase();
+
+		expect(player.hand.length).toBe(7);
+
+		game.playActionCard(player, 0, card);
+		expect(player.hand.length).toBe(6);
+		expect(game.trash.length).toBe(1);
+		expect(game.phase).toBe("gain");
+		expect(game.maxGainCost).toBe(5);
+
+		game.gainCardWithCheck("festival", 0);
+		game.endActionCardPhase();
+		expect(game.phase).toBe("action");
+
+		// feast
+		expect(game.trash.length).toBe(1);
+
+		// festival
+		expect(player.discard.length).toBe(1);
+	});
+
 	test("try the strategy of multiple buys per turn", () => {
 		const game = new Game({
 			numPlayers: 2,

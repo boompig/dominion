@@ -36,7 +36,16 @@ yarn build
 
 - Cellar
 - Chapel
-- 
+- Village
+- Woodcutter
+- Feast
+- Workshop
+
+## Unsupported Cards
+
+- Chancellor
+- Moat
+- Bureaucrat
 
 ### Adding New Cards
 
