@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy, PointsOnlyStrategy } = require("./player-strategies.js");
 
+// for debugging
 console.debug = function() {};
 
 const Player = require("./player.js");
@@ -64,7 +65,7 @@ class Game {
 		this.phase = "draw";
 		this.endPhaseCallback = null;
 		this.round = 0;
-		this.gameOver = false;
+		this.isGameOver = false;
 
 		// gain-phase specific
 		this.maxGainCost = 0;
@@ -324,11 +325,12 @@ class Game {
 	/**
 	 * Worth 1 Victory for every 10 cards in your deck (rounded down).
 	 * @param {number} playerIndex
+	 * @returns {number} number of points to add
 	 */
 	gardensCardEffect(playerIndex) {
 		const player = this.players[playerIndex];
-		const playerDeckSize = player.hand.length + player.discard.length;
-		return Math.floor(playerDeckSize / 10);
+		const numCards = player.hand.length + player.discard.length + player.deck.length;
+		return Math.floor(numCards / 10);
 	}
 
 	/** ********************************************* */
@@ -532,7 +534,7 @@ class Game {
 	 * Initialize mapping of card names to their quantity
 	 * @param {number} numPlayers
 	 * @param {string[] | null} kingdomCardPiles
-	 * @returns {object}
+	 * @returns {object} mapping of card names to their quantity
 	 */
 	initSupply(numPlayers, kingdomCardPiles) {
 		const supply = {};
@@ -552,6 +554,7 @@ class Game {
 			numVictoryCards = 12;
 		}
 
+		// per the rules, starting cards do not come from supply
 		supply.estate = numVictoryCards + numPlayers * 3;
 		supply.duchy = numVictoryCards;
 		supply.province = numVictoryCards;
@@ -607,12 +610,12 @@ class Game {
 		}
 
 		// draw only from base cards
-		let p2 = _.sample(baseKingdomCards, 10 - kingdomCardPiles.length);
-		let piles = kingdomCardPiles.concat(p2);
+		const p2 = _.sampleSize(baseKingdomCards, 10 - kingdomCardPiles.length);
+		const piles = kingdomCardPiles.concat(p2);
 
-		// if(piles.length != 10) {
-		// 	throw new Error(`Piles must be exactly of size 10 in setup, found ${piles.length}`);
-		// }
+		if(piles.length != 10) {
+			throw new Error(`Piles must be exactly of size 10 in setup, found ${piles.length}`);
+		}
 
 		for(let cardName of piles) {
 			const card = this.cards[cardName];
@@ -970,7 +973,7 @@ class Game {
 	 * Run the game to completion. If the game is over, return the winning players
 	 */
 	playGame() {
-		while (!this.gameOver) {
+		while (!this.isGameOver) {
 			this.doTurn();
 		}
 		return this.winArr;
@@ -979,12 +982,20 @@ class Game {
 	calculateGameEnd() {
 		// trigger all the effects for cards
 		for (let playerIndex = 0; playerIndex < this.numPlayers; playerIndex++) {
+			// reset points for this player
 			let player = this.players[playerIndex];
-			let playerDeck = player.hand.concat(player.discard);
-			for(let card of playerDeck) {
+			player.points = 0;
+
+			let allCards = player.hand.concat(player.discard, player.deck);
+			for(let card of allCards) {
+				if(card.type === "victory" && card.points) {
+					console.debug(`Added points to player ${player.name} due to ${card.name}`);
+					player.points += card.points;
+				}
+
 				if(card.type === "victory" && card.pointsEffect) {
 					let bonusPoints = card.pointsEffect(playerIndex);
-					console.log(`Added ${bonusPoints} points to player ${player.name} due to gardens card`);
+					console.debug(`Added ${bonusPoints} points to player ${player.name} due to gardens card`);
 					player.points += bonusPoints;
 				}
 			}
@@ -1036,7 +1047,7 @@ class Game {
 		}
 
 		if (this.checkGameEnd()) {
-			this.gameOver = true;
+			this.isGameOver = true;
 			this.calculateGameEnd();
 		} else {
 			this.turn = (this.turn + 1) % this.numPlayers;
@@ -1180,7 +1191,7 @@ class Game {
 	 * Run player strategy automatically
 	 */
 	doTurn() {
-		if (this.gameOver) {
+		if (this.isGameOver) {
 			return;
 		}
 

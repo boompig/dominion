@@ -17601,6 +17601,22 @@ class Game {
 	}
 
 	/**
+	 * +2 Cards
+	 * Each other player gains a Curse card.
+	 */
+	witchCardEffect(playerIndex) {
+		for (let i = 0; i < 2; i++) {
+			this.drawCard(playerIndex);
+		}
+		for(let i = 0; i < this.numPlayers; i++) {
+			if(i != playerIndex) {
+				this.gainCard("curse", i);
+			}
+		}
+		return {};
+	}
+
+	/**
 	 * Gain a card costing up to $4.
 	 */
 	workshopCardEffect() {
@@ -17798,6 +17814,14 @@ class Game {
 			effect: chapelEffect,
 		};
 
+		const witchEffect = this.witchCardEffect.bind(this);
+		cards.witch = {
+			name: "witch",
+			cost: 5,
+			type: "action",
+			effect: witchEffect
+		};
+
 		const workshopEffect = this.workshopCardEffect.bind(this);
 		cards.workshop = {
 			name: "workshop",
@@ -17896,7 +17920,6 @@ class Game {
 		supply.province = numVictoryCards;
 		supply.curse = (numPlayers - 1) * 10;
 
-
 		if(kingdomCardPiles.length > 10) {
 			throw new Error("Cannot have more than 10 kingdom card piles");
 		}
@@ -17919,7 +17942,7 @@ class Game {
 			// throne room: not implemented
 			// council room: not implemented
 			// library: not implemented
-			// witch: not implemented
+			"witch",
 			// adventurer: not implemented
 			"smithy",
 			"festival",
@@ -17936,7 +17959,7 @@ class Game {
 			let i = implementedKingdomCards.indexOf(cardName);
 			// find the card
 			if(i === -1) {
-				throw new Error(`Could not find card ${cardName}, possibly not implemented`);
+				throw new Error(`Could not find card ${cardName} in card names, possibly not implemented`);
 			}
 			// remove from array
 			implementedKingdomCards.splice(i, 1);

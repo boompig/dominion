@@ -29,7 +29,7 @@ new Vue({
 		},
 		doRound: function() {
 			const round = this.game.round;
-			while((this.game.round === round) && !this.game.gameOver &&
+			while((this.game.round === round) && !this.game.isGameOver &&
 				(this.game.turn !== this.humanPlayerIndex)) {
 				this.game.doTurn();
 			}
@@ -37,7 +37,7 @@ new Vue({
 		/*
 		doSim: function() {
 			this.simMode = true;
-			while (!this.game.gameOver) {
+			while (!this.game.isGameOver) {
 				this.game.doTurn();
 			}
 			this.simMode = false;
@@ -226,7 +226,7 @@ new Vue({
 		 * for AI buttons
 		 */
 		buttonDisabled: function() {
-			return this.game.gameOver || this.simMode || (this.game.turn === this.humanPlayerIndex);
+			return this.game.isGameOver || this.simMode || (this.game.turn === this.humanPlayerIndex);
 		},
 		standardSupplyCards: function() {
 			return Object.keys(this.game.supply).filter((cardName) => {

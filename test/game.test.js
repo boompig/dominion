@@ -32,7 +32,32 @@ class SimpleTestStrategy extends PlayerStrategy {
 	}
 }
 
+class DoNothingStrategy extends PlayerStrategy {
+	actionTurn() {
+		return null;
+	}
+
+	getBuyGoal() {
+		return null;
+	}
+}
+
 describe("game", () => {
+	test("setup is correct", () => {
+		const game = new Game({
+			numPlayers: 2
+		});
+
+		for(let i = 0; i < 2; i++) {
+			let player = game.players[i];
+			let allCards = player.deck.concat(player.hand);
+			expect(allCards.length).toBe(10);
+		}
+
+		// 4 victory piles incl curses, 3 treasure piles, 10 kingdom piles
+		expect(Object.keys(game.supply).length).toBe(17);
+	});
+
 
 	test("can finish a game by resource exhaustion manually", () => {
 		const game = new Game({
@@ -41,7 +66,7 @@ describe("game", () => {
 
 		// set the AI
 
-		while(!game.gameOver) {
+		while(!game.isGameOver) {
 			let player = game.players[game.turn];
 
 			// we have a very stupid AI
@@ -80,7 +105,7 @@ describe("game", () => {
 			numPlayers: 2,
 			players: players
 		});
-		while(!game.gameOver) {
+		while(!game.isGameOver) {
 			game.doTurn();
 		}
 		// just want the game to run to completion
@@ -422,6 +447,44 @@ describe("game", () => {
 				expect(discardedCard.name).toBe("curse");
 			}
 		}
+	});
+
+	test("test gardens - victory card with effect", () => {
+		const supply = ["gardens"];
+		const players = [
+			new Player(
+				"do nothing AI - gardens",
+				new DoNothingStrategy()
+			),
+			new Player(
+				"test 2",
+				new SimpleTestStrategy()
+			)
+		];
+		const game = new Game({
+			numPlayers: 2,
+			players: players,
+			supplyCards: supply,
+		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
+		const player = game.players[0];
+		// add 3 gardens cards to player 0
+		for(let i = 0; i < 3; i++) {
+			player.hand.push(game.cards.gardens);
+		}
+
+		while(!game.isGameOver) {
+			game.doTurn();
+		}
+
+		// player 0 should have precisely 10 cards
+		const allCards = player.deck.concat(player.hand, player.discard);
+		expect(allCards.length).toBe(13);
+
+		game.calculateGameEnd();
+		// 3 gardens + 3 estates
+		expect(player.points).toBe(6);
 	});
 
 	test("implement merchant card 'in code'", () => {
