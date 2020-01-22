@@ -3,7 +3,7 @@
  * The human player is always inserted as the first player
  */
 
-/* global Vue, alert */
+/* global Vue, alert, window */
 const Game = require("./game.js");
 
 new Vue({
@@ -11,7 +11,8 @@ new Vue({
 	data: {
 		game: null,
 		simMode: false,
-		cardsToTrash: 0,
+		numCardsToTrash: 0,
+		numCardsToDiscard: 0,
 
 		// game parameters
 		numPlayers: 4,
@@ -49,6 +50,8 @@ new Vue({
 				humanPlayerName: this.humanPlayerName,
 				numPlayers: this.numPlayers
 			});
+			this.numCardsToTrash = 0;
+			this.numCardsToDiscard = 0;
 		},
 
 		/*** human player functions start here ****/
@@ -74,7 +77,7 @@ new Vue({
 			this.game.endActionPhase();
 		},
 
-		playCard(player, playerIndex, card, cardIndex) {
+		clickHandCard(player, playerIndex, card, cardIndex) {
 			if(playerIndex !== this.humanPlayerIndex) {
 				// throw new Error("can only play cards on behalf of human player");
 				console.warn("can only play cards on behalf of human player");
@@ -86,10 +89,12 @@ new Vue({
 				return;
 			}
 
-
-			if (this.cardsToTrash > 0) {
+			if (this.game.phase === "trash") {
 				console.debug(`Trying to trash card ${card.name}...`);
 				this.trashCard(card, cardIndex);
+			} else if (this.game.phase === "discard") {
+				console.debug(`Trying to discard card ${card.name}...`);
+				this.discardCard(card, cardIndex);
 			} else if (card.type === "treasure") {
 				try {
 					return this.game.playTreasureCard(cardIndex);
@@ -98,21 +103,25 @@ new Vue({
 					alert(e.message);
 					return;
 				}
-			} else {
+			} else if (card.type === "action") {
 				try {
-					const cardEffect = this.game.playActionCard(player, playerIndex, card);
-					if (cardEffect.trash) {
-						this.cardsToTrash = cardEffect.trash;
+					this.game.playActionCard(player, playerIndex, card);
+					if (this.game.phase === "trash") {
+						this.numCardsToTrash = this.game.numTrash;
+					} else if (this.game.phase === "discard") {
+						this.numCardsToDiscard = this.game.numDiscard;
 					}
 				} catch (e) {
 					console.error(e);
 					alert(e.message);
 					return;
 				}
+			} else {
+				throw new Error(`Unsupported card type: ${card.type}`)
 			}
 		},
 
-		clickDeckCard: function(cardName) {
+		clickSupplyCard: function(cardName) {
 			if (this.game.turn !== this.humanPlayerIndex) {
 				console.warn("can only buy on your turn");
 				return;
@@ -140,16 +149,29 @@ new Vue({
 		},
 
 		trashCard: function(card, cardIndex) {
-			if (this.cardsToTrash === 0) {
+			if (this.numCardsToTrash === 0) {
 				throw new Error("Cannot trash cards right now");
 			}
 			const player = this.game.players[this.game.turn];
 			this.game.trashCards(player, [cardIndex]);
-			this.cardsToTrash--;
+			this.numCardsToTrash--;
+		},
+
+		discardCard: function(card, cardIndex) {
+			if (this.numCardsToDiscard === 0) {
+				throw new Error("Cannot discard cards right now");
+			}
+			const player = this.game.players[this.game.turn];
+			this.game.discardCards(player, [cardIndex]);
+			this.numCardsToDiscard--;
 		},
 
 		stopTrashingCards: function() {
-			this.cardsToTrash = 0;
+			this.numCardsToTrash = 0;
+		},
+
+		stopDiscardingCards: function() {
+			this.numCardsToDiscard = 0;
 		},
 
 		endHumanPlayerTurn: function() {
@@ -206,12 +228,12 @@ new Vue({
 		buttonDisabled: function() {
 			return this.game.gameOver || this.simMode || (this.game.turn === this.humanPlayerIndex);
 		},
-		standardDeckCards: function() {
+		standardSupplyCards: function() {
 			return Object.keys(this.game.supply).filter((cardName) => {
 				return this.game.cards[cardName].type !== "action";
 			});
 		},
-		kingdomDeckCards: function() {
+		kingdomSupplyCards: function() {
 			return Object.keys(this.game.supply).filter((cardName) => {
 				return this.game.cards[cardName].type === "action";
 			});

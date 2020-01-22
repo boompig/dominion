@@ -285,6 +285,42 @@ describe("game", () => {
 		expect(player.discard.length).toBe(2);
 	});
 
+	test("test cellar - discard 5 and draw 5", () => {
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human"
+		});
+		// 5 cards
+		const player = game.players[0];
+
+		// +1 card
+		const card = game.cards.cellar;
+		player.hand.push(card);
+
+		// +1 card
+		game.drawPhase();
+
+		expect(player.hand.length).toBe(7);
+		expect(game.phase).toBe("action");
+
+		expect(card.name).toBe("cellar");
+		game.playActionCard(player, 0, card);
+		expect(game.phase).toBe("discard");
+
+		game.discardCards(player, [0, 1, 2, 3, 4]);
+		// 5 cards + cellar
+		expect(player.discard.length).toBe(6);
+
+		// -6 cards
+		expect(player.hand.length).toBe(1);
+
+		game.endActionCardPhase();
+		// +5 cards
+		expect(player.hand.length).toBe(7);
+		expect(game.phase).toBe("action");
+	});
+
 	test("implement merchant card 'in code'", () => {
 
 		const game = new Game({

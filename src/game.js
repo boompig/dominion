@@ -58,6 +58,7 @@ class Game {
 		 * other phases are enabled via action cards:
 		 * - gain
 		 * - trash
+		 * - discard
 		 */
 		this.phase = "draw";
 		this.endPhaseCallback = null;
@@ -70,6 +71,8 @@ class Game {
 		// trash-phase specific
 		this.numTrash = 0;
 		this.trashType = null;
+		// discard-phase specific
+		this.numDiscard = 0;
 		// this is a little hack to make sure action stack cleaned up only when all card effects are processed
 		this.canCleanupActionStack = true;
 
@@ -99,7 +102,6 @@ class Game {
 	/**
 	 * Draw 3 cards
 	 * @param {number} playerIndex
-	 * [+number of actions to add, +number of buys to add, +money]
 	 */
 	smithyCardEffect(playerIndex) {
 		for (let i = 0; i < 3; i++) {
@@ -116,7 +118,6 @@ class Game {
 	 * +2 cards
 	 * +1 action
 	 * @param {number} playerIndex
-	 * [+number of actions to add, +number of buys to add, +money]
 	 */
 	laboratoryCardEffect(playerIndex) {
 		for (let i = 0; i < 2; i++) {
@@ -159,7 +160,6 @@ class Game {
 
 	/**
 	 * +1 buy, +2 gold
-	 * @param {number} playerIndex
 	 */
 	woodcutterCardEffect() {
 		return {
@@ -169,12 +169,16 @@ class Game {
 		};
 	}
 
+	/**
+	 * Trash a card from your hand.
+	 * Gain a card costing up to $2 more than the trashed card.
+	 */
 	remodelCardEffect() {
 		this.changePhaseUsingActionCard("trash", {
 			numTrash: 1,
 			trashType: "any",
 		}, () => {
-			// get the last trashed card
+			// TODO this will give incorrect results if player does not trash a card
 			const trashedCard = this.trash[this.trash.length - 1];
 			this.changePhaseUsingActionCard("gain", {
 				maxGainCost: trashedCard.cost + 2,
@@ -203,7 +207,10 @@ class Game {
 		};
 	}
 
-	// +1 card, +1 action, +1 gold if you play a silver this turn
+	/**
+	 * NOTE: this card is not in the standard set
+	 * +1 card, +1 action, +1 gold if you play a silver this turn
+	 */
 	merchantCardEffect(playerIndex) {
 		for (let i = 0; i < 1; i++) {
 			this.drawCard(playerIndex);
@@ -229,7 +236,9 @@ class Game {
 		return {};
 	}
 
-	// gain a card costing up to 4 gold
+	/**
+	 * Gain a card costing up to $4.
+	 */
 	workshopCardEffect() {
 		this.changePhaseUsingActionCard("gain", {
 			maxGainCost: 4,
@@ -238,11 +247,16 @@ class Game {
 		return {};
 	}
 
+	/**
+	 * Trash a Treasure card from your hand.
+	 * Gain a Treasure card costing up to $3 more; put it into your hand.
+	 */
 	mineCardEffect() {
 		this.changePhaseUsingActionCard("trash", {
 			numTrash: 1,
 			trashType: "treasure"
 		}, () => {
+			// TODO this will give incorrect results if player does not trash a card
 			const trashedCard = this.trash[this.trash.length - 1];
 			this.changePhaseUsingActionCard("gain", {
 				maxGainCost: trashedCard.cost + 3,
@@ -255,14 +269,25 @@ class Game {
 		};
 	}
 
+	/**
+	 * +1 Action
+	 * Discard any number of cards.
+	 * +1 Card per card discarded.
+	 * @param {number} playerIndex
+	 */
 	cellarCardEffect(playerIndex) {
-		this.changePhase("discard", playerIndex, (discardedCards) => {
-			return {
-				buys: discardedCards.length,
-				actions: 1
-			};
+		const discardPileSizeStart = this.players[playerIndex].discard.length;
+		this.changePhaseUsingActionCard("discard", {
+			// means functionally unlimited
+			numDiscard: 999,
+		}, () => {
+			const discardPileSizeEnd = this.players[playerIndex].discard.length;
+			const numDiscarded = discardPileSizeEnd - discardPileSizeStart;
+			for (let i = 0; i < numDiscarded; i++) {
+				this.drawCard(playerIndex);
+			}
 		});
-
+		return {};
 	}
 	/** ********************************************* */
 
@@ -296,25 +321,25 @@ class Game {
 		cards.estate = {
 			name: "estate",
 			cost: 2,
-			type: "point",
+			type: "victory",
 			points: 1,
 		};
 		cards.duchy = {
 			name: "duchy",
 			cost: 5,
-			type: "point",
+			type: "victory",
 			points: 3,
 		};
 		cards.province = {
 			name: "province",
 			cost: 8,
-			type: "point",
+			type: "victory",
 			points: 6,
 		};
 		cards.curse = {
 			name: "curse",
 			cost: 0,
-			type: "point",
+			type: "victory",
 			points: -1,
 		};
 
@@ -399,16 +424,16 @@ class Game {
 			effect: mineEffect
 		};
 
-		// TODO unfinished cards
 
-		// const cellarEffect = this.cellarEffect.bind(this);
+		const cellarEffect = this.cellarCardEffect.bind(this);
 		cards.cellar = {
 			name: "cellar",
 			cost: 2,
 			type: "action",
-			effect: () => {}
+			effect: cellarEffect
 		};
 
+		// TODO unfinished cards
 		cards.moat = {
 			name: "moat",
 			cost: 2,
@@ -472,9 +497,9 @@ class Game {
 		// kingdom cards - use the Dominion Only initial set
 		// add a few and ignore a few based on implementation difficulties
 
-		// supply.cellar = 10;
+		supply.cellar = 10;
 		supply.market = 10;
-		supply.merchant = 10;
+		// supply.merchant = 10;
 		// supply.militia = 10;
 		supply.mine = 10;
 		// supply.moat = 10;
@@ -588,7 +613,7 @@ class Game {
 		const card = this.cards[cardName];
 
 		// points are added on here
-		if (card.type === "point") {
+		if (card.type === "victory") {
 			player.points += card.points;
 		}
 
@@ -620,6 +645,9 @@ class Game {
 
 	/**
 	 * Change the game phase using an action card
+	 * @param {string} phaseName
+	 * @param {any} params
+	 * @param {callable} callback
 	 */
 	changePhaseUsingActionCard(phaseName, params, callback) {
 		this.canCleanupActionStack = false;
@@ -636,8 +664,8 @@ class Game {
 		if(params.trashType) {
 			this.trashType = params.trashType;
 		}
-		if(params.nextPhase) {
-			this.actionCardNextPhase = params.nextPhase;
+		if(params.numDiscard) {
+			this.numDiscard = params.numDiscard;
 		}
 		this.endPhaseCallback = callback;
 	}
@@ -653,6 +681,7 @@ class Game {
 			this.gainType = null;
 			this.numTrash = 0;
 			this.trashType = null;
+			this.numDiscard = 0;
 			this.phase = "action";
 		}
 	}
@@ -755,15 +784,6 @@ class Game {
 		player.discard.push(card);
 		console.debug(`Player ${player.name} gained ${card.name}`);
 		return card;
-	}
-
-	/**
-	 * @param {number} cardIndex
-	 * @param {number} playerIndex
-	 */
-	discardCard(cardIndex, playerIndex) {
-		const player = this.players[playerIndex];
-		player.discardCard(cardIndex);
 	}
 
 	/**
@@ -922,6 +942,30 @@ class Game {
 	}
 
 	/**
+	 * Discard cards in discard phase. Check restrictions.
+	 * @param {Player} player
+	 * @param {number[]} cardIndexes
+	 */
+	discardCards(player, cardIndexes) {
+		if(this.phase !== "discard") {
+			throw new Error("Can only discard cards in discard phase");
+		}
+		if(cardIndexes.length > this.numDiscard) {
+			throw new Error(`Tried to discard ${cardIndexes.length} but can only discard up to ${this.numDiscard}`);
+		}
+		// sort in reverse order to not mess up indexing
+		cardIndexes.sort((a, b) => {
+			return b - a;
+		});
+
+		// reverse order
+		for(let cardIndex of cardIndexes) {
+			player.discardCard(cardIndex);
+		}
+	}
+
+
+	/**
 	 * Processes the effect of the card
 	 * Puts the card in the discard pile
 	 * -- numActions for the player
@@ -1009,7 +1053,7 @@ class Game {
 		if (p === 0) {
 			this.round++;
 			console.debug("");
-			console.debug(`******** starting round ${this.round } *************`);
+			console.debug(`******** starting round ${this.round} *************`);
 		}
 
 		// draw a card and automatically transition to next phase

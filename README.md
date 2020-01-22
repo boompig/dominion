@@ -32,7 +32,13 @@ Shared files (between browser and Node) can be found in the `/src` directory. Bu
 yarn build
 ```
 
-## Adding New Cards
+## Supported Cards
+
+- Cellar
+- Chapel
+- 
+
+### Adding New Cards
 
 See `initCards` function in `src/game.js`.
 
