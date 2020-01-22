@@ -172,13 +172,17 @@ describe("game", () => {
 
 		expect(player.hand.length).toBe(7);
 
-		const cardEffect = game.playActionCard(player, 0, card);
-		expect(cardEffect.gain).toBe(4);
+		game.playActionCard(player, 0, card);
+		expect(game.gainMaxCost).toBe(4);
+		expect(game.phase).toBe("gain");
 
 		game.gainCard("smithy", 0);
 
 		// smithy and workshop
 		expect(player.discard.length).toBe(2);
+
+		game.endActionCardPhase();
+		expect(game.phase).toBe("action");
 	});
 
 	test("test trashing a card to gain a better card using remodel", () => {

@@ -56,6 +56,8 @@ class Game {
 		 * - cleanup
 		 */
 		this.phase = "draw";
+		this.endPhaseCallback = null;
+		this.gainMaxCost = 0;
 		this.round = 0;
 		this.gameOver = false;
 
@@ -65,6 +67,22 @@ class Game {
 	}
 
 	/** *************** CARD EFFECTS **************** */
+
+	/*
+	 * The way this section works is each card has a few numerical effects
+	 * It only works for cards with straightforward effects
+	 *
+	 * First, the effect is called. It's a callable that takes `playerIndex` parameter
+	 * Second, the effect returns the resultant change to the player as a dictionary of numbers
+	 *
+	 * - actions: + how many actions
+	 * - buys: + how many buys
+	 * - gold: + how much gold/money
+	 * - trash: how many cards you may trash (up to)
+	 * - gainAction: what you must do to gain a card
+	 * - gainBonus: in addition to the value of the card(s) discarded or trashed, how much money is added to gain
+	 * - gain: maximum value of card to gain
+	 */
 
 	/**
 	 * Draw 3 cards
@@ -190,10 +208,12 @@ class Game {
 	}
 
 	// gain a card costing up to 4 gold
-	workshopCardEffect() {
-		return {
-			gain: 4
-		};
+	workshopCardEffect(playerIndex) {
+		this.changePhaseUsingActionCard("gain", {
+			gainMaxCost: 4,
+			playerIndex: playerIndex
+		}, null);
+		return {};
 	}
 
 	mineCardEffect() {
@@ -558,6 +578,26 @@ class Game {
 	}
 
 	/**
+	 * Change the game phase using an action card
+	 */
+	changePhaseUsingActionCard(phaseName, params, callback) {
+		this.phase = phaseName;
+		if(params.gainMaxCost) {
+			this.gainMaxCost = params.gainMaxCost;
+		}
+		this.endPhaseCallback = callback;
+	}
+
+	endActionCardPhase() {
+		if (this.endPhaseCallback) {
+			this.endPhaseCallback();
+		}
+		this.endPhaseCallback = null;
+		this.gainMaxCost = 0;
+		this.phase = "action";
+	}
+
+	/**
 	 * End the action phase for the current player
 	 * Transition to buy phase
 	 * Initializes treasure pot
@@ -850,6 +890,9 @@ class Game {
 	}
 	*/
 
+	/**
+	 * Run player strategy automatically
+	 */
 	doTurn() {
 		if (this.gameOver) {
 			return;
@@ -884,16 +927,17 @@ class Game {
 					const trashCards = player.strategy.trashCards(player, effect.trash);
 					this.trashCards(player, trashCards);
 				}
-				if(effect.gain) {
-					const gainCardName = player.strategy.gainCard(player, effect.gain);
+				if(this.phase === "gain") {
+					const gainCardName = player.strategy.gainCard(player, this.maxGainCost);
 					if(gainCardName) {
 						let gainCard = this.cards[gainCardName];
-						if(gainCard.cost > effect.gain) {
-							throw new Error(`Card allowed you to gain a card costing up to ${effect.gain} but you tried to gain a card costing ${gainCard.cost}`);
+						if(gainCard.cost > this.maxGainCost) {
+							throw new Error(`Card allowed you to gain a card costing up to ${this.maxGainCost} but you tried to gain a card costing ${gainCard.cost}`);
 						}
 						console.debug(`Player ${player.name} gained card ${gainCardName}`);
 						this.gainCard(gainCardName, p);
 					}
+					this.endActionCardPhase();
 				}
 				if(effect.gainAction) {
 					if(effect.gainAction === "trash") {
