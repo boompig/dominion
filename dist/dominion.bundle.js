@@ -17387,6 +17387,8 @@ class Game {
 		 * - cleanup
 		 */
 		this.phase = "draw";
+		this.endPhaseCallback = null;
+		this.gainMaxCost = 0;
 		this.round = 0;
 		this.gameOver = false;
 
@@ -17396,6 +17398,22 @@ class Game {
 	}
 
 	/** *************** CARD EFFECTS **************** */
+
+	/*
+	 * The way this section works is each card has a few numerical effects
+	 * It only works for cards with straightforward effects
+	 *
+	 * First, the effect is called. It's a callable that takes `playerIndex` parameter
+	 * Second, the effect returns the resultant change to the player as a dictionary of numbers
+	 *
+	 * - actions: + how many actions
+	 * - buys: + how many buys
+	 * - gold: + how much gold/money
+	 * - trash: how many cards you may trash (up to)
+	 * - gainAction: what you must do to gain a card
+	 * - gainBonus: in addition to the value of the card(s) discarded or trashed, how much money is added to gain
+	 * - gain: maximum value of card to gain
+	 */
 
 	/**
 	 * Draw 3 cards
@@ -17521,10 +17539,12 @@ class Game {
 	}
 
 	// gain a card costing up to 4 gold
-	workshopCardEffect() {
-		return {
-			gain: 4
-		};
+	workshopCardEffect(playerIndex) {
+		this.changePhaseUsingActionCard("gain", {
+			gainMaxCost: 4,
+			playerIndex: playerIndex
+		}, null);
+		return {};
 	}
 
 	mineCardEffect() {
@@ -17534,6 +17554,16 @@ class Game {
 			trashType: "treasure",
 			gainType: "treasure"
 		};
+	}
+
+	cellarCardEffect(playerIndex) {
+		this.changePhase("discard", playerIndex, (discardedCards) => {
+			return {
+				buys: discardedCards.length,
+				actions: 1
+			};
+		});
+
 	}
 	/** ********************************************* */
 
@@ -17672,6 +17702,7 @@ class Game {
 
 		// TODO unfinished cards
 
+		// const cellarEffect = this.cellarEffect.bind(this);
 		cards.cellar = {
 			name: "cellar",
 			cost: 2,

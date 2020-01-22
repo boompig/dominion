@@ -112,20 +112,30 @@ new Vue({
 			}
 		},
 
-		buyCard: function(cardName) {
+		clickDeckCard: function(cardName) {
 			if (this.game.turn !== this.humanPlayerIndex) {
 				console.warn("can only buy on your turn");
 				return;
 			}
-			if(this.game.phase !== "buy") {
-				console.warn("cannot buy card outside buy phase using this method");
+			if(this.game.phase !== "buy" && this.game.phase !== "gain") {
+				console.warn("cannot buy/gain card outside buy/gain phase using this method");
 			}
-			try {
-				this.game.buyCard(cardName, this.humanPlayerIndex);
-				return true;
-			} catch (e) {
-				alert(e.message);
-				return false;
+			if(this.game.phase === "buy") {
+				try {
+					this.game.buyCard(cardName, this.humanPlayerIndex);
+					return true;
+				} catch (e) {
+					alert(e.message);
+					return false;
+				}
+			} else if(this.game.phase === "gain") {
+				try {
+					this.game.gainCard(cardName, this.humanPlayerIndex);
+					return true;
+				} catch (e) {
+					alert(e.message);
+					return false;
+				}
 			}
 		},
 

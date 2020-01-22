@@ -26,7 +26,7 @@
                     <div class="deck-inner-container">
                         <div v-for="cardName in standardDeckCards">
                             <div class="deck-card" v-bind:class="cardClasses(cardName, 'deck')"
-                                v-on:click="buyCard(cardName)">
+                                v-on:click="clickDeckCard(cardName)">
                                 {{cardName}} ({{ game.cards[cardName].cost }}) - {{ game.supply[cardName] }} left
                             </div>
                         </div>

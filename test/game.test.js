@@ -87,7 +87,7 @@ describe("game", () => {
 		expect(1).toBe(1);
 	});
 
-	test("make sure Chapel works", () => {
+	test("test chapel - trash n numbers of cards", () => {
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
@@ -106,11 +106,15 @@ describe("game", () => {
 		expect(player.hand.length).toBe(7);
 
 		// play chapel card
-		const cardEffect = game.playActionCard(player, 0, card);
-		expect(cardEffect.trash).toBe(4);
+		game.playActionCard(player, 0, card);
+		expect(game.phase).toBe("trash");
+		expect(game.trashType).toBe("any");
+		expect(game.numTrash).toBe(4);
 
 		// trash 4 cards
 		game.trashCards(player, [0, 1, 2, 3]);
+		game.endActionCardPhase();
+		expect(game.phase).toBe("action");
 
 		// now should have 2 cards (-4 cards, -1 chapel card)
 		expect(player.hand.length).toBe(2);
@@ -157,7 +161,7 @@ describe("game", () => {
 		expect(player.hand.length).toBe(10);
 	});
 
-	test("test gaining a card using workshop", () => {
+	test("test workshop - gain card with restrictions", () => {
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
@@ -173,7 +177,7 @@ describe("game", () => {
 		expect(player.hand.length).toBe(7);
 
 		game.playActionCard(player, 0, card);
-		expect(game.gainMaxCost).toBe(4);
+		expect(game.maxGainCost).toBe(4);
 		expect(game.phase).toBe("gain");
 
 		game.gainCard("smithy", 0);
@@ -185,7 +189,7 @@ describe("game", () => {
 		expect(game.phase).toBe("action");
 	});
 
-	test("test trashing a card to gain a better card using remodel", () => {
+	test("test remodel - trash & gain phase", () => {
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
@@ -206,14 +210,31 @@ describe("game", () => {
 
 		expect(player.hand.length).toBe(8);
 
-		const cardEffect = game.playActionCard(player, 0, card);
-		expect(cardEffect.gainAction).toBe("trash");
+		game.playActionCard(player, 0, card);
+		expect(game.phase).toBe("trash");
+		expect(game.numTrash).toBe(1);
 
-		// estate has index 6 because remodel has just been spent
-		game.trashCards(player, [6]);
+		// find the first estate card
+		let estateIndex = 0;
+		for(let i = 0; i < player.hand.length; i++) {
+			if(player.hand[i].name === "estate") {
+				estateIndex = i;
+				break;
+			}
+		}
+
+		expect(player.hand[estateIndex].name).toBe("estate");
+
+		game.trashCards(player, [estateIndex]);
+		game.endActionCardPhase();
+		expect(game.phase).toBe("gain");
+		expect(game.maxGainCost).toBe(4);
+
 		// gain a card costing up to 2 more than it
 		// so that's 4
-		game.gainCard("smithy", 0);
+		game.gainCardWithCheck("smithy", 0);
+		game.endActionCardPhase();
+		expect(game.phase).toBe("action");
 
 		// estate
 		expect(game.trash.length).toBe(1);
@@ -221,7 +242,7 @@ describe("game", () => {
 		expect(player.discard.length).toBe(2);
 	});
 
-	test("test trashing a card to gain a better card using mine", () => {
+	test("test mine - trash and gain treasure", () => {
 		const game = new Game({
 			numPlayers: 2,
 			humanPlayerIndex: 0,
@@ -241,14 +262,22 @@ describe("game", () => {
 
 		expect(player.hand.length).toBe(8);
 
-		const cardEffect = game.playActionCard(player, 0, card);
-		expect(cardEffect.gainAction).toBe("trash");
+		game.playActionCard(player, 0, card);
+		expect(game.phase).toBe("trash");
+		expect(game.numTrash).toBe(1);
 
 		// silver has index 6 because mine has just been spent
-		game.trashCards(player, [6]);
+		expect(player.hand[5].name).toBe("silver");
+		game.trashCards(player, [5]);
+		game.endActionCardPhase();
+		expect(game.phase).toBe("gain");
+		expect(game.maxGainCost).toBe(6);
+
 		// gain a card costing up to 3 more than it
 		// so that's 6
-		game.gainCard("gold", 0);
+		game.gainCardWithCheck("gold", 0);
+		game.endActionCardPhase();
+		expect(game.phase).toBe("action");
 
 		// silver
 		expect(game.trash.length).toBe(1);

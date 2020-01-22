@@ -54,12 +54,24 @@ class Game {
 		 * - action
 		 * - buy
 		 * - cleanup
+		 *
+		 * other phases are enabled via action cards:
+		 * - gain
+		 * - trash
 		 */
 		this.phase = "draw";
 		this.endPhaseCallback = null;
-		this.gainMaxCost = 0;
 		this.round = 0;
 		this.gameOver = false;
+
+		// gain-phase specific
+		this.maxGainCost = 0;
+		this.gainType = null;
+		// trash-phase specific
+		this.numTrash = 0;
+		this.trashType = null;
+		// this is a little hack to make sure action stack cleaned up only when all card effects are processed
+		this.canCleanupActionStack = true;
 
 		this.winArr = [];
 
@@ -158,9 +170,21 @@ class Game {
 	}
 
 	remodelCardEffect() {
+		this.changePhaseUsingActionCard("trash", {
+			numTrash: 1,
+			trashType: "any",
+		}, () => {
+			// get the last trashed card
+			const trashedCard = this.trash[this.trash.length - 1];
+			this.changePhaseUsingActionCard("gain", {
+				maxGainCost: trashedCard.cost + 2,
+				gainType: "any"
+			});
+
+		});
 		return {
-			gainAction: "trash",
-			gainBonus: 2
+			gainBonusCost: 2,
+			gainType: "any"
 		};
 	}
 
@@ -198,31 +222,47 @@ class Game {
 	 * trash 4 cards
 	 */
 	chapelCardEffect() {
-		return {
-			actions: 0,
-			buys: 0,
-			gold: 0,
-			// trash up to 4 cards from your hand
-			trash: 4
-		};
+		this.changePhaseUsingActionCard("trash", {
+			numTrash: 4,
+			trashType: "any"
+		});
+		return {};
 	}
 
 	// gain a card costing up to 4 gold
-	workshopCardEffect(playerIndex) {
+	workshopCardEffect() {
 		this.changePhaseUsingActionCard("gain", {
-			gainMaxCost: 4,
-			playerIndex: playerIndex
+			maxGainCost: 4,
+			gainType: "any"
 		}, null);
 		return {};
 	}
 
 	mineCardEffect() {
+		this.changePhaseUsingActionCard("trash", {
+			numTrash: 1,
+			trashType: "treasure"
+		}, () => {
+			const trashedCard = this.trash[this.trash.length - 1];
+			this.changePhaseUsingActionCard("gain", {
+				maxGainCost: trashedCard.cost + 3,
+				gainType: "treasure"
+			});
+		});
 		return {
-			gainAction: "trash",
-			gainBonus: 3,
-			trashType: "treasure",
+			gainBonusCost: 3,
 			gainType: "treasure"
 		};
+	}
+
+	cellarCardEffect(playerIndex) {
+		this.changePhase("discard", playerIndex, (discardedCards) => {
+			return {
+				buys: discardedCards.length,
+				actions: 1
+			};
+		});
+
 	}
 	/** ********************************************* */
 
@@ -361,6 +401,7 @@ class Game {
 
 		// TODO unfinished cards
 
+		// const cellarEffect = this.cellarEffect.bind(this);
 		cards.cellar = {
 			name: "cellar",
 			cost: 2,
@@ -581,20 +622,39 @@ class Game {
 	 * Change the game phase using an action card
 	 */
 	changePhaseUsingActionCard(phaseName, params, callback) {
+		this.canCleanupActionStack = false;
 		this.phase = phaseName;
-		if(params.gainMaxCost) {
-			this.gainMaxCost = params.gainMaxCost;
+		if(params.maxGainCost) {
+			this.maxGainCost = params.maxGainCost;
+		}
+		if(params.gainType) {
+			this.gainType = params.gainType;
+		}
+		if(params.numTrash) {
+			this.numTrash = params.numTrash;
+		}
+		if(params.trashType) {
+			this.trashType = params.trashType;
+		}
+		if(params.nextPhase) {
+			this.actionCardNextPhase = params.nextPhase;
 		}
 		this.endPhaseCallback = callback;
 	}
 
 	endActionCardPhase() {
+		this.canCleanupActionStack = true;
 		if (this.endPhaseCallback) {
 			this.endPhaseCallback();
 		}
-		this.endPhaseCallback = null;
-		this.gainMaxCost = 0;
-		this.phase = "action";
+		if(this.canCleanupActionStack) {
+			this.endPhaseCallback = null;
+			this.maxGainCost = 0;
+			this.gainType = null;
+			this.numTrash = 0;
+			this.trashType = null;
+			this.phase = "action";
+		}
 	}
 
 	/**
@@ -660,7 +720,28 @@ class Game {
 	}
 
 	/**
+	 * Same as gainCard, but check the phase and other restrictions first
+	 * @param {string} cardName
+	 * @param {number} playerIndex
+	 * @returns {Card}
+	 */
+	gainCardWithCheck(cardName, playerIndex) {
+		if(this.phase !== "gain") {
+			throw new Error(`Cannot gain cards outside of gain phase - phase is ${this.phase}`);
+		}
+		let gainCard = this.cards[cardName];
+		if(gainCard.cost > this.maxGainCost) {
+			throw new Error(`Action card allowed you to gain a card costing up to ${this.maxGainCost} but you tried to gain a card costing ${gainCard.cost}`);
+		}
+		if(this.gainType !== "any" && gainCard.type !== this.gainType) {
+			throw new Error(`Action card allowed you to gain a card of type ${this.gainType} but you tried to gain a card of type ${gainCard.type}`);
+		}
+		return this.gainCard(cardName, playerIndex);
+	}
+
+	/**
 	 * Remove a card from the supply and add it to the player's discard pile
+	 * Only checks whether the supply has that card
 	 * @param {string} cardName
 	 * @param {number} playerIndex
 	 * @returns {Card}
@@ -669,11 +750,20 @@ class Game {
 		const player = this.players[playerIndex];
 		const card = this.takeCard(cardName, playerIndex);
 		if (card === null) {
-			throw new Error("Failed to take the card from the deck while buying");
+			throw new Error("Failed to take the card from the deck while buying/gaining");
 		}
 		player.discard.push(card);
 		console.debug(`Player ${player.name} gained ${card.name}`);
 		return card;
+	}
+
+	/**
+	 * @param {number} cardIndex
+	 * @param {number} playerIndex
+	 */
+	discardCard(cardIndex, playerIndex) {
+		const player = this.players[playerIndex];
+		player.discardCard(cardIndex);
 	}
 
 	/**
@@ -714,7 +804,7 @@ class Game {
 	 */
 	playTreasureCard(cardIndex) {
 		if(this.phase !== "buy") {
-			throw new Error("cannot play treasure cards outside the buy phase");
+			throw new Error(`cannot play treasure cards outside the buy phase (${this.phase} phase)`);
 		}
 		const player = this.players[this.turn];
 		if(player.hand[cardIndex].type !== "treasure") {
@@ -808,6 +898,12 @@ class Game {
 	 * @returns {Card[]} trashed cards
 	 */
 	trashCards(player, cardIndexes) {
+		if(this.phase !== "trash") {
+			throw new Error("Cannot trash cards outside of trash phase");
+		}
+		if(cardIndexes.length > this.numTrash) {
+			throw new Error(`Can trash a max of ${this.numTrash} cards, tried to trash ${cardIndexes.length}`);
+		}
 		const trashed = [];
 		// sort in reverse order to not mess up indexing
 		cardIndexes.sort((a, b) => {
@@ -815,6 +911,9 @@ class Game {
 		});
 		for(let cardIndex of cardIndexes) {
 			const card = player.hand.splice(cardIndex, 1)[0];
+			if(this.trashType !== "any" && card.type !== this.trashType) {
+				throw new Error(`Can only trash cards of type ${this.trashType} but tried to trash card of type ${card.type}`);
+			}
 			console.debug(`Player ${player.name} trashed card ${card.name}`);
 			this.trash.push(card);
 			trashed.push(card);
@@ -833,7 +932,7 @@ class Game {
 	 */
 	playActionCard(player, playerIndex, card) {
 		if(this.phase !== "action") {
-			throw new Error("cannot play action cards outside of action phase");
+			throw new Error(`cannot play action cards outside of action phase (${this.phase} phase)`);
 		}
 		if(card.name in this.firstPlayBonus) {
 			this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
@@ -923,52 +1022,37 @@ class Game {
 			if (card) {
 				console.debug(`Player ${player.name} played action card ${card.name} on round ${this.round}`);
 				const effect = this.playActionCard(player, p, card);
-				if(effect.trash) {
-					const trashCards = player.strategy.trashCards(player, effect.trash);
-					this.trashCards(player, trashCards);
-				}
-				if(this.phase === "gain") {
-					const gainCardName = player.strategy.gainCard(player, this.maxGainCost);
-					if(gainCardName) {
-						let gainCard = this.cards[gainCardName];
-						if(gainCard.cost > this.maxGainCost) {
-							throw new Error(`Card allowed you to gain a card costing up to ${this.maxGainCost} but you tried to gain a card costing ${gainCard.cost}`);
+				while(this.phase !== "action") {
+					if (this.phase === "gain") {
+						const gainCardName = player.strategy.gainCard(player, this.maxGainCost);
+						if (gainCardName) {
+							this.gainCardWithCheck(gainCardName, p);
+							console.debug(`Player ${player.name} gained card ${gainCardName}`);
 						}
-						console.debug(`Player ${player.name} gained card ${gainCardName}`);
-						this.gainCard(gainCardName, p);
+					}
+					else if (this.phase === "trash") {
+						const trashCardIndexes = player.strategy.trashCardForGain(
+							player,
+							effect.gainBonusCost,
+							this.trashType,
+							effect.gainType
+						);
+						this.trashCards(player, trashCardIndexes);
+					} else {
+						throw new Error(`phase ${this.phase} not implemented`);
 					}
 					this.endActionCardPhase();
 				}
-				if(effect.gainAction) {
-					if(effect.gainAction === "trash") {
-						let o = player.strategy.trashCardForGain(
-							player,
-							effect.gainBonus,
-							effect.trashType,
-							effect.gainType
-						);
-						if(o) {
-							let trashedCards = this.trashCards(player, o.trashCards);
-							let maxGainCost = effect.gainBonus;
-							for(let card of trashedCards) {
-								maxGainCost += card.cost;
-							}
-							let gainCard = this.cards[o.gainCardName];
-							if(gainCard.cost > maxGainCost) {
-								throw new Error(`Card allowed you to gain a card costing up to ${maxGainCost} but you tried to gain a card costing ${gainCard.cost}`);
-							}
-							this.gainCard(o.gainCardName, p);
-						}
-					} else {
-						throw new Error("not implemented");
-					}
-				}
 			} else {
+				// no action
 				break;
 			}
 		}
-
 		this.endActionPhase();
+
+		if(this.phase !== "buy") {
+			throw new Error(`should be buy phase after action phase, got ${this.phase} phase`);
+		}
 
 		// buy phase
 		while (player.numBuys > 0) {

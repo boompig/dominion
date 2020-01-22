@@ -46,6 +46,15 @@ class Player {
 		}
 		return money;
 	}
+
+	/**
+	 * @param {number} cardIndex
+	 */
+	discardCard(cardIndex) {
+		const cards = this.hand.splice(cardIndex, 1);
+		console.log(`Discarding card ${cards[0].name} from player ${this.name}`);
+		this.discard.push(cards[0]);
+	}
 }
 
 module.exports = Player;
