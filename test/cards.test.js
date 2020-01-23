@@ -788,6 +788,41 @@ describe("game", () => {
 		expect(game.players[0].discard.length).toBe(2);
 	});
 
+	test("bureaucrat - put card on deck; reveal victory card", () => {
+		const supply = ["bureaucrat"];
+		const game = new Game({
+			numPlayers: 4,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human",
+			supplyCards: supply
+		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
+		// otherPlayer should have predictable victory card
+		const otherPlayer = game.players[3];
+		otherPlayer.hand.push(game.cards.estate);
+
+		// 5 cards
+		const player = game.players[0];
+		// +1 card
+		const card = game.cards.bureaucrat;
+		player.hand.push(card);
+		// +1 card
+		game.drawPhase();
+		expect(player.hand.length).toBe(7);
+
+		game.playActionCard(player, 0, card);
+		expect(game.phase).toBe("bureaucrat");
+
+		// estate
+		expect(otherPlayer.revealedCards.length).toBe(1);
+
+		game.endActionCardPhase();
+
+		expect(otherPlayer.deck[otherPlayer.deck.length - 1].name).toBe("estate");
+		expect(player.deck[player.deck.length - 1].name).toBe("silver");
+	});
+
 	test("implement merchant card 'in code'", () => {
 		const supply = ["merchant"];
 		const game = new Game({

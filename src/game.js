@@ -65,6 +65,7 @@ class Game {
 		 * - adventurer
 		 * - spy
 		 * - thief
+		 * - bureaucrat
 		 */
 		this.phase = "draw";
 		this.endPhaseCallback = null;
@@ -480,6 +481,49 @@ class Game {
 	}
 
 	/**
+	 * Gain a silver card; put it on top of your deck.
+	 * Each other player reveals a Victory card from his hand and puts it on his deck
+	 * (or reveals a hand with no Victory cards).
+	 */
+	bureaucratCardEffect(playerIndex) {
+		this.gainCard("silver", playerIndex, {location: "deck-top"});
+
+		// TODO - right now automatically reveals the 1st victory card found in hand...
+		// rather than have player choose
+		// this player has revealed a card
+		const r = {};
+		for(let i = 0; i < this.numPlayers; i++) {
+			if(i === playerIndex) {
+				continue;
+			}
+			let player = this.players[i];
+			for(let j = 0; j < player.hand.length; j++) {
+				if(player.hand[j].type === "victory") {
+					let card = player.hand.splice(j, 1)[0];
+					player.revealedCards.push(card);
+					r[i] = true;
+					break;
+				}
+			}
+		}
+
+		this.changePhaseUsingActionCard("bureaucrat", {},
+			() => {
+				for(let i = 0; i < this.numPlayers; i++) {
+					if(r[i]) {
+						let player = this.players[i];
+						// take the
+						let card = player.revealedCards.pop();
+						player.deck.push(card);
+					}
+				}
+			}
+		);
+
+		return {};
+	}
+
+	/**
 	 * +$2
 	 * You may immediately put your deck into your discard pile.
 	 */
@@ -726,6 +770,30 @@ class Game {
 			effect: libraryEffect
 		};
 
+		const councilRoomEffect = this.councilRoomCardEffect.bind(this);
+		cards["council room"] = {
+			name: "council room",
+			cost: 5,
+			type: "action",
+			effect: councilRoomEffect
+		};
+
+		const adventurerEffect = this.adventurerCardEffect.bind(this);
+		cards.adventurer = {
+			name: "adventurer",
+			cost: 6,
+			type: "action",
+			effect: adventurerEffect
+		};
+
+		const bureaucrat = this.bureaucratCardEffect.bind(this);
+		cards.bureaucrat = {
+			name: "bureaucrat",
+			cost: 4,
+			type: "action",
+			effect: bureaucrat
+		};
+
 		// TODO unfinished cards
 		cards.moat = {
 			name: "moat",
@@ -750,22 +818,6 @@ class Game {
 			cost: 3,
 			type: "action",
 			effect: merchantEffect
-		};
-
-		const councilRoomEffect = this.councilRoomCardEffect.bind(this);
-		cards["council room"] = {
-			name: "council room",
-			cost: 5,
-			type: "action",
-			effect: councilRoomEffect
-		};
-
-		const adventurerEffect = this.adventurerCardEffect.bind(this);
-		cards.adventurer = {
-			name: "adventurer",
-			cost: 6,
-			type: "action",
-			effect: adventurerEffect
 		};
 
 		return cards;
@@ -808,6 +860,7 @@ class Game {
 		// commented-out cards are not implemented
 		const baseKingdomCards = [
 			"adventurer",
+			"bureaucrat",
 			"cellar",
 			"chancellor",
 			"chapel",
@@ -820,6 +873,11 @@ class Game {
 			"mine",
 
 			"library",
+
+			/*
+			 * This is hard because it requires other players to act in the middle of the
+			 * current player's turn
+			 */
 			// "militia",
 			"moneylender",
 			"remodel",
@@ -830,6 +888,10 @@ class Game {
 			"witch",
 			"woodcutter",
 			"workshop",
+
+			/*
+			 * This is hard because there is no clear mechanism to play a card twice
+			 */
 			// throne room: not implemented
 		];
 		const implementedKingdomCards = baseKingdomCards.concat([
@@ -1156,17 +1218,23 @@ class Game {
 	/**
 	 * Remove a card from the supply and add it to the player's discard pile
 	 * Only checks whether the supply has that card
+	 * Optionally gain the card to another location if options specified
 	 * @param {string} cardName
 	 * @param {number} playerIndex
+	 * @param {any} options {location: "deck-top"} supported
 	 * @returns {Card}
 	 */
-	gainCard(cardName, playerIndex) {
+	gainCard(cardName, playerIndex, options) {
 		const player = this.players[playerIndex];
 		const card = this.takeCard(cardName, playerIndex);
 		if (card === null) {
 			throw new Error("Failed to take the card from the deck while buying/gaining");
 		}
-		player.discard.push(card);
+		if(options && options.location && options.location === "deck-top") {
+			player.deck.push(card);
+		} else {
+			player.discard.push(card);
+		}
 		console.debug(`Player ${player.name} gained ${card.name}`);
 		return card;
 	}

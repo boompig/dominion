@@ -35,6 +35,7 @@ yarn build
 ## Supported Cards
 
 - Adventurer
+- Bureaucrat
 - Cellar
 - Chancellor
 - Chapel
@@ -58,7 +59,6 @@ yarn build
 
 ## Unsupported Cards
 
-- Bureaucrat
 - Moat
 - Militia
 - Throne Room
