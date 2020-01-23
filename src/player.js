@@ -29,6 +29,15 @@ class Player {
 		 */
 		this.discard = [];
 
+		/**
+		 * The cards that are currently revealed.
+		 * Typically this is temporary
+		 */
+		this.revealedCards = [];
+
+		/**
+		 * These may not always be totally accurate
+		 */
 		this.points = 0;
 		this.isHuman = isHuman || false;
 

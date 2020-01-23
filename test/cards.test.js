@@ -613,6 +613,48 @@ describe("game", () => {
 		expect(game.playArea.length).toBe(1);
 	});
 
+	test("adventurer - reveal cards from deck", () => {
+		const supply = ["adventurer", "village"];
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human",
+			supplyCards: supply
+		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
+		// 5 cards
+		const player = game.players[0];
+
+		// +1 card
+		const card = game.cards.adventurer;
+		player.hand.push(card);
+
+		// +1 card
+		game.drawPhase();
+		expect(player.hand.length).toBe(7);
+
+		// shape the deck
+		player.deck.push(game.cards.gold);
+		player.deck.push(game.cards.village);
+		player.deck.push(game.cards.silver);
+		player.deck.push(game.cards.province);
+
+		game.playActionCard(player, 0, card);
+		expect(game.phase).toBe("adventurer");
+		// gold, village, silver, province not in that order
+		expect(player.revealedCards.length).toBe(4);
+		expect(player.hand.length).toBe(6);
+
+		game.endActionCardPhase();
+		expect(game.phase).toBe("action");
+
+		// +silver, +gold
+		expect(player.hand.length).toBe(8);
+		// village, province
+		expect(player.discard.length).toBe(2);
+	});
+
 	test("implement merchant card 'in code'", () => {
 		const supply = ["merchant"];
 		const game = new Game({

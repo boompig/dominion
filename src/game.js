@@ -62,6 +62,7 @@ class Game {
 		 * - trash
 		 * - discard
 		 * - discard-deck
+		 * - adventurer
 		 */
 		this.phase = "draw";
 		this.endPhaseCallback = null;
@@ -396,6 +397,32 @@ class Game {
 		};
 	}
 
+	/**
+	 * Reveal cards from your deck until you reveal 2 Treasure cards.
+	 * Put those Treasure cards in your hand and discard the other revealed cards.
+	 */
+	adventurerCardEffect(playerIndex) {
+		let numTreasures = 0;
+		while(numTreasures < 2) {
+			let card = this.drawCard(playerIndex, true);
+			if(card.type === "treasure") {
+				numTreasures++;
+			}
+		}
+		this.changePhaseUsingActionCard("adventurer", {}, () => {
+			const player = this.players[playerIndex];
+			while(player.revealedCards.length > 0) {
+				let card = player.revealedCards.pop();
+				if(card.type === "treasure") {
+					player.hand.push(card);
+				} else {
+					player.discard.push(card);
+				}
+			}
+		});
+		return {};
+	}
+
 	/** ********************************************* */
 
 	/**
@@ -623,6 +650,14 @@ class Game {
 			effect: councilRoomEffect
 		};
 
+		const adventurerEffect = this.adventurerCardEffect.bind(this);
+		cards.adventurer = {
+			name: "adventurer",
+			cost: 6,
+			type: "action",
+			effect: adventurerEffect
+		};
+
 		return cards;
 	}
 
@@ -662,6 +697,7 @@ class Game {
 
 		// commented-out cards are not implemented
 		const baseKingdomCards = [
+			"adventurer",
 			"cellar",
 			"chancellor",
 			"chapel",
@@ -686,7 +722,6 @@ class Game {
 			// spy: not implemented
 			// thief: not implemented
 			// throne room: not implemented
-			// adventurer: not implemented
 		];
 		const implementedKingdomCards = baseKingdomCards.concat([
 			// not part of basic set but implemented:
@@ -850,7 +885,7 @@ class Game {
 		if(this.phase !== "draw") {
 			throw new Error("can only call drawPhase in draw phase");
 		}
-		const res = this.drawCard(this.turn);
+		this.drawCard(this.turn);
 		const player = this.players[this.turn];
 		// start out with 1 buy
 		player.numBuys = 1;
@@ -858,7 +893,7 @@ class Game {
 		this.treasurePot = 0;
 		this.firstPlayBonus = {};
 		this.phase = "action";
-		return res;
+		return player.deck.length === 0 && player.discard.length === 0;
 	}
 
 	/**
@@ -934,9 +969,10 @@ class Game {
 	 * Draw a card from the player's deck.
 	 * If the deck is empty, shuffle in cards from discard pile
 	 * @param {number} playerIndex
-	 * @returns {boolean} Return false iff discard and deck are both empty
+	 * @param {boolean} addToRevealed If true, instead of adding the card to hand, add to the revealed cards
+	 * @returns {Card} Return the card that was drawn
 	 */
-	drawCard(playerIndex) {
+	drawCard(playerIndex, addToRevealed) {
 		const player = this.players[playerIndex];
 		if (player.deck.length === 0) {
 			// the player has run out of cards
@@ -953,11 +989,15 @@ class Game {
 		if(!card) {
 			throw new Error("Drew null card from the deck");
 		}
-		player.hand.push(card);
+		if(addToRevealed) {
+			player.revealedCards.push(card);
+		} else {
+			player.hand.push(card);
+		}
 
 		console.debug(`Player ${player.name} drew ${card.name}`);
 
-		return true;
+		return card;
 	}
 
 	dealHands() {

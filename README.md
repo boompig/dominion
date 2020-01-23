@@ -34,6 +34,7 @@ yarn build
 
 ## Supported Cards
 
+- Adventurer
 - Cellar
 - Chancellor
 - Chapel
@@ -61,7 +62,6 @@ yarn build
 - Thief
 - Militia
 - Throne Room
-- Adventurer
 
 ### Adding New Cards
 
