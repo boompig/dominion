@@ -17430,6 +17430,7 @@ class Game {
 		this.endPhaseCallback = null;
 		this.round = 0;
 		this.isGameOver = false;
+		this.playArea = [];
 
 		// gain-phase specific
 		this.maxGainCost = 0;
@@ -17439,6 +17440,8 @@ class Game {
 		this.trashType = null;
 		// discard-phase specific
 		this.numDiscard = 0;
+		this.discardType = null;
+		this.discardRange = null;
 		// this is a little hack to make sure action stack cleaned up only when all card effects are processed
 		this.canCleanupActionStack = true;
 
@@ -17470,14 +17473,8 @@ class Game {
 	 * @param {number} playerIndex
 	 */
 	smithyCardEffect(playerIndex) {
-		for (let i = 0; i < 3; i++) {
-			this.drawCard(playerIndex);
-		}
-		return {
-			actions: 0,
-			buys: 0,
-			gold: 0
-		};
+		this.drawCards(playerIndex, 3);
+		return {};
 	}
 
 	/**
@@ -17486,13 +17483,9 @@ class Game {
 	 * @param {number} playerIndex
 	 */
 	laboratoryCardEffect(playerIndex) {
-		for (let i = 0; i < 2; i++) {
-			this.drawCard(playerIndex);
-		}
+		this.drawCards(playerIndex, 2);
 		return {
 			actions: 1,
-			buys: 0,
-			gold: 0
 		};
 	}
 
@@ -17514,13 +17507,9 @@ class Game {
 	 * +1 card
 	 */
 	villageCardEffect(playerIndex) {
-		for (let i = 0; i < 1; i++) {
-			this.drawCard(playerIndex);
-		}
+		this.drawCards(playerIndex, 1);
 		return {
 			actions: 2,
-			buys: 0,
-			gold: 0
 		};
 	}
 
@@ -17529,8 +17518,7 @@ class Game {
 	 */
 	woodcutterCardEffect() {
 		return {
-			actions: 0,
-			buys: 0,
+			buys: 1,
 			gold: 2
 		};
 	}
@@ -17563,9 +17551,7 @@ class Game {
 	 * @param {number} playerIndex
 	 */
 	marketCardEffect(playerIndex) {
-		for (let i = 0; i < 1; i++) {
-			this.drawCard(playerIndex);
-		}
+		this.drawCards(playerIndex, 1);
 		return {
 			actions: 1,
 			buys: 1,
@@ -17574,13 +17560,31 @@ class Game {
 	}
 
 	/**
+	 * Draw until you have 7 cards in hand.
+	 * You may set aside any Action cards drawn this way, as you draw them;
+	 * discard the set aside cards after you finish drawing.
+	 * @param {number} playerIndex
+	 */
+	libraryCardEffect(playerIndex) {
+		const numCardsInHand = this.players[playerIndex].hand.length;
+		this.drawCards(playerIndex, 7 - numCardsInHand);
+		this.changePhaseUsingActionCard("discard", {
+			discardRange: {
+				start: numCardsInHand,
+				end: 7
+			},
+			discardType: "action",
+			numDiscard: 999
+		});
+		return {};
+	}
+
+	/**
 	 * NOTE: this card is not in the standard set
 	 * +1 card, +1 action, +1 gold if you play a silver this turn
 	 */
 	merchantCardEffect(playerIndex) {
-		for (let i = 0; i < 1; i++) {
-			this.drawCard(playerIndex);
-		}
+		this.drawCards(playerIndex, 1);
 		return {
 			actions: 1,
 			firstPlayBonus: {
@@ -17588,6 +17592,22 @@ class Game {
 					gold: 1
 				}
 			}
+		};
+	}
+
+	/**
+	 * +4 Cards; +1 Buy
+	 * Each other player draws a card.
+	 */
+	councilRoomCardEffect(playerIndex) {
+		for(let i = 0; i < this.numPlayers; i++) {
+			if(i != playerIndex) {
+				this.drawCard(i);
+			}
+		}
+		this.drawCards(playerIndex, 4);
+		return {
+			buys: 1
 		};
 	}
 
@@ -17676,6 +17696,7 @@ class Game {
 		this.changePhaseUsingActionCard("discard", {
 			// means functionally unlimited
 			numDiscard: 999,
+			discardType: "any"
 		}, () => {
 			const discardPileSizeEnd = this.players[playerIndex].discard.length;
 			const numDiscarded = discardPileSizeEnd - discardPileSizeStart;
@@ -17895,6 +17916,13 @@ class Game {
 			effect: chancellorEffect
 		};
 
+		const libraryEffect = this.libraryCardEffect.bind(this);
+		cards.library = {
+			name: "library",
+			cost: 5,
+			type: "action",
+			effect: libraryEffect
+		};
 
 		// TODO unfinished cards
 		cards.moat = {
@@ -17920,6 +17948,14 @@ class Game {
 			cost: 3,
 			type: "action",
 			effect: merchantEffect
+		};
+
+		const councilRoomEffect = this.councilRoomCardEffect.bind(this);
+		cards["council room"] = {
+			name: "council room",
+			cost: 5,
+			type: "action",
+			effect: councilRoomEffect
 		};
 
 		return cards;
@@ -17964,6 +18000,7 @@ class Game {
 			"cellar",
 			"chancellor",
 			"chapel",
+			"council room",
 			"feast",
 			"festival",
 			"gardens",
@@ -17971,6 +18008,7 @@ class Game {
 			"market",
 			"mine",
 
+			"library",
 			// "militia",
 			// moneylender: not implemented
 			"remodel",
@@ -17983,8 +18021,6 @@ class Game {
 			// spy: not implemented
 			// thief: not implemented
 			// throne room: not implemented
-			// council room: not implemented
-			// library: not implemented
 			// adventurer: not implemented
 		];
 		const implementedKingdomCards = baseKingdomCards.concat([
@@ -18184,6 +18220,12 @@ class Game {
 		if(params.numDiscard) {
 			this.numDiscard = params.numDiscard;
 		}
+		if(params.discardType) {
+			this.discardType = params.discardType;
+		}
+		if(params.discardRange) {
+			this.discardRange = params.discardRange;
+		}
 		this.endPhaseCallback = callback;
 	}
 
@@ -18199,6 +18241,9 @@ class Game {
 			this.numTrash = 0;
 			this.trashType = null;
 			this.numDiscard = 0;
+			this.discardType = null;
+			this.discardRange = null;
+			// this.setAsideCards = [];
 			this.phase = "action";
 		}
 	}
@@ -18429,19 +18474,21 @@ class Game {
 
 		this.phase = "cleanup";
 
-		this.players[this.turn].numActions = 0;
-		this.players[this.turn].numBuys = 0;
+		const player = this.players[this.turn];
+
+		player.numActions = 0;
+		player.numBuys = 0;
+
+		// cleanup phase: discard all cards in play area
+		player.discard.push(...this.playArea);
+		this.playArea = [];
 
 		// cleanup phase: discard whole hand
-		while (this.players[this.turn].hand.length > 0) {
-			const c = this.players[this.turn].hand.pop();
-			this.players[this.turn].discard.push(c);
-		}
+		player.discard.push(...player.hand);
+		player.hand = [];
 
 		// draw 5 new cards
-		for (let i = 0; i < 5; i++) {
-			this.drawCard(this.turn);
-		}
+		this.drawCards(this.turn, 5);
 
 		if (this.checkGameEnd()) {
 			this.isGameOver = true;
@@ -18518,10 +18565,27 @@ class Game {
 
 		// reverse order
 		for(let cardIndex of cardIndexes) {
+			if(this.discardRange && (cardIndex < this.discardRange.min || cardIndex >= this.discardRange.max)) {
+				throw new Error(`discard range is [${this.discardRange.min}, ${this.discardRange.max}). Tried to discard at index ${cardIndex}`);
+			}
+			const card = player.hand[cardIndex];
+			if(this.discardType != "any" && this.discardType != card.type) {
+				throw new Error(`Card was of type ${card.type} but can only discard cards of type ${this.discardType}`);
+			}
 			player.discardCard(cardIndex);
 		}
 	}
 
+	/**
+	 * Draw multiple cards for the target player
+	 * @param {number} playerIndex
+	 * @param {number} numCards
+	 */
+	drawCards(playerIndex, numCards) {
+		for(let i = 0; i < numCards; i++) {
+			this.drawCard(playerIndex);
+		}
+	}
 
 	/**
 	 * Processes the effect of the card
@@ -18536,6 +18600,15 @@ class Game {
 		if(this.phase !== "action") {
 			throw new Error(`cannot play action cards outside of action phase (${this.phase} phase)`);
 		}
+		if(!card) {
+			throw new Error("card cannot be null");
+		}
+
+		// remove card from player's hand before triggering its effects
+		const cardIndex = player.hand.indexOf(card);
+		player.hand.splice(cardIndex, 1);
+		this.playArea.push(card);
+
 		if(card.name in this.firstPlayBonus) {
 			this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
 			this.firstPlayBonus.pop(card.name);
@@ -18555,19 +18628,10 @@ class Game {
 			this.firstPlayBonus[cardName] = firstPlayBonus[cardName];
 		}
 
-		// remove element from hand and place it on the discard pile
-		let cardIndex;
-		for(let i = 0; i < player.hand.length; i++) {
-			if(card === player.hand[i]) {
-				cardIndex = i;
-				break;
-			}
-		}
-		player.hand.splice(cardIndex, 1)[0];
 		if(sendToTrash) {
 			this.trash.push(card);
-		} else {
-			player.discard.push(card);
+			let i = this.playArea.indexOf(card);
+			this.playArea.splice(i, 1);
 		}
 
 		player.numActions--;

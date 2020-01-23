@@ -75,6 +75,7 @@ class Game {
 		// trash-phase specific
 		this.numTrash = 0;
 		this.trashType = null;
+		this.trashName = null;
 		// discard-phase specific
 		this.numDiscard = 0;
 		this.discardType = null;
@@ -194,6 +195,25 @@ class Game {
 			buys: 1,
 			gold: 1
 		};
+	}
+
+	/**
+	 * Trash a Copper from your hand. If you do, +$3.
+	 * @param {number} playerIndex
+	 */
+	moneylenderCardEffect() {
+		const trashCount = this.trash.length;
+		this.changePhaseUsingActionCard("trash", {
+			trashName: "copper",
+			numTrash: 1,
+			trashType: "treasure"
+		}, () => {
+			if(this.trash.length > trashCount) {
+				// copper was trashed
+				this.treasurePot += 3;
+			}
+		});
+		return {};
 	}
 
 	/**
@@ -488,6 +508,14 @@ class Game {
 			effect: market
 		};
 
+		const moneylenderEffect = this.moneylenderCardEffect.bind(this);
+		cards.moneylender = {
+			name: "moneylender",
+			cost: 4,
+			type: "action",
+			effect: moneylenderEffect
+		};
+
 		const chapelEffect = this.chapelCardEffect.bind(this);
 		cards.chapel = {
 			name: "chapel",
@@ -647,7 +675,7 @@ class Game {
 
 			"library",
 			// "militia",
-			// moneylender: not implemented
+			"moneylender",
 			"remodel",
 			"smithy",
 
@@ -854,6 +882,9 @@ class Game {
 		if(params.trashType) {
 			this.trashType = params.trashType;
 		}
+		if(params.trashName) {
+			this.trashName = params.trashName;
+		}
 		if(params.numDiscard) {
 			this.numDiscard = params.numDiscard;
 		}
@@ -877,10 +908,10 @@ class Game {
 			this.gainType = null;
 			this.numTrash = 0;
 			this.trashType = null;
+			this.trashName = null;
 			this.numDiscard = 0;
 			this.discardType = null;
 			this.discardRange = null;
-			// this.setAsideCards = [];
 			this.phase = "action";
 		}
 	}
@@ -1175,6 +1206,9 @@ class Game {
 			const card = player.hand.splice(cardIndex, 1)[0];
 			if(runChecks && this.trashType !== "any" && card.type !== this.trashType) {
 				throw new Error(`Can only trash cards of type ${this.trashType} but tried to trash card of type ${card.type}`);
+			}
+			if(runChecks && this.trashName && card.name !== this.trashName) {
+				throw new Error(`Can only trash cards with name ${this.trashName}`);
 			}
 			console.debug(`Player ${player.name} trashed card ${card.name}`);
 			this.trash.push(card);

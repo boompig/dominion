@@ -4,7 +4,7 @@ const Player = require("../src/player");
 
 describe("game", () => {
 
-	test("test chapel - trash n numbers of cards", () => {
+	test("chapel - trash n numbers of cards", () => {
 		const supply = ["chapel"];
 		const game = new Game({
 			numPlayers: 2,
@@ -43,7 +43,7 @@ describe("game", () => {
 		expect(game.playArea.length).toBe(1);
 	});
 
-	test("test feast - trash self", () => {
+	test("feast - trash self", () => {
 		const supply = ["feast", "festival"];
 		const game = new Game({
 			numPlayers: 2,
@@ -83,7 +83,7 @@ describe("game", () => {
 		expect(player.discard.length).toBe(1);
 	});
 
-	test("test lab, village, market - multiple buys per turn", () => {
+	test("lab, village, market - multiple buys per turn", () => {
 		const supply = ["laboratory", "village", "market"];
 		const game = new Game({
 			numPlayers: 2,
@@ -125,7 +125,7 @@ describe("game", () => {
 		expect(player.hand.length).toBe(10);
 	});
 
-	test("test workshop - gain card with restrictions", () => {
+	test("workshop - gain card with restrictions", () => {
 		const supply = ["workshop", "smithy"];
 		const game = new Game({
 			numPlayers: 2,
@@ -157,7 +157,7 @@ describe("game", () => {
 		expect(game.phase).toBe("action");
 	});
 
-	test("test remodel - trash & gain phase", () => {
+	test("remodel - trash & gain phase", () => {
 		const supply = ["remodel"];
 		const game = new Game({
 			numPlayers: 2,
@@ -215,7 +215,7 @@ describe("game", () => {
 		expect(game.playArea.length).toBe(1);
 	});
 
-	test("test mine - trash and gain treasure", () => {
+	test("mine - trash and gain treasure", () => {
 		const supply = ["mine"];
 		const game = new Game({
 			numPlayers: 2,
@@ -263,7 +263,7 @@ describe("game", () => {
 		expect(game.playArea.length).toBe(1);
 	});
 
-	test("test cellar - discard 5 and draw 5", () => {
+	test("cellar - discard 5 and draw 5", () => {
 		const supply = ["cellar"];
 		const game = new Game({
 			numPlayers: 2,
@@ -304,7 +304,7 @@ describe("game", () => {
 		expect(game.phase).toBe("action");
 	});
 
-	test("test witch - other players gain curse cards", () => {
+	test("witch - other players gain curse cards", () => {
 		const supply = ["witch"];
 		const playerIndex = 0;
 		const game = new Game({
@@ -358,7 +358,7 @@ describe("game", () => {
 		}
 	});
 
-	test("test gardens - victory card with effect", () => {
+	test("gardens - victory card with effect", () => {
 		const supply = ["gardens"];
 		const players = [
 			new Player(
@@ -396,7 +396,7 @@ describe("game", () => {
 		expect(player.points).toBe(6);
 	});
 
-	test("test library - draw till 7 no action cards", () => {
+	test("library - draw till 7 no action cards", () => {
 		const supply = ["library"];
 		const game = new Game({
 			numPlayers: 2,
@@ -420,7 +420,7 @@ describe("game", () => {
 		game.endActionCardPhase();
 	});
 
-	test("test library - draw till 7 and set aside action cards drawn", () => {
+	test("library - draw till 7 and set aside action cards drawn", () => {
 		const supply = ["library", "village"];
 		const game = new Game({
 			numPlayers: 2,
@@ -571,6 +571,46 @@ describe("game", () => {
 
 		expect(player.numBuys).toBe(2);
 		expect(player.hand.length).toBe(10);
+	});
+
+	test("moneylender - trash card with specific name", () => {
+		const supply = ["moneylender"];
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human",
+			supplyCards: supply
+		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
+		// 5 cards
+		const player = game.players[0];
+
+		// +1 card
+		const card = game.cards.moneylender;
+		player.hand.push(card);
+
+		// +1 card
+		game.drawPhase();
+		expect(player.hand.length).toBe(7);
+
+		game.playActionCard(player, 0, card);
+		expect(game.phase).toBe("trash");
+
+		let copperIndex;
+		for(let i = 0; i < player.hand.length; i++) {
+			if(player.hand[i].name === "copper") {
+				copperIndex = i;
+			}
+		}
+
+		game.trashCards(player, [copperIndex]);
+		game.endActionCardPhase();
+
+		expect(game.treasurePot).toBe(3);
+		expect(player.hand.length).toBe(5);
+		expect(game.trash.length).toBe(1);
+		expect(game.playArea.length).toBe(1);
 	});
 
 	test("implement merchant card 'in code'", () => {

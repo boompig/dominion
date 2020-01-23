@@ -45,6 +45,7 @@ yarn build
 - Library
 - Market
 - Mine
+- Moneylender
 - Remodel
 - Smithy
 - Village
@@ -55,8 +56,12 @@ yarn build
 ## Unsupported Cards
 
 - Bureaucrat
-- Chancellor
 - Moat
+- Spy
+- Thief
+- Militia
+- Throne Room
+- Adventurer
 
 ### Adding New Cards
 
