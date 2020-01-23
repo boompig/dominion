@@ -107,14 +107,8 @@ class Game {
 	 * @param {number} playerIndex
 	 */
 	smithyCardEffect(playerIndex) {
-		for (let i = 0; i < 3; i++) {
-			this.drawCard(playerIndex);
-		}
-		return {
-			actions: 0,
-			buys: 0,
-			gold: 0
-		};
+		this.drawCards(playerIndex, 3);
+		return {};
 	}
 
 	/**
@@ -123,13 +117,9 @@ class Game {
 	 * @param {number} playerIndex
 	 */
 	laboratoryCardEffect(playerIndex) {
-		for (let i = 0; i < 2; i++) {
-			this.drawCard(playerIndex);
-		}
+		this.drawCards(playerIndex, 2);
 		return {
 			actions: 1,
-			buys: 0,
-			gold: 0
 		};
 	}
 
@@ -151,13 +141,9 @@ class Game {
 	 * +1 card
 	 */
 	villageCardEffect(playerIndex) {
-		for (let i = 0; i < 1; i++) {
-			this.drawCard(playerIndex);
-		}
+		this.drawCards(playerIndex, 1);
 		return {
 			actions: 2,
-			buys: 0,
-			gold: 0
 		};
 	}
 
@@ -166,8 +152,7 @@ class Game {
 	 */
 	woodcutterCardEffect() {
 		return {
-			actions: 0,
-			buys: 0,
+			buys: 1,
 			gold: 2
 		};
 	}
@@ -200,9 +185,7 @@ class Game {
 	 * @param {number} playerIndex
 	 */
 	marketCardEffect(playerIndex) {
-		for (let i = 0; i < 1; i++) {
-			this.drawCard(playerIndex);
-		}
+		this.drawCards(playerIndex, 1);
 		return {
 			actions: 1,
 			buys: 1,
@@ -215,9 +198,7 @@ class Game {
 	 * +1 card, +1 action, +1 gold if you play a silver this turn
 	 */
 	merchantCardEffect(playerIndex) {
-		for (let i = 0; i < 1; i++) {
-			this.drawCard(playerIndex);
-		}
+		this.drawCards(playerIndex, 1);
 		return {
 			actions: 1,
 			firstPlayBonus: {
@@ -225,6 +206,22 @@ class Game {
 					gold: 1
 				}
 			}
+		};
+	}
+
+	/**
+	 * +4 Cards; +1 Buy
+	 * Each other player draws a card.
+	 */
+	councilRoomCardEffect(playerIndex) {
+		for(let i = 0; i < this.numPlayers; i++) {
+			if(i != playerIndex) {
+				this.drawCard(i);
+			}
+		}
+		this.drawCards(playerIndex, 4);
+		return {
+			buys: 1
 		};
 	}
 
@@ -559,6 +556,14 @@ class Game {
 			effect: merchantEffect
 		};
 
+		const councilRoomEffect = this.councilRoomCardEffect.bind(this);
+		cards["council room"] = {
+			name: "council room",
+			cost: 5,
+			type: "action",
+			effect: councilRoomEffect
+		};
+
 		return cards;
 	}
 
@@ -601,6 +606,7 @@ class Game {
 			"cellar",
 			"chancellor",
 			"chapel",
+			"council room",
 			"feast",
 			"festival",
 			"gardens",
@@ -620,7 +626,6 @@ class Game {
 			// spy: not implemented
 			// thief: not implemented
 			// throne room: not implemented
-			// council room: not implemented
 			// library: not implemented
 			// adventurer: not implemented
 		];
@@ -1159,6 +1164,16 @@ class Game {
 		}
 	}
 
+	/**
+	 * Draw multiple cards for the target player
+	 * @param {number} playerIndex
+	 * @param {number} numCards
+	 */
+	drawCards(playerIndex, numCards) {
+		for(let i = 0; i < numCards; i++) {
+			this.drawCard(playerIndex);
+		}
+	}
 
 	/**
 	 * Processes the effect of the card
@@ -1172,6 +1187,9 @@ class Game {
 	playActionCard(player, playerIndex, card) {
 		if(this.phase !== "action") {
 			throw new Error(`cannot play action cards outside of action phase (${this.phase} phase)`);
+		}
+		if(!card) {
+			throw new Error("card cannot be null");
 		}
 		if(card.name in this.firstPlayBonus) {
 			this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
