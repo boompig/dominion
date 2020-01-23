@@ -50,6 +50,7 @@ yarn build
 - Remodel
 - Smithy
 - Spy
+- Thief
 - Village
 - Witch
 - Woodcutter
@@ -59,7 +60,6 @@ yarn build
 
 - Bureaucrat
 - Moat
-- Thief
 - Militia
 - Throne Room
 

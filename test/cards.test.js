@@ -680,7 +680,6 @@ describe("game", () => {
 			deckSizes[i] = game.players[i].deck.length;
 		}
 
-		// see the deck
 		game.playActionCard(player, 0, card);
 		// -1 for played action card, +1 for newly drawn card
 		expect(player.hand.length).toBe(7);
@@ -695,13 +694,12 @@ describe("game", () => {
 			}
 		}
 
-		game.setSpyChoice({
+		game.endActionCardPhase({
 			0: "deck",
 			1: "discard",
 			2: "discard",
 			3: "deck"
 		});
-		game.endActionCardPhase();
 
 		expect(game.phase).toBe("action");
 		for(let i = 0; i < game.numPlayers; i++) {
@@ -718,6 +716,76 @@ describe("game", () => {
 		}
 		// card grants +1 action
 		expect(player.numActions).toBe(1);
+	});
+
+	test("thief - trash and gain revealed cards from others' decks", () => {
+		const supply = ["thief"];
+		const game = new Game({
+			numPlayers: 4,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human",
+			supplyCards: supply
+		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
+		// 5 cards
+		const player = game.players[0];
+
+		// +1 card
+		const card = game.cards.thief;
+		player.hand.push(card);
+
+		// +1 card
+		game.drawPhase();
+		expect(player.hand.length).toBe(7);
+		const deckSizes = {};
+		for(let i = 0; i < game.numPlayers; i++) {
+			// plant treasure cards
+			game.players[i].deck.push(game.cards.silver);
+			game.players[i].deck.push(game.cards.gold);
+			deckSizes[i] = game.players[i].deck.length;
+		}
+
+		game.playActionCard(player, 0, card);
+		// -1 for played action card
+		expect(player.hand.length).toBe(6);
+
+		expect(game.phase).toBe("thief");
+		for(let i = 0; i < game.numPlayers; i++) {
+			if(i === 0) {
+				expect(game.players[i].revealedCards.length).toBe(0);
+				expect(game.players[i].deck.length).toBe(deckSizes[i]);
+			} else {
+				expect(game.players[i].revealedCards.length).toBe(2);
+				expect(game.players[i].deck.length).toBe(deckSizes[i] - 2);
+				expect(game.players[i].revealedCards[0].name).toBe("gold");
+			}
+		}
+
+		// make sure that planted cards are now revealed
+
+		game.endActionCardPhase({
+			1: {
+				index: 0,
+				action: "trash"
+			},
+			2: {
+				index: 0,
+				action: "gain",
+			},
+			3: {
+				index: 1,
+				action: "gain"
+			}
+		});
+
+		expect(game.phase).toBe("action");
+		expect(game.players[0].deck.length).toBe(deckSizes[0]);
+
+		// gold
+		expect(game.trash.length).toBe(1);
+		// gold and silver
+		expect(game.players[0].discard.length).toBe(2);
 	});
 
 	test("implement merchant card 'in code'", () => {
