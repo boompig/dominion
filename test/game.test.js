@@ -406,7 +406,7 @@ describe("game", () => {
 		expect(game.phase).toBe("action");
 	});
 
-	test("test witch - other players gain cards", () => {
+	test("test witch - other players gain curse cards", () => {
 		const supply = ["witch"];
 		const playerIndex = 0;
 		const game = new Game({
@@ -447,6 +447,16 @@ describe("game", () => {
 				expect(discardedCard.name).toBe("curse");
 			}
 		}
+
+		// verify that curse cards are counted in points
+		game.calculateGameEnd();
+		for(let i = 0; i < game.numPlayers; i++) {
+			if(i === playerIndex) {
+				expect(game.players[i].points).toBe(3);
+			} else {
+				expect(game.players[i].points).toBe(2);
+			}
+		}
 	});
 
 	test("test gardens - victory card with effect", () => {
@@ -485,6 +495,91 @@ describe("game", () => {
 		game.calculateGameEnd();
 		// 3 gardens + 3 estates
 		expect(player.points).toBe(6);
+	});
+
+	// test("test militia - other players discard cards", () => {
+	// 	const supply = ["militia"];
+	// 	const playerIndex = 0;
+	// 	const game = new Game({
+	// 		numPlayers: 4,
+	// 		humanPlayerIndex: playerIndex,
+	// 		humanPlayerName: "test human",
+	// 		supplyCards: supply
+	// 	});
+	// 	expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+	// 	expect(game.numPlayers).toBe(4);
+
+	// 	const player = game.players[playerIndex];
+	// 	const card = game.cards.militia;
+
+	// 	// +1 card
+	// 	player.hand.push(card);
+
+	// 	// +1 card
+	// 	game.drawPhase();
+
+	// 	// make sure that other players have 5 cards in their hand
+	// 	for(let i = 0; i < game.numPlayers; i++) {
+	// 		if(i != playerIndex) {
+	// 			expect(game.players[i].hand.length).toBe(5);
+	// 		}
+	// 	}
+
+	// 	game.playActionCard(player, playerIndex, card);
+
+	// 	for(let i = 0; i < game.numPlayers; i++) {
+	// 		if(i != playerIndex) {
+	// 			expect(game.players[i].hand.length).toBe(3);
+	// 		}
+	// 	}
+	// });
+
+	test("test chancellor - cycle deck", () => {
+		const supply = ["chancellor"];
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human",
+			supplyCards: supply
+		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
+		// 5 cards
+		const player = game.players[0];
+
+		// +1 card
+		const card = game.cards.chancellor;
+		player.hand.push(card);
+
+		// +1 card
+		game.drawPhase();
+
+		expect(player.hand.length).toBe(7);
+		expect(player.deck.length).toBe(4);
+
+		// play chancellor
+		game.playActionCard(player, 0, card);
+		expect(game.phase).toBe("discard-deck");
+
+		// trigger its effect
+		game.discardDeck(player);
+		game.endActionCardPhase();
+		expect(game.phase).toBe("action");
+
+		// did it work?
+		expect(player.deck.length).toBe(0);
+		expect(player.discard.length).toBe(1 + 4);
+		expect(game.treasurePot).toBe(2);
+
+		// after the end of the turn did it cycle?
+		game.endActionPhase();
+		expect(game.phase).toBe("buy");
+
+		game.endTurn();
+		expect(player.discard.length).toBe(0);
+		expect(player.hand.length).toBe(5);
+		// 11  - 5
+		expect(player.deck.length).toBe(6);
 	});
 
 	test("implement merchant card 'in code'", () => {

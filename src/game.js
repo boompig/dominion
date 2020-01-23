@@ -61,6 +61,7 @@ class Game {
 		 * - gain
 		 * - trash
 		 * - discard
+		 * - discard-deck
 		 */
 		this.phase = "draw";
 		this.endPhaseCallback = null;
@@ -333,6 +334,27 @@ class Game {
 		return Math.floor(numCards / 10);
 	}
 
+	militiaCardEffect() {
+		throw new Error("not implemented");
+	// for(let i = 0; i < this.numPlayers; i++) {
+	// 	if(i != playerIndex) {
+	// 		this.discardCards()
+	// 	}
+	// }
+	}
+
+	/**
+	 * +$2
+	 * You may immediately put your deck into your discard pile.
+	 */
+	chancellorCardEffect() {
+		this.changePhaseUsingActionCard("discard-deck", {}, () => {
+		});
+		return {
+			gold: 2
+		};
+	}
+
 	/** ********************************************* */
 
 	/**
@@ -502,6 +524,15 @@ class Game {
 			effect: feastEffect
 		};
 
+		const chancellorEffect = this.chancellorCardEffect.bind(this);
+		cards.chancellor = {
+			name: "chancellor",
+			cost: 3,
+			type: "action",
+			effect: chancellorEffect
+		};
+
+
 		// TODO unfinished cards
 		cards.moat = {
 			name: "moat",
@@ -511,20 +542,21 @@ class Game {
 			effect: () => {}
 		};
 
+		const militiaEffect = this.militiaCardEffect.bind(this);
+		cards.militia = {
+			name: "militia",
+			cost: 4,
+			type: "action",
+			attack: true,
+			effect: militiaEffect
+		};
+
 		const merchantEffect = this.merchantCardEffect.bind(this);
 		cards.merchant = {
 			name: "merchant",
 			cost: 3,
 			type: "action",
 			effect: merchantEffect
-		};
-
-		cards.militia = {
-			name: "militia",
-			cost: 4,
-			type: "action",
-			attack: true,
-			effect: () => {}
 		};
 
 		return cards;
@@ -564,31 +596,33 @@ class Game {
 			throw new Error("Cannot have more than 10 kingdom card piles");
 		}
 
-		// pick remainder from cards below
+		// commented-out cards are not implemented
 		const baseKingdomCards = [
 			"cellar",
+			"chancellor",
 			"chapel",
-			// chancellor: not implemented
-			"village",
-			"woodcutter",
 			"feast",
-			// militia: not implemented
-			// moneylender: not implemented
-			"workshop",
+			"festival",
 			"gardens",
+			"laboratory",
+			"market",
+			"mine",
+
+			// "militia",
+			// moneylender: not implemented
 			"remodel",
+			"smithy",
+
+			"village",
+			"witch",
+			"woodcutter",
+			"workshop",
 			// spy: not implemented
 			// thief: not implemented
 			// throne room: not implemented
 			// council room: not implemented
 			// library: not implemented
-			"witch",
 			// adventurer: not implemented
-			"smithy",
-			"festival",
-			"laboratory",
-			"market",
-			"mine",
 		];
 		const implementedKingdomCards = baseKingdomCards.concat([
 			// not part of basic set but implemented:
@@ -1021,13 +1055,13 @@ class Game {
 	}
 
 	/**
-	 * Change the phase to cleanup, then to buy
+	 * Change the phase to cleanup, then to draw for the next player
 	 * Perform the cleanup phase for the current player
 	 * Change the turn to the next player
 	 */
 	endTurn() {
 		if(this.phase !== "buy") {
-			console.warn(`cannot end turn in ${this.phase} phase`);
+			throw new Error(`cannot end turn in ${this.phase} phase`);
 		}
 
 		this.phase = "cleanup";
@@ -1054,6 +1088,18 @@ class Game {
 		}
 
 		this.phase = "draw";
+	}
+
+	/**
+	 * Put entire deck into discard stack
+	 * @param {Player} player
+	 */
+	discardDeck(player) {
+		if(this.phase !== "discard-deck") {
+			throw new Error("cannot discard deck outside of discard-deck phase");
+		}
+		player.discard.push(...player.deck);
+		player.deck = [];
 	}
 
 	/**
@@ -1135,7 +1181,7 @@ class Game {
 		const cardEffect = card.effect(playerIndex);
 		if(!cardEffect) {
 			console.log(card);
-			console.error("Failed to find effect for card ^");
+			console.error(`Failed to find effect for card ${card.name}`);
 		}
 		player.numActions += cardEffect.actions || 0;
 		player.numBuys += cardEffect.buys || 0;
