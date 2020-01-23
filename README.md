@@ -35,17 +35,28 @@ yarn build
 ## Supported Cards
 
 - Cellar
+- Chancellor
 - Chapel
-- Village
-- Woodcutter
+- Council Room
 - Feast
+- Festival
+- Gardens
+- Laboratory
+- Library
+- Market
+- Mine
+- Remodel
+- Smithy
+- Village
+- Witch
+- Woodcutter
 - Workshop
 
 ## Unsupported Cards
 
+- Bureaucrat
 - Chancellor
 - Moat
-- Bureaucrat
 
 ### Adding New Cards
 

@@ -39,7 +39,8 @@ describe("game", () => {
 		// now should have 2 cards (-4 cards, -1 chapel card)
 		expect(player.hand.length).toBe(2);
 		expect(game.trash.length).toBe(4);
-		expect(player.discard.length).toBe(1);
+		expect(player.discard.length).toBe(0);
+		expect(game.playArea.length).toBe(1);
 	});
 
 	test("test feast - trash self", () => {
@@ -76,6 +77,7 @@ describe("game", () => {
 
 		// feast
 		expect(game.trash.length).toBe(1);
+		expect(game.playArea.length).toBe(0);
 
 		// festival
 		expect(player.discard.length).toBe(1);
@@ -148,7 +150,8 @@ describe("game", () => {
 		game.gainCard("smithy", 0);
 
 		// smithy and workshop
-		expect(player.discard.length).toBe(2);
+		expect(player.discard.length).toBe(1);
+		expect(game.playArea.length).toBe(1);
 
 		game.endActionCardPhase();
 		expect(game.phase).toBe("action");
@@ -208,7 +211,8 @@ describe("game", () => {
 		// estate
 		expect(game.trash.length).toBe(1);
 		// smithy and remodel
-		expect(player.discard.length).toBe(2);
+		expect(player.discard.length).toBe(1);
+		expect(game.playArea.length).toBe(1);
 	});
 
 	test("test mine - trash and gain treasure", () => {
@@ -255,7 +259,8 @@ describe("game", () => {
 		// silver
 		expect(game.trash.length).toBe(1);
 		// gold and mine
-		expect(player.discard.length).toBe(2);
+		expect(player.discard.length).toBe(1);
+		expect(game.playArea.length).toBe(1);
 	});
 
 	test("test cellar - discard 5 and draw 5", () => {
@@ -287,14 +292,15 @@ describe("game", () => {
 
 		game.discardCards(player, [0, 1, 2, 3, 4]);
 		// 5 cards + cellar
-		expect(player.discard.length).toBe(6);
+		expect(player.discard.length).toBe(5);
+		expect(game.playArea.length).toBe(1);
 
 		// -6 cards
 		expect(player.hand.length).toBe(1);
 
 		game.endActionCardPhase();
 		// +5 cards
-		expect(player.hand.length).toBe(7);
+		expect(player.hand.length).toBe(6);
 		expect(game.phase).toBe("action");
 	});
 
@@ -329,7 +335,8 @@ describe("game", () => {
 
 		// 7 - 1 (witch played) + 2 (cards drawn)
 		expect(player.hand.length).toBe(8);
-		expect(player.discard.length).toBe(1);
+		expect(game.playArea.length).toBe(1);
+		expect(player.discard.length).toBe(0);
 
 		// verify that all other players have a curse card in discard pile
 		for(let i = 0; i < game.numPlayers; i++) {
@@ -387,6 +394,69 @@ describe("game", () => {
 		game.calculateGameEnd();
 		// 3 gardens + 3 estates
 		expect(player.points).toBe(6);
+	});
+
+	test("test library - draw till 7 no action cards", () => {
+		const supply = ["library"];
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			supplyCards: supply,
+		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
+		const player = game.players[0];
+		const card = game.cards.library;
+
+		player.hand.push(card);
+
+		game.drawPhase();
+
+		game.playActionCard(player, 0, card, 5);
+		// no action cards in deck
+		expect(player.hand.length).toBe(7);
+		expect(game.phase).toBe("discard");
+
+		game.endActionCardPhase();
+	});
+
+	test("test library - draw till 7 and set aside action cards drawn", () => {
+		const supply = ["library", "village"];
+		const game = new Game({
+			numPlayers: 2,
+			humanPlayerIndex: 0,
+			supplyCards: supply,
+		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
+		const player = game.players[0];
+		const library = game.cards.library;
+		const village = game.cards.village;
+
+		// +1 card
+		player.hand.push(library);
+
+		// +1 card
+		game.drawPhase();
+
+		player.deck.push(village);
+
+		game.playActionCard(player, 0, library, 5);
+
+		// draw until 7 including the village card placed at the top of the deck
+		expect(player.hand.length).toBe(7);
+		expect(game.phase).toBe("discard");
+		expect(player.hand).toContain(village);
+
+		// discard village card
+		const cardIndex = player.hand.indexOf(village);
+		game.discardCards(player, [cardIndex]);
+		game.endActionCardPhase();
+
+		expect(game.phase).toBe("action");
+		expect(player.hand.length).toBe(6);
+		// village
+		expect(player.discard.length).toBe(1);
 	});
 
 	// test("test militia - other players discard cards", () => {
@@ -460,7 +530,8 @@ describe("game", () => {
 
 		// did it work?
 		expect(player.deck.length).toBe(0);
-		expect(player.discard.length).toBe(1 + 4);
+		expect(player.discard.length).toBe(4);
+		expect(game.playArea.length).toBe(1);
 		expect(game.treasurePot).toBe(2);
 
 		// after the end of the turn did it cycle?
