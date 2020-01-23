@@ -63,6 +63,7 @@ class Game {
 		 * - discard
 		 * - discard-deck
 		 * - adventurer
+		 * - spy
 		 */
 		this.phase = "draw";
 		this.endPhaseCallback = null;
@@ -81,6 +82,8 @@ class Game {
 		this.numDiscard = 0;
 		this.discardType = null;
 		this.discardRange = null;
+		// spy-phase specific
+		this.spyChoice = null;
 		// this is a little hack to make sure action stack cleaned up only when all card effects are processed
 		this.canCleanupActionStack = true;
 
@@ -114,6 +117,42 @@ class Game {
 	smithyCardEffect(playerIndex) {
 		this.drawCards(playerIndex, 3);
 		return {};
+	}
+
+	/**
+	 * +1 Card; +1 Action
+	 * Each player (including you)
+	 * reveals the top card of his deck and either discards it or puts it back, your choice.
+	 */
+	spyCardEffect(playerIndex) {
+		// +1 card
+		this.drawCards(playerIndex, 1);
+		// reveal 1 card for each player
+		for(let i = 0; i < this.numPlayers; i++) {
+			this.drawCard(i, true);
+		}
+		this.changePhaseUsingActionCard("spy", {}, () => {
+			for(let i = 0; i < this.numPlayers; i++) {
+				const card = this.players[i].revealedCards.pop();
+				if(this.spyChoice[i] === "deck") {
+					this.players[i].deck.push(card);
+				} else {
+					this.players[i].discard.push(card);
+				}
+			}
+		});
+		return {
+			actions: 1
+		};
+	}
+
+	/**
+	 * After playing the spy card (in the spy phase) can set the spy choice
+	 * Acceptable choices are "discard" and "deck"
+	 * @param {any} choices Map from player index to choice: "discard" or "deck"
+	 */
+	setSpyChoice(choices) {
+		this.spyChoice = choices;
 	}
 
 	/**
@@ -495,6 +534,14 @@ class Game {
 			effect: smithy,
 		};
 
+		const spy = this.spyCardEffect.bind(this);
+		cards.spy = {
+			name: "spy",
+			cost: 4,
+			type: "action",
+			effect: spy
+		};
+
 		const laboratory = this.laboratoryCardEffect.bind(this);
 		cards.laboratory = {
 			name: "laboratory",
@@ -714,12 +761,11 @@ class Game {
 			"moneylender",
 			"remodel",
 			"smithy",
-
+			"spy",
 			"village",
 			"witch",
 			"woodcutter",
 			"workshop",
-			// spy: not implemented
 			// thief: not implemented
 			// throne room: not implemented
 		];
@@ -947,6 +993,7 @@ class Game {
 			this.numDiscard = 0;
 			this.discardType = null;
 			this.discardRange = null;
+			this.spyChoice = null;
 			this.phase = "action";
 		}
 	}

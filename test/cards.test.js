@@ -613,7 +613,7 @@ describe("game", () => {
 		expect(game.playArea.length).toBe(1);
 	});
 
-	test("adventurer - reveal cards from deck", () => {
+	test("adventurer - reveal cards from own deck", () => {
 		const supply = ["adventurer", "village"];
 		const game = new Game({
 			numPlayers: 2,
@@ -653,6 +653,71 @@ describe("game", () => {
 		expect(player.hand.length).toBe(8);
 		// village, province
 		expect(player.discard.length).toBe(2);
+	});
+
+	test("spy - reveal cards from others' decks", () => {
+		const supply = ["spy"];
+		const game = new Game({
+			numPlayers: 4,
+			humanPlayerIndex: 0,
+			humanPlayerName: "test human",
+			supplyCards: supply
+		});
+		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
+
+		// 5 cards
+		const player = game.players[0];
+
+		// +1 card
+		const card = game.cards.spy;
+		player.hand.push(card);
+
+		// +1 card
+		game.drawPhase();
+		expect(player.hand.length).toBe(7);
+		const deckSizes = {};
+		for(let i = 0; i < game.numPlayers; i++) {
+			deckSizes[i] = game.players[i].deck.length;
+		}
+
+		// see the deck
+		game.playActionCard(player, 0, card);
+		// -1 for played action card, +1 for newly drawn card
+		expect(player.hand.length).toBe(7);
+
+		expect(game.phase).toBe("spy");
+		for(let i = 0; i < game.numPlayers; i++) {
+			expect(game.players[i].revealedCards.length).toBe(1);
+			if(i === 0) {
+				expect(game.players[i].deck.length).toBe(deckSizes[i] - 2);
+			} else {
+				expect(game.players[i].deck.length).toBe(deckSizes[i] - 1);
+			}
+		}
+
+		game.setSpyChoice({
+			0: "deck",
+			1: "discard",
+			2: "discard",
+			3: "deck"
+		});
+		game.endActionCardPhase();
+
+		expect(game.phase).toBe("action");
+		for(let i = 0; i < game.numPlayers; i++) {
+			if(i == 0) {
+				expect(game.players[i].deck.length).toBe(deckSizes[i] - 1);
+				expect(game.players[i].discard.length).toBe(0);
+			} else if(i == 3) {
+				expect(game.players[i].deck.length).toBe(deckSizes[i]);
+				expect(game.players[i].discard.length).toBe(0);
+			} else {
+				expect(game.players[i].deck.length).toBe(deckSizes[i] - 1);
+				expect(game.players[i].discard.length).toBe(1);
+			}
+		}
+		// card grants +1 action
+		expect(player.numActions).toBe(1);
 	});
 
 	test("implement merchant card 'in code'", () => {

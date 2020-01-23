@@ -49,6 +49,7 @@ yarn build
 - Moneylender
 - Remodel
 - Smithy
+- Spy
 - Village
 - Witch
 - Woodcutter
@@ -58,7 +59,6 @@ yarn build
 
 - Bureaucrat
 - Moat
-- Spy
 - Thief
 - Militia
 - Throne Room
