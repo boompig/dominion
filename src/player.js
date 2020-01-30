@@ -1,3 +1,6 @@
+// debugging
+console.debug = function() {};
+
 class Player {
 	/**
 	 * @param {String} name
@@ -26,6 +29,15 @@ class Player {
 		 */
 		this.discard = [];
 
+		/**
+		 * The cards that are currently revealed.
+		 * Typically this is temporary
+		 */
+		this.revealedCards = [];
+
+		/**
+		 * These may not always be totally accurate
+		 */
 		this.points = 0;
 		this.isHuman = isHuman || false;
 
@@ -45,6 +57,15 @@ class Player {
 			}
 		}
 		return money;
+	}
+
+	/**
+	 * @param {number} cardIndex
+	 */
+	discardCard(cardIndex) {
+		const cards = this.hand.splice(cardIndex, 1);
+		console.debug(`Discarding card ${cards[0].name} from player ${this.name}`);
+		this.discard.push(cards[0]);
 	}
 }
 

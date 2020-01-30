@@ -32,7 +32,38 @@ Shared files (between browser and Node) can be found in the `/src` directory. Bu
 yarn build
 ```
 
-## Adding New Cards
+## Supported Cards
+
+- Adventurer
+- Bureaucrat
+- Cellar
+- Chancellor
+- Chapel
+- Council Room
+- Feast
+- Festival
+- Gardens
+- Laboratory
+- Library
+- Market
+- Mine
+- Moneylender
+- Remodel
+- Smithy
+- Spy
+- Thief
+- Village
+- Witch
+- Woodcutter
+- Workshop
+
+## Unsupported Cards
+
+- Moat
+- Militia
+- Throne Room
+
+### Adding New Cards
 
 See `initCards` function in `src/game.js`.
 
