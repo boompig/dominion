@@ -17427,6 +17427,8 @@ class Game {
 		 * - discard-deck
 		 * - adventurer
 		 * - spy
+		 * - thief
+		 * - bureaucrat
 		 */
 		this.phase = "draw";
 		this.endPhaseCallback = null;
@@ -17445,8 +17447,6 @@ class Game {
 		this.numDiscard = 0;
 		this.discardType = null;
 		this.discardRange = null;
-		// spy-phase specific
-		this.spyChoice = null;
 		// this is a little hack to make sure action stack cleaned up only when all card effects are processed
 		this.canCleanupActionStack = true;
 
@@ -17494,28 +17494,84 @@ class Game {
 		for(let i = 0; i < this.numPlayers; i++) {
 			this.drawCard(i, true);
 		}
-		this.changePhaseUsingActionCard("spy", {}, () => {
-			for(let i = 0; i < this.numPlayers; i++) {
-				const card = this.players[i].revealedCards.pop();
-				if(this.spyChoice[i] === "deck") {
-					this.players[i].deck.push(card);
-				} else {
-					this.players[i].discard.push(card);
+		this.changePhaseUsingActionCard("spy", {},
+			/**
+			 * After playing the spy card (in the spy phase) can set the spy choice
+			 * Acceptable choices are "discard" and "deck"
+			 * @param {any} choices Map from player index to choice: "discard" or "deck"
+			 */
+			(spyChoices) => {
+				if (!spyChoices) {
+					throw new Error("Spy choices expected in spy callback to endActionCardPhase");
+				}
+
+				for (let i = 0; i < this.numPlayers; i++) {
+					const card = this.players[i].revealedCards.pop();
+					if (spyChoices[i] === "deck") {
+						this.players[i].deck.push(card);
+					} else {
+						this.players[i].discard.push(card);
+					}
 				}
 			}
-		});
+		);
 		return {
 			actions: 1
 		};
 	}
 
 	/**
-	 * After playing the spy card (in the spy phase) can set the spy choice
-	 * Acceptable choices are "discard" and "deck"
-	 * @param {any} choices Map from player index to choice: "discard" or "deck"
+	 * Each other player reveals the top 2 cards of his deck.
+	 * If they revealed any Treasure cards, they trash one of them that you choose.
+	 * You may gain any or all of these trashed cards.
+	 * They discard the other revealed cards.
+	 * @param {number} playerIndex
 	 */
-	setSpyChoice(choices) {
-		this.spyChoice = choices;
+	thiefCardEffect(playerIndex) {
+		for(let i = 0; i < this.numPlayers; i++) {
+			if(i != playerIndex) {
+				// reveal top 2 cards from OTHER players
+				this.drawCard(i, true);
+				this.drawCard(i, true);
+			}
+		}
+		this.changePhaseUsingActionCard("thief", {},
+			/**
+			 * After playing the thief card (in the thief phase) can set the thief choice
+			 * For each player specify which treasure cards (if any) to trash
+			 * For the trashed cards, specify if they should be trashed or gained
+			 * @param {any} choices Map from player index to {index: <number>, action: "trash" | "gain"}
+			 */
+			(choices) => {
+				for(let i = 0; i < this.numPlayers; i++) {
+					if(choices[i]) {
+						let j = choices[i].index;
+						if(j > this.players[i].revealedCards.length) {
+							throw new Error(`${j} is not a valid index into revealed cards by player ${this.players[i].name}`);
+						}
+						let card = this.players[i].revealedCards[j];
+						if(card.type !== "treasure") {
+							throw new Error("selected card must be a treasure card");
+						}
+						// remove from revealed cards
+						this.players[i].revealedCards.splice(j, 1);
+						if(choices[i].action === "trash") {
+							// trash that card
+							this.trash.push(card);
+						} else {
+							// gain that card
+							this.gainCard(card.name, playerIndex);
+						}
+					}
+					// discard all revealed cards that haven't been trashed/gained
+					while(this.players[i].revealedCards.length > 0) {
+						let card = this.players[i].revealedCards.pop();
+						this.players[i].discard.push(card);
+					}
+				}
+			}
+		);
+		return {};
 	}
 
 	/**
@@ -17788,6 +17844,49 @@ class Game {
 	}
 
 	/**
+	 * Gain a silver card; put it on top of your deck.
+	 * Each other player reveals a Victory card from his hand and puts it on his deck
+	 * (or reveals a hand with no Victory cards).
+	 */
+	bureaucratCardEffect(playerIndex) {
+		this.gainCard("silver", playerIndex, {location: "deck-top"});
+
+		// TODO - right now automatically reveals the 1st victory card found in hand...
+		// rather than have player choose
+		// this player has revealed a card
+		const r = {};
+		for(let i = 0; i < this.numPlayers; i++) {
+			if(i === playerIndex) {
+				continue;
+			}
+			let player = this.players[i];
+			for(let j = 0; j < player.hand.length; j++) {
+				if(player.hand[j].type === "victory") {
+					let card = player.hand.splice(j, 1)[0];
+					player.revealedCards.push(card);
+					r[i] = true;
+					break;
+				}
+			}
+		}
+
+		this.changePhaseUsingActionCard("bureaucrat", {},
+			() => {
+				for(let i = 0; i < this.numPlayers; i++) {
+					if(r[i]) {
+						let player = this.players[i];
+						// take the
+						let card = player.revealedCards.pop();
+						player.deck.push(card);
+					}
+				}
+			}
+		);
+
+		return {};
+	}
+
+	/**
 	 * +$2
 	 * You may immediately put your deck into your discard pile.
 	 */
@@ -17903,6 +18002,14 @@ class Game {
 			cost: 4,
 			type: "action",
 			effect: spy
+		};
+
+		const thief = this.thiefCardEffect.bind(this);
+		cards.thief = {
+			name: "thief",
+			cost: 4,
+			type: "action",
+			effect: thief
 		};
 
 		const laboratory = this.laboratoryCardEffect.bind(this);
@@ -18026,6 +18133,30 @@ class Game {
 			effect: libraryEffect
 		};
 
+		const councilRoomEffect = this.councilRoomCardEffect.bind(this);
+		cards["council room"] = {
+			name: "council room",
+			cost: 5,
+			type: "action",
+			effect: councilRoomEffect
+		};
+
+		const adventurerEffect = this.adventurerCardEffect.bind(this);
+		cards.adventurer = {
+			name: "adventurer",
+			cost: 6,
+			type: "action",
+			effect: adventurerEffect
+		};
+
+		const bureaucrat = this.bureaucratCardEffect.bind(this);
+		cards.bureaucrat = {
+			name: "bureaucrat",
+			cost: 4,
+			type: "action",
+			effect: bureaucrat
+		};
+
 		// TODO unfinished cards
 		cards.moat = {
 			name: "moat",
@@ -18050,22 +18181,6 @@ class Game {
 			cost: 3,
 			type: "action",
 			effect: merchantEffect
-		};
-
-		const councilRoomEffect = this.councilRoomCardEffect.bind(this);
-		cards["council room"] = {
-			name: "council room",
-			cost: 5,
-			type: "action",
-			effect: councilRoomEffect
-		};
-
-		const adventurerEffect = this.adventurerCardEffect.bind(this);
-		cards.adventurer = {
-			name: "adventurer",
-			cost: 6,
-			type: "action",
-			effect: adventurerEffect
 		};
 
 		return cards;
@@ -18108,6 +18223,7 @@ class Game {
 		// commented-out cards are not implemented
 		const baseKingdomCards = [
 			"adventurer",
+			"bureaucrat",
 			"cellar",
 			"chancellor",
 			"chapel",
@@ -18120,16 +18236,25 @@ class Game {
 			"mine",
 
 			"library",
+
+			/*
+			 * This is hard because it requires other players to act in the middle of the
+			 * current player's turn
+			 */
 			// "militia",
 			"moneylender",
 			"remodel",
 			"smithy",
 			"spy",
+			"thief",
 			"village",
 			"witch",
 			"woodcutter",
 			"workshop",
-			// thief: not implemented
+
+			/*
+			 * This is hard because there is no clear mechanism to play a card twice
+			 */
 			// throne room: not implemented
 		];
 		const implementedKingdomCards = baseKingdomCards.concat([
@@ -18341,10 +18466,15 @@ class Game {
 		this.endPhaseCallback = callback;
 	}
 
-	endActionCardPhase() {
+	/**
+	 * End the current phase that was triggered by an action card
+	 * Pass options to the callback for that action card
+	 * @param {any} endPhaseOptions
+	 */
+	endActionCardPhase(endPhaseOptions) {
 		this.canCleanupActionStack = true;
 		if (this.endPhaseCallback) {
-			this.endPhaseCallback();
+			this.endPhaseCallback(endPhaseOptions);
 		}
 		if(this.canCleanupActionStack) {
 			this.endPhaseCallback = null;
@@ -18356,7 +18486,6 @@ class Game {
 			this.numDiscard = 0;
 			this.discardType = null;
 			this.discardRange = null;
-			this.spyChoice = null;
 			this.phase = "action";
 		}
 	}
@@ -18452,17 +18581,23 @@ class Game {
 	/**
 	 * Remove a card from the supply and add it to the player's discard pile
 	 * Only checks whether the supply has that card
+	 * Optionally gain the card to another location if options specified
 	 * @param {string} cardName
 	 * @param {number} playerIndex
+	 * @param {any} options {location: "deck-top"} supported
 	 * @returns {Card}
 	 */
-	gainCard(cardName, playerIndex) {
+	gainCard(cardName, playerIndex, options) {
 		const player = this.players[playerIndex];
 		const card = this.takeCard(cardName, playerIndex);
 		if (card === null) {
 			throw new Error("Failed to take the card from the deck while buying/gaining");
 		}
-		player.discard.push(card);
+		if(options && options.location && options.location === "deck-top") {
+			player.deck.push(card);
+		} else {
+			player.discard.push(card);
+		}
 		console.debug(`Player ${player.name} gained ${card.name}`);
 		return card;
 	}
@@ -18821,8 +18956,7 @@ class Game {
 							this.gainCardWithCheck(gainCardName, p);
 							console.debug(`Player ${player.name} gained card ${gainCardName}`);
 						}
-					}
-					else if (this.phase === "trash") {
+					} else if (this.phase === "trash") {
 						const trashCardIndexes = player.strategy.trashCardForGain(
 							player,
 							effect.gainBonusCost,
