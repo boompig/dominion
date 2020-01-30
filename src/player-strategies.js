@@ -1,6 +1,6 @@
 class PlayerStrategy {
 	/**
-	 * @param {String} name
+	 * @param {string} name
 	 */
 	constructor() {
 		/*
@@ -55,7 +55,7 @@ class PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} supply
+	 * @param {Map<string, number>} supply
 	 * @param {number} treasurePot
 	 * @returns {number[]} array of card indexes
 	 */
@@ -82,7 +82,7 @@ class PlayerStrategy {
 	}
 
 	/**
-	 * @returns {String}
+	 * @returns {string}
 	 */
 	buyTurn() {
 		return this.buyGoalCard;
@@ -105,7 +105,7 @@ class BigMoneyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @returns {String}
+	 * @returns {string}
 	 */
 	getBuyGoal(player, supply, treasurePot) {
 		const money = player.getMoneyInHand() + treasurePot;
@@ -136,7 +136,7 @@ class SmartBigMoneyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} supply Map from card name to number of cards of that type left
+	 * @param {Map<string, number>} supply Map from card name to number of cards of that type left
 	 * @param {number} treasurePot
 	 * @returns {string | null}
 	 */
@@ -186,7 +186,7 @@ class SmartDuchyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} supply Map from card name to number of cards of that type left
+	 * @param {Map<string, number>} supply Map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
 	getBuyGoal(player, supply, treasurePot) {
@@ -242,7 +242,7 @@ class SmartSmithyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} supply Map from card name to number of cards of that type left
+	 * @param {Map<string, number>} supply Map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
 	getBuyGoal(player, supply, treasurePot) {
@@ -254,7 +254,7 @@ class SmartSmithyStrategy extends PlayerStrategy {
 	/**
 	 * @param {number} money
 	 * @param {Player} player
-	 * @param {object} supply Map from card name to number of cards of that type left
+	 * @param {Map<string, number>} supply Map from card name to number of cards of that type left
 	 */
 	buyTurnWrapper(money, player, supply) {
 		// calculate the avg value of coins in my supply

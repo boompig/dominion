@@ -117,7 +117,7 @@ new Vue({
 					return;
 				}
 			} else {
-				throw new Error(`Unsupported card type: ${card.type}`)
+				throw new Error(`Unsupported card type: ${card.type}`);
 			}
 		},
 

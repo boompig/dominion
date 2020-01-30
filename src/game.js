@@ -20,19 +20,38 @@ class Game {
 	constructor(options) {
 		options = options || {};
 
-		// array of player objects
+		/**
+		 * array of player objects
+		 * @type {Player[]}
+		 */
 		this.players = [];
 
-		// map from card names to their quantity in the deck
+		/**
+		 * map from card names to their quantity in the deck
+		 * @type { {[key: string] : number}}
+		 */
 		this.supply = {};
 
-		// map from card names to their properties
+		/**
+		 * map from card names to their properties
+		 * @type { {[key: string] : Card} }
+		 */
 		this.cards = {};
 
-		// array of cards that have been trashed
+		/**
+		 * array of cards that have been trashed
+		 * @type {Card[]}
+		 */
 		this.trash = [];
 
+		/**
+		 * @type {number}
+		 */
 		this.numPlayers = options.numPlayers || 5;
+
+		/**
+		 * @type {string | null}
+		 */
 		this.humanPlayerName = options.humanPlayerName || null;
 
 		// humanPlayerIndex may be 0
@@ -44,10 +63,17 @@ class Game {
 			this.hasHumanPlayer = false;
 		}
 
-		// index into this.players
+		/**
+		 * index into this.players
+		 * @type {number}
+		 */
 		this.turn = 0;
 
 		this.treasurePot = 0;
+
+		/**
+		 * map from card names to bonus
+		 */
 		this.firstPlayBonus = {};
 
 		/**
@@ -66,11 +92,17 @@ class Game {
 		 * - spy
 		 * - thief
 		 * - bureaucrat
+		 *
+		 * @type {string}
 		 */
 		this.phase = "draw";
 		this.endPhaseCallback = null;
 		this.round = 0;
 		this.isGameOver = false;
+
+		/**
+		 * @type {Card[]}
+		 */
 		this.playArea = [];
 
 		// gain-phase specific
@@ -827,10 +859,10 @@ class Game {
 	 * Initialize mapping of card names to their quantity
 	 * @param {number} numPlayers
 	 * @param {string[] | null} kingdomCardPiles
-	 * @returns {object} mapping of card names to their quantity
+	 * @returns {Map<string, number>} mapping of card names to their quantity
 	 */
 	initSupply(numPlayers, kingdomCardPiles) {
-		const supply = {};
+		const supply = new Map();
 		kingdomCardPiles = kingdomCardPiles || [];
 
 		// treasure cards
@@ -1186,7 +1218,7 @@ class Game {
 
 	/**
 	 * @param {Player[] | null} players
-	 * @param {String[] | null} supplyCards
+	 * @param {string[] | null} supplyCards
 	 */
 	setup(players, supplyCards) {
 		this.cards = this.initCards();
@@ -1504,7 +1536,7 @@ class Game {
 
 		if(card.name in this.firstPlayBonus) {
 			this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
-			this.firstPlayBonus.pop(card.name);
+			delete this.firstPlayBonus[card.name];
 		}
 
 		const cardEffect = card.effect(playerIndex);

@@ -18,7 +18,7 @@
     }
   },
   "scripts": {
-    "lint": "yarn eslint *.js",
+    "lint": "yarn eslint *.js src",
     "build": "yarn browserify src/dominion.js -o dist/dominion.bundle.js",
     "test": "yarn jest"
   },
