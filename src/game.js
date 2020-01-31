@@ -869,16 +869,16 @@ class Game {
 	 * Initialize mapping of card names to their quantity
 	 * @param {number} numPlayers
 	 * @param {string[] | null} kingdomCardPiles
-	 * @returns {Map<string, number>} mapping of card names to their quantity
+	 * @returns {any} mapping of card names to their quantity
 	 */
 	initSupply(numPlayers, kingdomCardPiles) {
-		const supply = new Map();
+		const supply = {};
 		kingdomCardPiles = kingdomCardPiles || [];
 
 		// treasure cards
-		supply.set("copper",  60 + numPlayers * 7);
-		supply.set("silver", 40);
-		supply.set("gold", 30);
+		supply.copper = 60 + numPlayers * 7;
+		supply.silver = 40;
+		supply.gold = 30;
 
 		// victory cards
 		// they have different numbers depending on # of players
@@ -890,10 +890,10 @@ class Game {
 		}
 
 		// per the rules, starting cards do not come from supply
-		supply.set("estate", numVictoryCards + numPlayers * 3);
-		supply.set("duchy", numVictoryCards);
-		supply.set("province", numVictoryCards);
-		supply.set("curse", (numPlayers - 1) * 10);
+		supply.estate = numVictoryCards + numPlayers * 3;
+		supply.duchy = numVictoryCards;
+		supply.province = numVictoryCards;
+		supply.curse = (numPlayers - 1) * 10;
 
 		if(kingdomCardPiles.length > 10) {
 			throw new Error("Cannot have more than 10 kingdom card piles");
@@ -970,9 +970,9 @@ class Game {
 				throw new Error(`Failed to find card ${cardName}`);
 			}
 			if(card.type === "action") {
-				supply.set(cardName, 10);
+				supply[cardName] = 10;
 			} else if(card.type === "victory") {
-				supply.set(cardName, numVictoryCards);
+				supply[cardName] = numVictoryCards;
 			} else {
 				throw new Error();
 			}
