@@ -1,6 +1,99 @@
-(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-(function (global){
-/**
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// define __esModule on exports
+/******/ 	__webpack_require__.r = function(exports) {
+/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 		}
+/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 	};
+/******/
+/******/ 	// create a fake namespace object
+/******/ 	// mode & 1: value is a module id, require it
+/******/ 	// mode & 2: merge all properties of value into the ns
+/******/ 	// mode & 4: return value when already ns object
+/******/ 	// mode & 8|1: behave like require
+/******/ 	__webpack_require__.t = function(value, mode) {
+/******/ 		if(mode & 1) value = __webpack_require__(value);
+/******/ 		if(mode & 8) return value;
+/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
+/******/ 		var ns = Object.create(null);
+/******/ 		__webpack_require__.r(ns);
+/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
+/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
+/******/ 		return ns;
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+/******/
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = "./src/dominion.js");
+/******/ })
+/************************************************************************/
+/******/ ({
+
+/***/ "./node_modules/lodash/lodash.js":
+/*!***************************************!*\
+  !*** ./node_modules/lodash/lodash.js ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
  * @license
  * Lodash <https://lodash.com/>
  * Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
@@ -424,7 +517,7 @@
   var root = freeGlobal || freeSelf || Function('return this')();
 
   /** Detect free variable `exports`. */
-  var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+  var freeExports =  true && exports && !exports.nodeType && exports;
 
   /** Detect free variable `module`. */
   var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -17087,7 +17180,7 @@
   var _ = runInContext();
 
   // Some AMD build optimizers, like r.js, check for condition patterns like:
-  if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
+  if (true) {
     // Expose Lodash on the global object to prevent errors when Lodash is
     // loaded by a script tag in the presence of an AMD loader.
     // See http://requirejs.org/docs/errors.html#mismatch for more details.
@@ -17096,32 +17189,97 @@
 
     // Define as an anonymous module so, through path mapping, it can be
     // referenced as the "underscore" module.
-    define(function() {
+    !(__WEBPACK_AMD_DEFINE_RESULT__ = (function() {
       return _;
-    });
+    }).call(exports, __webpack_require__, exports, module),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
   }
   // Check for `exports` after `define` in case a build optimizer adds it.
-  else if (freeModule) {
-    // Export for Node.js.
-    (freeModule.exports = _)._ = _;
-    // Export for CommonJS support.
-    freeExports._ = _;
-  }
-  else {
-    // Export to the global object.
-    root._ = _;
-  }
+  else {}
 }.call(this));
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],2:[function(require,module,exports){
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../webpack/buildin/module.js */ "./node_modules/webpack/buildin/module.js")(module)))
+
+/***/ }),
+
+/***/ "./node_modules/webpack/buildin/global.js":
+/*!***********************************!*\
+  !*** (webpack)/buildin/global.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || new Function("return this")();
+} catch (e) {
+	// This works if the window reference is available
+	if (typeof window === "object") g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+
+/***/ "./node_modules/webpack/buildin/module.js":
+/*!***********************************!*\
+  !*** (webpack)/buildin/module.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if (!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if (!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+
+/***/ "./src/dominion.js":
+/*!*************************!*\
+  !*** ./src/dominion.js ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
 /**
  * This file controls the in-browser visualization of a game of Dominion
  * The human player is always inserted as the first player
  */
 
 /* global Vue, alert, window */
-const Game = require("./game.js");
+const Game = __webpack_require__(/*! ./game.js */ "./src/game.js");
 
 new Vue({
 	el: "#app-container",
@@ -17234,7 +17392,7 @@ new Vue({
 					return;
 				}
 			} else {
-				throw new Error(`Unsupported card type: ${card.type}`)
+				throw new Error(`Unsupported card type: ${card.type}`);
 			}
 		},
 
@@ -17256,7 +17414,7 @@ new Vue({
 				}
 			} else if(this.game.phase === "gain") {
 				try {
-					this.game.gainCard(cardName, this.humanPlayerIndex);
+					this.game.gainCardWithCheck(cardName, this.humanPlayerIndex);
 					return true;
 				} catch (e) {
 					alert(e.message);
@@ -17315,7 +17473,7 @@ new Vue({
 		cardClasses: function() {
 			/**
 			 * @param {Card | string} card can be either a string or Card object
-			 * @param {string} source - either "hand" or "deck"
+			 * @param {string} source - either "hand" or "supply"
 			 */
 			return (card, source) => {
 				const classes = {
@@ -17331,7 +17489,7 @@ new Vue({
 
 				if(source === "hand" && card.type === "action") {
 					classes["active"] = (this.game.turn === this.humanPlayerIndex) && this.game.phase === "action";
-				} else if(source === "deck" || card.type === "treasure") {
+				} else if(source === "supply" || card.type === "treasure") {
 					classes["active"] = (this.game.turn === this.humanPlayerIndex && this.game.phase === "buy");
 				}
 
@@ -17360,14 +17518,23 @@ new Vue({
 		}
 	}
 });
-},{"./game.js":3}],3:[function(require,module,exports){
-const _ = require("lodash");
-const { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy, PointsOnlyStrategy } = require("./player-strategies.js");
+
+/***/ }),
+
+/***/ "./src/game.js":
+/*!*********************!*\
+  !*** ./src/game.js ***!
+  \*********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+const _ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
+const { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy, PointsOnlyStrategy } = __webpack_require__(/*! ./player-strategies.js */ "./src/player-strategies.js");
 
 // for debugging
 console.debug = function() {};
 
-const Player = require("./player.js");
+const Player = __webpack_require__(/*! ./player.js */ "./src/player.js");
 
 class Game {
 	/**
@@ -17383,19 +17550,38 @@ class Game {
 	constructor(options) {
 		options = options || {};
 
-		// array of player objects
+		/**
+		 * array of player objects
+		 * @type {Player[]}
+		 */
 		this.players = [];
 
-		// map from card names to their quantity in the deck
+		/**
+		 * map from card names to their quantity in the deck
+		 * @type { {[key: string] : number}}
+		 */
 		this.supply = {};
 
-		// map from card names to their properties
+		/**
+		 * map from card names to their properties
+		 * @type { {[key: string] : Card} }
+		 */
 		this.cards = {};
 
-		// array of cards that have been trashed
+		/**
+		 * array of cards that have been trashed
+		 * @type {Card[]}
+		 */
 		this.trash = [];
 
+		/**
+		 * @type {number}
+		 */
 		this.numPlayers = options.numPlayers || 5;
+
+		/**
+		 * @type {string | null}
+		 */
 		this.humanPlayerName = options.humanPlayerName || null;
 
 		// humanPlayerIndex may be 0
@@ -17407,10 +17593,20 @@ class Game {
 			this.hasHumanPlayer = false;
 		}
 
-		// index into this.players
+		/**
+		 * index into this.players
+		 * @type {number}
+		 */
 		this.turn = 0;
 
+		/**
+		 * @type {number}
+		 */
 		this.treasurePot = 0;
+
+		/**
+		 * map from card names to bonus
+		 */
 		this.firstPlayBonus = {};
 
 		/**
@@ -17429,16 +17625,23 @@ class Game {
 		 * - spy
 		 * - thief
 		 * - bureaucrat
+		 *
+		 * @type {string}
 		 */
 		this.phase = "draw";
 		this.endPhaseCallback = null;
 		this.round = 0;
 		this.isGameOver = false;
+
+		/**
+		 * @type {Card[]}
+		 */
 		this.playArea = [];
 
 		// gain-phase specific
-		this.maxGainCost = 0;
+		this.numGain = 0;
 		this.gainType = null;
+		this.maxGainCost = 0;
 		// trash-phase specific
 		this.numTrash = 0;
 		this.trashType = null;
@@ -17633,13 +17836,15 @@ class Game {
 			const trashedCard = this.trash[this.trash.length - 1];
 			this.changePhaseUsingActionCard("gain", {
 				maxGainCost: trashedCard.cost + 2,
-				gainType: "any"
+				gainType: "any",
+				numGain: 1
 			});
 
 		});
 		return {
 			gainBonusCost: 2,
-			gainType: "any"
+			gainType: "any",
+			numGain: 1
 		};
 	}
 
@@ -17760,7 +17965,8 @@ class Game {
 	workshopCardEffect() {
 		this.changePhaseUsingActionCard("gain", {
 			maxGainCost: 4,
-			gainType: "any"
+			gainType: "any",
+			numGain: 1
 		}, null);
 		return {};
 	}
@@ -17778,12 +17984,14 @@ class Game {
 			const trashedCard = this.trash[this.trash.length - 1];
 			this.changePhaseUsingActionCard("gain", {
 				maxGainCost: trashedCard.cost + 3,
-				gainType: "treasure"
+				gainType: "treasure",
+				numGain: 1
 			});
 		});
 		return {
 			gainBonusCost: 3,
-			gainType: "treasure"
+			gainType: "treasure",
+			numGain: 1
 		};
 	}
 
@@ -17794,7 +18002,8 @@ class Game {
 	feastCardEffect() {
 		this.changePhaseUsingActionCard("gain", {
 			maxGainCost: 5,
-			gainType: "any"
+			gainType: "any",
+			numGain: 1
 		});
 		return {
 			sendToTrash: true
@@ -18190,7 +18399,7 @@ class Game {
 	 * Initialize mapping of card names to their quantity
 	 * @param {number} numPlayers
 	 * @param {string[] | null} kingdomCardPiles
-	 * @returns {object} mapping of card names to their quantity
+	 * @returns {any} mapping of card names to their quantity
 	 */
 	initSupply(numPlayers, kingdomCardPiles) {
 		const supply = {};
@@ -18278,6 +18487,7 @@ class Game {
 
 		// draw only from base cards
 		const p2 = _.sampleSize(baseKingdomCards, 10 - kingdomCardPiles.length);
+		// @type string[]
 		const piles = kingdomCardPiles.concat(p2);
 
 		if(piles.length != 10) {
@@ -18442,6 +18652,9 @@ class Game {
 		if(params.maxGainCost) {
 			this.maxGainCost = params.maxGainCost;
 		}
+		if(params.numGain) {
+			this.numGain = params.numGain;
+		}
 		if(params.gainType) {
 			this.gainType = params.gainType;
 		}
@@ -18512,6 +18725,8 @@ class Game {
 	 * @returns {Card} Return the card that was drawn
 	 */
 	drawCard(playerIndex, addToRevealed) {
+		addToRevealed = addToRevealed || false;
+
 		const player = this.players[playerIndex];
 		if (player.deck.length === 0) {
 			// the player has run out of cards
@@ -18549,7 +18764,7 @@ class Game {
 
 	/**
 	 * @param {Player[] | null} players
-	 * @param {String[] | null} supplyCards
+	 * @param {string[] | null} supplyCards
 	 */
 	setup(players, supplyCards) {
 		this.cards = this.initCards();
@@ -18568,6 +18783,11 @@ class Game {
 		if(this.phase !== "gain") {
 			throw new Error(`Cannot gain cards outside of gain phase - phase is ${this.phase}`);
 		}
+
+		if(this.numGain === 0) {
+			throw new Error("cannot gain any more cards");
+		}
+
 		let gainCard = this.cards[cardName];
 		if(gainCard.cost > this.maxGainCost) {
 			throw new Error(`Action card allowed you to gain a card costing up to ${this.maxGainCost} but you tried to gain a card costing ${gainCard.cost}`);
@@ -18599,6 +18819,7 @@ class Game {
 			player.discard.push(card);
 		}
 		console.debug(`Player ${player.name} gained ${card.name}`);
+		this.numGain--;
 		return card;
 	}
 
@@ -18856,8 +19077,13 @@ class Game {
 		if(this.phase !== "action") {
 			throw new Error(`cannot play action cards outside of action phase (${this.phase} phase)`);
 		}
+
 		if(!card) {
 			throw new Error("card cannot be null");
+		}
+
+		if(this.numActions === 0) {
+			throw new Error("no more actions!");
 		}
 
 		// remove card from player's hand before triggering its effects
@@ -18867,7 +19093,7 @@ class Game {
 
 		if(card.name in this.firstPlayBonus) {
 			this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
-			this.firstPlayBonus.pop(card.name);
+			delete this.firstPlayBonus[card.name];
 		}
 
 		const cardEffect = card.effect(playerIndex);
@@ -19008,10 +19234,19 @@ class Game {
 }
 
 module.exports = Game;
-},{"./player-strategies.js":4,"./player.js":5,"lodash":1}],4:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./src/player-strategies.js":
+/*!**********************************!*\
+  !*** ./src/player-strategies.js ***!
+  \**********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 class PlayerStrategy {
 	/**
-	 * @param {String} name
+	 * @param {string} name
 	 */
 	constructor() {
 		/*
@@ -19066,12 +19301,17 @@ class PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} supply
+	 * @param {any} supply
 	 * @param {number} treasurePot
 	 * @returns {number[]} array of card indexes
 	 */
 	playTreasures(player, supply, treasurePot) {
 		const cardName = this.getBuyGoal(player, supply, treasurePot);
+
+		if(!supply) {
+			throw new Error("supply not set");
+		}
+
 		this.buyGoalCard = cardName;
 		const treasures = [];
 
@@ -19093,7 +19333,7 @@ class PlayerStrategy {
 	}
 
 	/**
-	 * @returns {String}
+	 * @returns {string}
 	 */
 	buyTurn() {
 		return this.buyGoalCard;
@@ -19116,7 +19356,7 @@ class BigMoneyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @returns {String}
+	 * @returns {string}
 	 */
 	getBuyGoal(player, supply, treasurePot) {
 		const money = player.getMoneyInHand() + treasurePot;
@@ -19147,7 +19387,7 @@ class SmartBigMoneyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} supply Map from card name to number of cards of that type left
+	 * @param {any} supply Map from card name to number of cards of that type left
 	 * @param {number} treasurePot
 	 * @returns {string | null}
 	 */
@@ -19197,7 +19437,7 @@ class SmartDuchyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} supply Map from card name to number of cards of that type left
+	 * @param {any} supply Map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
 	getBuyGoal(player, supply, treasurePot) {
@@ -19253,7 +19493,7 @@ class SmartSmithyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {object} supply Map from card name to number of cards of that type left
+	 * @param {any} supply Map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
 	getBuyGoal(player, supply, treasurePot) {
@@ -19265,7 +19505,7 @@ class SmartSmithyStrategy extends PlayerStrategy {
 	/**
 	 * @param {number} money
 	 * @param {Player} player
-	 * @param {object} supply Map from card name to number of cards of that type left
+	 * @param {any} supply Map from card name to number of cards of that type left
 	 */
 	buyTurnWrapper(money, player, supply) {
 		// calculate the avg value of coins in my supply
@@ -19381,13 +19621,23 @@ module.exports = {
 	BigMoneyStrategy,
 	BigMoneySmithyStrategy
 };
-},{}],5:[function(require,module,exports){
+
+/***/ }),
+
+/***/ "./src/player.js":
+/*!***********************!*\
+  !*** ./src/player.js ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
 // debugging
 console.debug = function() {};
 
+
 class Player {
 	/**
-	 * @param {String} name
+	 * @param {string} name
 	 * @param {PlayerStrategy} strategy
 	 * @param {boolean} isHuman
 	 */
@@ -19398,35 +19648,51 @@ class Player {
 		/**
 		 * Array of Card objects
 		 * The player's draw pile
+		 * @type {Card[]}
 		 */
 		this.deck = [];
 
 		/**
 		 * Array of Card objects
 		 * The player's current hand
+		 * @type {Card[]}
 		 */
 		this.hand = [];
 
 		/**
 		 * Array of Card objects
 		 * The player's discard pile
+		 * @type {Card[]}
 		 */
 		this.discard = [];
 
 		/**
 		 * The cards that are currently revealed.
 		 * Typically this is temporary
+		 * @type {Card[]}
 		 */
 		this.revealedCards = [];
 
 		/**
 		 * These may not always be totally accurate
+		 * @type {number}
 		 */
 		this.points = 0;
+		/**
+		 * @type {boolean}
+		 */
 		this.isHuman = isHuman || false;
 
-		/* reset each turn */
+		/**
+		 * reset each turn
+		 * @type {number}
+		 */
 		this.numBuys = 0;
+
+		/**
+		 * reset each turn
+		 * @type {number}
+		 */
 		this.numActions = 0;
 	}
 
@@ -19454,4 +19720,8 @@ class Player {
 }
 
 module.exports = Player;
-},{}]},{},[2]);
+
+/***/ })
+
+/******/ });
+//# sourceMappingURL=dominion.bundle.js.map
