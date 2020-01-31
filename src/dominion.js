@@ -139,7 +139,7 @@ new Vue({
 				}
 			} else if(this.game.phase === "gain") {
 				try {
-					this.game.gainCard(cardName, this.humanPlayerIndex);
+					this.game.gainCardWithCheck(cardName, this.humanPlayerIndex);
 					return true;
 				} catch (e) {
 					alert(e.message);
@@ -198,7 +198,7 @@ new Vue({
 		cardClasses: function() {
 			/**
 			 * @param {Card | string} card can be either a string or Card object
-			 * @param {string} source - either "hand" or "deck"
+			 * @param {string} source - either "hand" or "supply"
 			 */
 			return (card, source) => {
 				const classes = {
@@ -214,7 +214,7 @@ new Vue({
 
 				if(source === "hand" && card.type === "action") {
 					classes["active"] = (this.game.turn === this.humanPlayerIndex) && this.game.phase === "action";
-				} else if(source === "deck" || card.type === "treasure") {
+				} else if(source === "supply" || card.type === "treasure") {
 					classes["active"] = (this.game.turn === this.humanPlayerIndex && this.game.phase === "buy");
 				}
 

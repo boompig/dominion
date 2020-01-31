@@ -147,7 +147,7 @@ describe("game", () => {
 		expect(game.maxGainCost).toBe(4);
 		expect(game.phase).toBe("gain");
 
-		game.gainCard("smithy", 0);
+		game.gainCardWithCheck("smithy", 0);
 
 		// smithy and workshop
 		expect(player.discard.length).toBe(1);

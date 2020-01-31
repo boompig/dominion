@@ -69,6 +69,9 @@ class Game {
 		 */
 		this.turn = 0;
 
+		/**
+		 * @type {number}
+		 */
 		this.treasurePot = 0;
 
 		/**
@@ -106,8 +109,9 @@ class Game {
 		this.playArea = [];
 
 		// gain-phase specific
-		this.maxGainCost = 0;
+		this.numGain = 0;
 		this.gainType = null;
+		this.maxGainCost = 0;
 		// trash-phase specific
 		this.numTrash = 0;
 		this.trashType = null;
@@ -302,13 +306,15 @@ class Game {
 			const trashedCard = this.trash[this.trash.length - 1];
 			this.changePhaseUsingActionCard("gain", {
 				maxGainCost: trashedCard.cost + 2,
-				gainType: "any"
+				gainType: "any",
+				numGain: 1
 			});
 
 		});
 		return {
 			gainBonusCost: 2,
-			gainType: "any"
+			gainType: "any",
+			numGain: 1
 		};
 	}
 
@@ -429,7 +435,8 @@ class Game {
 	workshopCardEffect() {
 		this.changePhaseUsingActionCard("gain", {
 			maxGainCost: 4,
-			gainType: "any"
+			gainType: "any",
+			numGain: 1
 		}, null);
 		return {};
 	}
@@ -447,12 +454,14 @@ class Game {
 			const trashedCard = this.trash[this.trash.length - 1];
 			this.changePhaseUsingActionCard("gain", {
 				maxGainCost: trashedCard.cost + 3,
-				gainType: "treasure"
+				gainType: "treasure",
+				numGain: 1
 			});
 		});
 		return {
 			gainBonusCost: 3,
-			gainType: "treasure"
+			gainType: "treasure",
+			numGain: 1
 		};
 	}
 
@@ -463,7 +472,8 @@ class Game {
 	feastCardEffect() {
 		this.changePhaseUsingActionCard("gain", {
 			maxGainCost: 5,
-			gainType: "any"
+			gainType: "any",
+			numGain: 1
 		});
 		return {
 			sendToTrash: true
@@ -866,9 +876,9 @@ class Game {
 		kingdomCardPiles = kingdomCardPiles || [];
 
 		// treasure cards
-		supply.copper = 60 + numPlayers * 7;
-		supply.silver = 40;
-		supply.gold = 30;
+		supply.set("copper",  60 + numPlayers * 7);
+		supply.set("silver", 40);
+		supply.set("gold", 30);
 
 		// victory cards
 		// they have different numbers depending on # of players
@@ -880,10 +890,10 @@ class Game {
 		}
 
 		// per the rules, starting cards do not come from supply
-		supply.estate = numVictoryCards + numPlayers * 3;
-		supply.duchy = numVictoryCards;
-		supply.province = numVictoryCards;
-		supply.curse = (numPlayers - 1) * 10;
+		supply.set("estate", numVictoryCards + numPlayers * 3);
+		supply.set("duchy", numVictoryCards);
+		supply.set("province", numVictoryCards);
+		supply.set("curse", (numPlayers - 1) * 10);
 
 		if(kingdomCardPiles.length > 10) {
 			throw new Error("Cannot have more than 10 kingdom card piles");
@@ -947,6 +957,7 @@ class Game {
 
 		// draw only from base cards
 		const p2 = _.sampleSize(baseKingdomCards, 10 - kingdomCardPiles.length);
+		// @type string[]
 		const piles = kingdomCardPiles.concat(p2);
 
 		if(piles.length != 10) {
@@ -959,9 +970,9 @@ class Game {
 				throw new Error(`Failed to find card ${cardName}`);
 			}
 			if(card.type === "action") {
-				supply[cardName] = 10;
+				supply.set(cardName, 10);
 			} else if(card.type === "victory") {
-				supply[cardName] = numVictoryCards;
+				supply.set(cardName, numVictoryCards);
 			} else {
 				throw new Error();
 			}
@@ -1111,6 +1122,9 @@ class Game {
 		if(params.maxGainCost) {
 			this.maxGainCost = params.maxGainCost;
 		}
+		if(params.numGain) {
+			this.numGain = params.numGain;
+		}
 		if(params.gainType) {
 			this.gainType = params.gainType;
 		}
@@ -1181,6 +1195,8 @@ class Game {
 	 * @returns {Card} Return the card that was drawn
 	 */
 	drawCard(playerIndex, addToRevealed) {
+		addToRevealed = addToRevealed || false;
+
 		const player = this.players[playerIndex];
 		if (player.deck.length === 0) {
 			// the player has run out of cards
@@ -1237,6 +1253,11 @@ class Game {
 		if(this.phase !== "gain") {
 			throw new Error(`Cannot gain cards outside of gain phase - phase is ${this.phase}`);
 		}
+
+		if(this.numGain === 0) {
+			throw new Error("cannot gain any more cards");
+		}
+
 		let gainCard = this.cards[cardName];
 		if(gainCard.cost > this.maxGainCost) {
 			throw new Error(`Action card allowed you to gain a card costing up to ${this.maxGainCost} but you tried to gain a card costing ${gainCard.cost}`);
@@ -1268,6 +1289,7 @@ class Game {
 			player.discard.push(card);
 		}
 		console.debug(`Player ${player.name} gained ${card.name}`);
+		this.numGain--;
 		return card;
 	}
 
@@ -1525,8 +1547,13 @@ class Game {
 		if(this.phase !== "action") {
 			throw new Error(`cannot play action cards outside of action phase (${this.phase} phase)`);
 		}
+
 		if(!card) {
 			throw new Error("card cannot be null");
+		}
+
+		if(this.numActions === 0) {
+			throw new Error("no more actions!");
 		}
 
 		// remove card from player's hand before triggering its effects

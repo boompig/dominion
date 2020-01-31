@@ -9,7 +9,7 @@ h1 {
     font-size: 2rem;
 }
 
-.deck-inner-container {
+.supply-inner-container {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
@@ -18,11 +18,11 @@ h1 {
     margin-bottom: .5rem;
 }
 
-.deck-container .card {
+.supply-container .card {
     margin-top: .3rem;
 }
 
-.deck-container.active .card {
+.supply-container.active .card {
     cursor: pointer;
 }
 

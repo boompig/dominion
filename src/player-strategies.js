@@ -61,6 +61,14 @@ class PlayerStrategy {
 	 */
 	playTreasures(player, supply, treasurePot) {
 		const cardName = this.getBuyGoal(player, supply, treasurePot);
+		if(!cardName) {
+			throw new Error("cardName is not set");
+		}
+
+		if(!supply) {
+			throw new Error("supply not set");
+		}
+
 		this.buyGoalCard = cardName;
 		const treasures = [];
 
