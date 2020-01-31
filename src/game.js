@@ -1,12 +1,12 @@
-const _ = require("lodash");
-const { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy, PointsOnlyStrategy } = require("./player-strategies.js");
+import _ from "lodash";
+import { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy, PointsOnlyStrategy } from "./player-strategies";
+import Player from "./player";
 
 // for debugging
 console.debug = function() {};
 
-const Player = require("./player.js");
 
-class Game {
+export class Game {
 	/**
 	 * Game will *automatically* be created with random AI unless the human parameters are passed
 	 *
@@ -1702,5 +1702,3 @@ class Game {
 		this.endTurn();
 	}
 }
-
-module.exports = Game;

@@ -2,7 +2,8 @@
 console.debug = function() {};
 
 
-class Player {
+export default class Player {
+
 	/**
 	 * @param {string} name
 	 * @param {PlayerStrategy} strategy
@@ -85,5 +86,3 @@ class Player {
 		this.discard.push(cards[0]);
 	}
 }
-
-module.exports = Player;
