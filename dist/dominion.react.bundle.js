@@ -50138,9 +50138,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Game", function() { return Game; });
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _player_strategies__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./player-strategies */ "./src/player-strategies.js");
+/* harmony import */ var _player_strategies__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./player-strategies */ "./src/player-strategies.ts");
 /* harmony import */ var _player_strategies__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_player_strategies__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./player */ "./src/player.js");
+/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./player */ "./src/player.ts");
+/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_player__WEBPACK_IMPORTED_MODULE_2__);
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
@@ -51221,7 +51222,7 @@ function () {
     key: "initPlayers",
     value: function initPlayers(players) {
       // not all of these will play
-      var aiPlayers = [new _player__WEBPACK_IMPORTED_MODULE_2__["default"]("Big Money", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["BigMoneyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2__["default"]("Smart Big Money", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["SmartBigMoneyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2__["default"]("Big Money with Smithy", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["BigMoneySmithyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2__["default"]("Smart Smithy", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["SmartSmithyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2__["default"]("Smart Duchy", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["SmartDuchyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2__["default"]("Points Only", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["PointsOnlyStrategy"]())]; // create generic player objects
+      var aiPlayers = [new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Big Money", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["BigMoneyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Smart Big Money", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["SmartBigMoneyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Big Money with Smithy", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["BigMoneySmithyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Smart Smithy", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["SmartSmithyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Smart Duchy", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["SmartDuchyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Points Only", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["PointsOnlyStrategy"]())]; // create generic player objects
 
       for (var i = 0; i < this.numPlayers; i++) {
         var p = void 0;
@@ -51229,7 +51230,7 @@ function () {
         if (players && players.length > i) {
           p = players[i];
         } else if (this.hasHumanPlayer && this.humanPlayerIndex === i) {
-          p = new _player__WEBPACK_IMPORTED_MODULE_2__["default"](this.humanPlayerName, null, true);
+          p = new _player__WEBPACK_IMPORTED_MODULE_2___default.a(this.humanPlayerName, null, true);
         } else {
           // inclusive
           var j = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.random(0, aiPlayers.length - 1);
@@ -52107,265 +52108,192 @@ react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_
 
 /***/ }),
 
-/***/ "./src/player-strategies.js":
+/***/ "./src/player-strategies.ts":
 /*!**********************************!*\
-  !*** ./src/player-strategies.js ***!
+  !*** ./src/player-strategies.ts ***!
   \**********************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+"use strict";
 
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var PlayerStrategy =
-/*#__PURE__*/
-function () {
-  /**
-   * @param {string} name
-   */
-  function PlayerStrategy() {
-    _classCallCheck(this, PlayerStrategy);
-
-    /*
-     * card name
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var PlayerStrategy = /** @class */ (function () {
+    /**
+     * @param {string} name
      */
-    this.buyGoalCard = null;
-  }
-  /**
-   * A basic implementation of trashing cards
-   *
-   * TODO for now, treat this as "up to"
-   *
-   * @param {Player}
-   * @param {number} numCards
-   * @returns {number[]} indices
-   */
-
-
-  _createClass(PlayerStrategy, [{
-    key: "trashCards",
-    value: function trashCards(player, numCards) {
-      var trash = [];
-
-      for (var i = 0; i < player.hand.length; i++) {
-        if (player.hand[i].type === "treasure" && player.hand[i].points < 0 && trash.length < numCards) {
-          trash.push(i);
-        }
-
-        if (player.hand[i].name === "copper" && trash.length < numCards) {
-          trash.push(i);
-        }
-      }
-
-      return trash;
+    function PlayerStrategy() {
+        /*
+         * card name
+         */
+        this.buyGoalCard = null;
     }
+    /**
+     * A basic implementation of trashing cards
+     *
+     * TODO for now, treat this as "up to"
+     *
+     * @param {Player}
+     * @param {number} numCards
+     * @returns {number[]} indices
+     */
+    PlayerStrategy.prototype.trashCards = function (player, numCards) {
+        var trash = [];
+        for (var i = 0; i < player.hand.length; i++) {
+            if (player.hand[i].type === "victory" && player.hand[i].points < 0 && trash.length < numCards) {
+                trash.push(i);
+            }
+            if (player.hand[i].name === "copper" && trash.length < numCards) {
+                trash.push(i);
+            }
+        }
+        return trash;
+    };
     /**
      * A basic implementation of gaining cards
      * @param {Player} player
      * @param {number} maxGainCost
-     * @returns {string}
+     * @returns {string | null}
      */
-
-  }, {
-    key: "gainCard",
-    value: function gainCard(player, maxGainCost) {
-      if (maxGainCost >= 3) {
-        return "silver";
-      }
-
-      return null;
-    }
+    PlayerStrategy.prototype.gainCard = function (player, maxGainCost) {
+        if (maxGainCost >= 3) {
+            return "silver";
+        }
+        return null;
+    };
     /**
-     * @returns {Card}
+     * @returns {Card | null}
      */
-
-  }, {
-    key: "actionTurn",
-    value: function actionTurn() {
-      throw new Error("must subclass");
-    }
+    PlayerStrategy.prototype.actionTurn = function (player) {
+        throw new Error("must subclass");
+    };
     /**
      * @param {Player} player
      * @param {any} supply
      * @param {number} treasurePot
      * @returns {number[]} array of card indexes
      */
-
-  }, {
-    key: "playTreasures",
-    value: function playTreasures(player, supply, treasurePot) {
-      this.buyGoalCard = this.getBuyGoal(player, supply, treasurePot);
-
-      if (!supply) {
-        throw new Error("supply not set");
-      }
-
-      var treasures = [];
-
-      if (this.buyGoalCard) {
-        console.debug("AI player ".concat(player.name, " trying to buy ").concat(this.buyGoalCard));
-        var buyGoalCost = supply[this.buyGoalCard].cost;
-        var total = 0;
-
-        for (var i = 0; i < player.hand.length; i++) {
-          var card = player.hand[i];
-
-          if (card.type === "treasure") {
-            total += card.value;
-            treasures.push(i);
-          }
-
-          if (total >= buyGoalCost) {
-            break;
-          }
+    PlayerStrategy.prototype.playTreasures = function (player, supply, treasurePot) {
+        this.buyGoalCard = this.getBuyGoal(player, supply, treasurePot);
+        if (!supply) {
+            throw new Error("supply not set");
         }
-      }
-
-      return treasures;
+        var treasures = [];
+        if (this.buyGoalCard) {
+            console.debug("AI player " + player.name + " trying to buy " + this.buyGoalCard);
+            var buyGoalCost = supply[this.buyGoalCard].cost;
+            var total = 0;
+            for (var i = 0; i < player.hand.length; i++) {
+                var card = player.hand[i];
+                if (card.type === "treasure") {
+                    total += card.value;
+                    treasures.push(i);
+                }
+                if (total >= buyGoalCost) {
+                    break;
+                }
+            }
+        }
+        return treasures;
+    };
+    /**
+     * @returns {string | null}
+     */
+    PlayerStrategy.prototype.buyTurn = function () {
+        return this.buyGoalCard;
+    };
+    PlayerStrategy.prototype.getBuyGoal = function (player, supply, treasurePot) {
+        throw new Error("must subclass");
+    };
+    return PlayerStrategy;
+}());
+exports.PlayerStrategy = PlayerStrategy;
+var BigMoneyStrategy = /** @class */ (function (_super) {
+    __extends(BigMoneyStrategy, _super);
+    function BigMoneyStrategy() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     /**
-     * @returns {string}
+     * @returns {Card | null}
      */
-
-  }, {
-    key: "buyTurn",
-    value: function buyTurn() {
-      return this.buyGoalCard;
-    }
-  }, {
-    key: "getBuyGoal",
-    value: function getBuyGoal() {
-      throw new Error("must subclass");
-    }
-  }]);
-
-  return PlayerStrategy;
-}();
-
-var BigMoneyStrategy =
-/*#__PURE__*/
-function (_PlayerStrategy) {
-  _inherits(BigMoneyStrategy, _PlayerStrategy);
-
-  function BigMoneyStrategy() {
-    _classCallCheck(this, BigMoneyStrategy);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(BigMoneyStrategy).apply(this, arguments));
-  }
-
-  _createClass(BigMoneyStrategy, [{
-    key: "actionTurn",
-
-    /**
-     * @returns {Card}
-     */
-    value: function actionTurn() {
-      return null;
-    }
+    BigMoneyStrategy.prototype.actionTurn = function (player) {
+        return null;
+    };
     /**
      * @param {Player} player
-     * @returns {string}
+     * @returns {string | null}
      */
-
-  }, {
-    key: "getBuyGoal",
-    value: function getBuyGoal(player, supply, treasurePot) {
-      var money = player.getMoneyInHand() + treasurePot;
-
-      if (money >= 8) {
-        return "province";
-      }
-
-      if (money >= 6) {
-        return "gold";
-      }
-
-      if (money >= 3) {
-        return "silver";
-      }
-
-      return null;
-    }
-  }]);
-
-  return BigMoneyStrategy;
-}(PlayerStrategy);
+    BigMoneyStrategy.prototype.getBuyGoal = function (player, supply, treasurePot) {
+        var money = player.getMoneyInHand() + treasurePot;
+        if (money >= 8) {
+            return "province";
+        }
+        if (money >= 6) {
+            return "gold";
+        }
+        if (money >= 3) {
+            return "silver";
+        }
+        return null;
+    };
+    return BigMoneyStrategy;
+}(PlayerStrategy));
+exports.BigMoneyStrategy = BigMoneyStrategy;
 /**
  * Same as big money, but buy duchies near the end
  */
-
-
-var SmartBigMoneyStrategy =
-/*#__PURE__*/
-function (_PlayerStrategy2) {
-  _inherits(SmartBigMoneyStrategy, _PlayerStrategy2);
-
-  function SmartBigMoneyStrategy() {
-    _classCallCheck(this, SmartBigMoneyStrategy);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(SmartBigMoneyStrategy).apply(this, arguments));
-  }
-
-  _createClass(SmartBigMoneyStrategy, [{
-    key: "actionTurn",
-
-    /**
-     * @returns {Card}
-     */
-    value: function actionTurn() {
-      return null;
+var SmartBigMoneyStrategy = /** @class */ (function (_super) {
+    __extends(SmartBigMoneyStrategy, _super);
+    function SmartBigMoneyStrategy() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
+    /**
+     * @returns {Card | null}
+     */
+    SmartBigMoneyStrategy.prototype.actionTurn = function (player) {
+        return null;
+    };
     /**
      * @param {Player} player
      * @param {any} supply map from card name to number of cards of that type left
      * @param {number} treasurePot
      * @returns {string | null}
      */
-
-  }, {
-    key: "getBuyGoal",
-    value: function getBuyGoal(player, supply, treasurePot) {
-      var money = player.getMoneyInHand() + treasurePot; // should make sure that these piles exist first, but whatevs...
-
-      if (money >= 8) {
-        return "province";
-      }
-
-      if (money >= 6) {
-        if (supply.province >= 5) {
-          return "gold";
+    SmartBigMoneyStrategy.prototype.getBuyGoal = function (player, supply, treasurePot) {
+        var money = player.getMoneyInHand() + treasurePot;
+        // should make sure that these piles exist first, but whatevs...
+        if (money >= 8) {
+            return "province";
         }
-
-        if (supply.duchy > 0) {
-          return "duchy";
+        if (money >= 6) {
+            if (supply.province >= 5) {
+                return "gold";
+            }
+            if (supply.duchy > 0) {
+                return "duchy";
+            }
         }
-      }
-
-      if (money >= 3) {
-        return "silver";
-      }
-
-      return null;
-    }
-  }]);
-
-  return SmartBigMoneyStrategy;
-}(PlayerStrategy);
+        if (money >= 3) {
+            return "silver";
+        }
+        return null;
+    };
+    return SmartBigMoneyStrategy;
+}(PlayerStrategy));
+exports.SmartBigMoneyStrategy = SmartBigMoneyStrategy;
 /**
  * Always go for province when you have 8
  * Always go for duchy when you have 5
@@ -52373,434 +52301,306 @@ function (_PlayerStrategy2) {
  * Always go for silver when you have 3
  * Go for gold when you have 6, if there are 4 or more provinces left, otherwise buy a duchy
  */
-
-
-var SmartDuchyStrategy =
-/*#__PURE__*/
-function (_PlayerStrategy3) {
-  _inherits(SmartDuchyStrategy, _PlayerStrategy3);
-
-  function SmartDuchyStrategy() {
-    _classCallCheck(this, SmartDuchyStrategy);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(SmartDuchyStrategy).apply(this, arguments));
-  }
-
-  _createClass(SmartDuchyStrategy, [{
-    key: "actionTurn",
-
-    /**
-     * @param {Player} player
-     * @returns {Card | null}
-     */
-    value: function actionTurn(player) {
-      // if I have an action card, play it
-      for (var i = 0; i < player.hand.length; i++) {
-        if (player.hand[i].type === "action") {
-          return player.hand[i];
-        }
-      }
-
-      return null;
-    }
-    /**
-     * @param {Player} player
-     * @param {any} supply map from card name to number of cards of that type left
-     * @returns {string | null}
-     */
-
-  }, {
-    key: "getBuyGoal",
-    value: function getBuyGoal(player, supply, treasurePot) {
-      var money = player.getMoneyInHand() + treasurePot;
-
-      if (money >= 8 && supply.province > 0) {
-        return "province";
-      }
-
-      if (money >= 6) {
-        if (supply.province >= 4) {
-          return "gold";
-        } else if (supply.duchy > 0) {
-          return "duchy";
-        }
-      }
-
-      if (money >= 5 && supply.duchy > 0) {
-        return "duchy";
-      }
-
-      if (money >= 4 && supply.smithy > 0) {
-        return "smithy";
-      }
-
-      if (money >= 3) {
-        return "silver";
-      }
-
-      return null;
-    }
-  }]);
-
-  return SmartDuchyStrategy;
-}(PlayerStrategy);
-
-var SmartSmithyStrategy =
-/*#__PURE__*/
-function (_PlayerStrategy4) {
-  _inherits(SmartSmithyStrategy, _PlayerStrategy4);
-
-  function SmartSmithyStrategy() {
-    var _this;
-
-    _classCallCheck(this, SmartSmithyStrategy);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(SmartSmithyStrategy).call(this));
-    _this.avgValue = 0.7;
-    _this.numCards = 10;
-    _this.provinceCutoff = 4;
-    return _this;
-  }
-
-  _createClass(SmartSmithyStrategy, [{
-    key: "addValue",
-    value: function addValue(v) {
-      this.avgValue = (this.numCards * this.avgValue + v) / (this.numCards + 1);
-      this.numCards++;
+var SmartDuchyStrategy = /** @class */ (function (_super) {
+    __extends(SmartDuchyStrategy, _super);
+    function SmartDuchyStrategy() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     /**
      * @param {Player} player
      * @returns {Card | null}
      */
-
-  }, {
-    key: "actionTurn",
-    value: function actionTurn(player) {
-      // if I have an action card, play it
-      for (var i = 0; i < player.hand.length; i++) {
-        if (player.hand[i].type === "action") {
-          return player.hand[i];
+    SmartDuchyStrategy.prototype.actionTurn = function (player) {
+        // if I have an action card, play it
+        for (var i = 0; i < player.hand.length; i++) {
+            if (player.hand[i].type === "action") {
+                return player.hand[i];
+            }
         }
-      }
-
-      return null;
-    }
+        return null;
+    };
     /**
      * @param {Player} player
      * @param {any} supply map from card name to number of cards of that type left
      * @returns {string | null}
      */
-
-  }, {
-    key: "getBuyGoal",
-    value: function getBuyGoal(player, supply, treasurePot) {
-      var money = player.getMoneyInHand() + treasurePot;
-      var card = this.buyTurnWrapper(money, player, supply);
-      return card;
+    SmartDuchyStrategy.prototype.getBuyGoal = function (player, supply, treasurePot) {
+        var money = player.getMoneyInHand() + treasurePot;
+        if (money >= 8 && supply.province > 0) {
+            return "province";
+        }
+        if (money >= 6) {
+            if (supply.province >= 4) {
+                return "gold";
+            }
+            else if (supply.duchy > 0) {
+                return "duchy";
+            }
+        }
+        if (money >= 5 && supply.duchy > 0) {
+            return "duchy";
+        }
+        if (money >= 4 && supply.smithy > 0) {
+            return "smithy";
+        }
+        if (money >= 3) {
+            return "silver";
+        }
+        return null;
+    };
+    return SmartDuchyStrategy;
+}(PlayerStrategy));
+exports.SmartDuchyStrategy = SmartDuchyStrategy;
+var SmartSmithyStrategy = /** @class */ (function (_super) {
+    __extends(SmartSmithyStrategy, _super);
+    function SmartSmithyStrategy() {
+        var _this = _super.call(this) || this;
+        _this.avgValue = 0.7;
+        _this.numCards = 10;
+        _this.provinceCutoff = 4;
+        return _this;
     }
+    SmartSmithyStrategy.prototype.addValue = function (v) {
+        this.avgValue = (this.numCards * this.avgValue + v) / (this.numCards + 1);
+        this.numCards++;
+    };
+    /**
+     * @param {Player} player
+     * @returns {Card | null}
+     */
+    SmartSmithyStrategy.prototype.actionTurn = function (player) {
+        // if I have an action card, play it
+        for (var i = 0; i < player.hand.length; i++) {
+            if (player.hand[i].type === "action") {
+                return player.hand[i];
+            }
+        }
+        return null;
+    };
+    /**
+     * @param {Player} player
+     * @param {any} supply map from card name to number of cards of that type left
+     * @returns {string | null}
+     */
+    SmartSmithyStrategy.prototype.getBuyGoal = function (player, supply, treasurePot) {
+        var money = player.getMoneyInHand() + treasurePot;
+        var card = this.buyTurnWrapper(money, player, supply);
+        return card;
+    };
     /**
      * @param {number} money
      * @param {Player} player
      * @param {any} supply map from card name to number of cards of that type left
      */
-
-  }, {
-    key: "buyTurnWrapper",
-    value: function buyTurnWrapper(money, player, supply) {
-      // calculate the avg value of coins in my supply
-      // if the avg value is > (let's say 2)
-      //
-      var valueDrawThree = this.avgValue * 3; // var valueWithGold = (this.avgValue * this.numCards + 3) / (this.numCards + 1);
-      // var valueWithSilver = (this.avgValue * this.numCards + 2) / (this.numCards + 1);
-
-      if (money >= 8) {
-        this.addValue(0);
-        return "province";
-      }
-
-      if (money >= 6 && valueDrawThree <= 3) {
-        if (supply.province >= this.provinceCutoff) {
-          this.addValue(3);
-          return "gold";
+    SmartSmithyStrategy.prototype.buyTurnWrapper = function (money, player, supply) {
+        // calculate the avg value of coins in my supply
+        // if the avg value is > (let's say 2)
+        //
+        var valueDrawThree = this.avgValue * 3;
+        // var valueWithGold = (this.avgValue * this.numCards + 3) / (this.numCards + 1);
+        // var valueWithSilver = (this.avgValue * this.numCards + 2) / (this.numCards + 1);
+        if (money >= 8) {
+            this.addValue(0);
+            return "province";
         }
-
-        this.addValue(0);
-
-        if (supply.duchy > 0) {
-          return "duchy";
+        if (money >= 6 && valueDrawThree <= 3) {
+            if (supply.province >= this.provinceCutoff) {
+                this.addValue(3);
+                return "gold";
+            }
+            this.addValue(0);
+            if (supply.duchy > 0) {
+                return "duchy";
+            }
         }
-      }
-
-      if (money >= 4 && valueDrawThree <= 2) {
-        this.addValue(2);
-        return "silver";
-      }
-
-      if (money >= 4) {
-        this.addValue(0);
-
-        if (supply.smithy > 0) {
-          return "smithy";
+        if (money >= 4 && valueDrawThree <= 2) {
+            this.addValue(2);
+            return "silver";
         }
-      }
-
-      if (money >= 3) {
-        this.addValue(2);
-        return "silver";
-      }
-
-      return null;
+        if (money >= 4) {
+            this.addValue(0);
+            if (supply.smithy > 0) {
+                return "smithy";
+            }
+        }
+        if (money >= 3) {
+            this.addValue(2);
+            return "silver";
+        }
+        return null;
+    };
+    return SmartSmithyStrategy;
+}(PlayerStrategy));
+exports.SmartSmithyStrategy = SmartSmithyStrategy;
+var BigMoneySmithyStrategy = /** @class */ (function (_super) {
+    __extends(BigMoneySmithyStrategy, _super);
+    function BigMoneySmithyStrategy() {
+        var _this = _super.call(this) || this;
+        _this.numSmithy = 0;
+        return _this;
     }
-  }]);
-
-  return SmartSmithyStrategy;
-}(PlayerStrategy);
-
-var BigMoneySmithyStrategy =
-/*#__PURE__*/
-function (_PlayerStrategy5) {
-  _inherits(BigMoneySmithyStrategy, _PlayerStrategy5);
-
-  function BigMoneySmithyStrategy() {
-    var _this2;
-
-    _classCallCheck(this, BigMoneySmithyStrategy);
-
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(BigMoneySmithyStrategy).call(this));
-    _this2.numSmithy = 0;
-    return _this2;
-  }
-  /**
-   * @param {Player} player
-   * @returns {Card | null}
-   */
-
-
-  _createClass(BigMoneySmithyStrategy, [{
-    key: "actionTurn",
-    value: function actionTurn(player) {
-      // if I have an action card, play it
-      for (var i = 0; i < player.hand.length; i++) {
-        if (player.hand[i].type === "action") {
-          return player.hand[i];
+    /**
+     * @param {Player} player
+     * @returns {Card | null}
+     */
+    BigMoneySmithyStrategy.prototype.actionTurn = function (player) {
+        // if I have an action card, play it
+        for (var i = 0; i < player.hand.length; i++) {
+            if (player.hand[i].type === "action") {
+                return player.hand[i];
+            }
         }
-      }
-
-      return null;
-    }
+        return null;
+    };
     /**
      * @param {Player} player
      * @returns {string | null}
      */
-
-  }, {
-    key: "getBuyGoal",
-    value: function getBuyGoal(player, supply, treasurePot) {
-      var money = player.getMoneyInHand() + treasurePot; // should make sure that these piles exist first, but whatevs...
-
-      if (money >= 8 && supply.province > 0) {
-        return "province";
-      }
-
-      if (money >= 6 && supply.gold > 0) {
-        return "gold";
-      }
-
-      if (money >= 4 && this.numSmithy < 3 && supply.smithy > 0) {
-        this.numSmithy++;
-        return "smithy";
-      }
-
-      if (money >= 3 && supply.silver > 0) {
-        return "silver";
-      }
-
-      return null;
+    BigMoneySmithyStrategy.prototype.getBuyGoal = function (player, supply, treasurePot) {
+        var money = player.getMoneyInHand() + treasurePot;
+        // should make sure that these piles exist first, but whatevs...
+        if (money >= 8 && supply.province > 0) {
+            return "province";
+        }
+        if (money >= 6 && supply.gold > 0) {
+            return "gold";
+        }
+        if (money >= 4 && this.numSmithy < 3 && supply.smithy > 0) {
+            this.numSmithy++;
+            return "smithy";
+        }
+        if (money >= 3 && supply.silver > 0) {
+            return "silver";
+        }
+        return null;
+    };
+    return BigMoneySmithyStrategy;
+}(PlayerStrategy));
+exports.BigMoneySmithyStrategy = BigMoneySmithyStrategy;
+var PointsOnlyStrategy = /** @class */ (function (_super) {
+    __extends(PointsOnlyStrategy, _super);
+    function PointsOnlyStrategy() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-  }]);
-
-  return BigMoneySmithyStrategy;
-}(PlayerStrategy);
-
-var PointsOnlyStrategy =
-/*#__PURE__*/
-function (_PlayerStrategy6) {
-  _inherits(PointsOnlyStrategy, _PlayerStrategy6);
-
-  function PointsOnlyStrategy() {
-    _classCallCheck(this, PointsOnlyStrategy);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(PointsOnlyStrategy).apply(this, arguments));
-  }
-
-  _createClass(PointsOnlyStrategy, [{
-    key: "actionTurn",
-
     /**
-     * @returns {Card}
+     * @returns {Card | null}
      */
-    value: function actionTurn() {
-      return null;
-    }
+    PointsOnlyStrategy.prototype.actionTurn = function (player) {
+        return null;
+    };
     /**
      * @param {Player} player
      * @returns {string | null}
      */
+    PointsOnlyStrategy.prototype.getBuyGoal = function (player, supply, treasurePot) {
+        var money = player.getMoneyInHand() + treasurePot;
+        if (money >= 8 && supply.province > 0) {
+            return "province";
+        }
+        if (money >= 5 && supply.duchy > 0) {
+            return "duchy";
+        }
+        if (money >= 2 && supply.estate > 0) {
+            return "estate";
+        }
+        return null;
+    };
+    return PointsOnlyStrategy;
+}(PlayerStrategy));
+exports.PointsOnlyStrategy = PointsOnlyStrategy;
 
-  }, {
-    key: "getBuyGoal",
-    value: function getBuyGoal(player, supply, treasurePot) {
-      var money = player.getMoneyInHand() + treasurePot;
-
-      if (money >= 8 && supply.province > 0) {
-        return "province";
-      }
-
-      if (money >= 5 && supply.duchy > 0) {
-        return "duchy";
-      }
-
-      if (money >= 2 && supply.estate > 0) {
-        return "estate";
-      }
-
-      return null;
-    }
-  }]);
-
-  return PointsOnlyStrategy;
-}(PlayerStrategy);
-
-module.exports = {
-  PlayerStrategy: PlayerStrategy,
-  PointsOnlyStrategy: PointsOnlyStrategy,
-  SmartBigMoneyStrategy: SmartBigMoneyStrategy,
-  SmartDuchyStrategy: SmartDuchyStrategy,
-  SmartSmithyStrategy: SmartSmithyStrategy,
-  BigMoneyStrategy: BigMoneyStrategy,
-  BigMoneySmithyStrategy: BigMoneySmithyStrategy
-};
 
 /***/ }),
 
-/***/ "./src/player.js":
+/***/ "./src/player.ts":
 /*!***********************!*\
-  !*** ./src/player.js ***!
+  !*** ./src/player.ts ***!
   \***********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Player; });
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
+Object.defineProperty(exports, "__esModule", { value: true });
 // debugging
-console.debug = function () {};
-
-var Player =
-/*#__PURE__*/
-function () {
-  /**
-   * @param {string} name
-   * @param {PlayerStrategy} strategy
-   * @param {boolean} isHuman
-   */
-  function Player(name, strategy, isHuman) {
-    _classCallCheck(this, Player);
-
-    this.name = name;
-    this.strategy = strategy;
+console.debug = function () { };
+;
+var Player = /** @class */ (function () {
     /**
-     * Array of Card objects
-     * The player's draw pile
-     * @type {Card[]}
+     * @param {string} name
+     * @param {PlayerStrategy} strategy
+     * @param {boolean} isHuman
      */
-
-    this.deck = [];
-    /**
-     * Array of Card objects
-     * The player's current hand
-     * @type {Card[]}
-     */
-
-    this.hand = [];
-    /**
-     * Array of Card objects
-     * The player's discard pile
-     * @type {Card[]}
-     */
-
-    this.discard = [];
-    /**
-     * The cards that are currently revealed.
-     * Typically this is temporary
-     * @type {Card[]}
-     */
-
-    this.revealedCards = [];
-    /**
-     * These may not always be totally accurate
-     * @type {number}
-     */
-
-    this.points = 0;
-    /**
-     * @type {boolean}
-     */
-
-    this.isHuman = isHuman || false;
-    /**
-     * reset each turn
-     * @type {number}
-     */
-
-    this.numBuys = 0;
-    /**
-     * reset each turn
-     * @type {number}
-     */
-
-    this.numActions = 0;
-  }
-  /**
-   * @returns {number}
-   */
-
-
-  _createClass(Player, [{
-    key: "getMoneyInHand",
-    value: function getMoneyInHand() {
-      var money = 0;
-
-      for (var i = 0; i < this.hand.length; i++) {
-        if (this.hand[i].type === "treasure") {
-          money += this.hand[i].value;
-        }
-      }
-
-      return money;
+    function Player(name, strategy, isHuman) {
+        this.name = name;
+        this.strategy = strategy;
+        /**
+         * Array of Card objects
+         * The player's draw pile
+         * @type {Card[]}
+         */
+        this.deck = [];
+        /**
+         * Array of Card objects
+         * The player's current hand
+         * @type {Card[]}
+         */
+        this.hand = [];
+        /**
+         * Array of Card objects
+         * The player's discard pile
+         * @type {Card[]}
+         */
+        this.discard = [];
+        /**
+         * The cards that are currently revealed.
+         * Typically this is temporary
+         * @type {Card[]}
+         */
+        this.revealedCards = [];
+        /**
+         * These may not always be totally accurate
+         * @type {number}
+         */
+        this.points = 0;
+        /**
+         * @type {boolean}
+         */
+        this.isHuman = isHuman || false;
+        /**
+         * reset each turn
+         * @type {number}
+         */
+        this.numBuys = 0;
+        /**
+         * reset each turn
+         * @type {number}
+         */
+        this.numActions = 0;
     }
+    /**
+     * @returns {number}
+     */
+    Player.prototype.getMoneyInHand = function () {
+        var money = 0;
+        for (var i = 0; i < this.hand.length; i++) {
+            if (this.hand[i].type === "treasure") {
+                money += this.hand[i].value;
+            }
+        }
+        return money;
+    };
     /**
      * @param {number} cardIndex
      */
-
-  }, {
-    key: "discardCard",
-    value: function discardCard(cardIndex) {
-      var cards = this.hand.splice(cardIndex, 1);
-      console.debug("Discarding card ".concat(cards[0].name, " from player ").concat(this.name));
-      this.discard.push(cards[0]);
-    }
-  }]);
-
-  return Player;
-}();
-
+    Player.prototype.discardCard = function (cardIndex) {
+        var cards = this.hand.splice(cardIndex, 1);
+        console.debug("Discarding card " + cards[0].name + " from player " + this.name);
+        this.discard.push(cards[0]);
+    };
+    return Player;
+}());
+exports.default = Player;
 
 
 /***/ })

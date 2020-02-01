@@ -1,15 +1,30 @@
+import {ICard, ITreasureCard} from "./card";
+
 // debugging
 console.debug = function() {};
 
 
+interface IPlayerStrategy {};
+
+
 export default class Player {
+	name: string;
+	strategy: IPlayerStrategy;
+	deck: ICard[];
+	hand: ICard[];
+	discard: ICard[];
+	revealedCards: ICard[];
+	points: number;
+	isHuman: boolean;
+	numBuys: number;
+	numActions: number;
 
 	/**
 	 * @param {string} name
 	 * @param {PlayerStrategy} strategy
 	 * @param {boolean} isHuman
 	 */
-	constructor(name, strategy, isHuman) {
+	constructor(name: string, strategy: IPlayerStrategy, isHuman: boolean) {
 		this.name = name;
 		this.strategy = strategy;
 
@@ -67,11 +82,11 @@ export default class Player {
 	/**
 	 * @returns {number}
 	 */
-	getMoneyInHand() {
+	getMoneyInHand(): number {
 		let money = 0;
 		for (let i = 0; i < this.hand.length; i++) {
 			if (this.hand[i].type === "treasure") {
-				money += this.hand[i].value;
+				money += (this.hand[i] as ITreasureCard).value;
 			}
 		}
 		return money;
@@ -80,7 +95,7 @@ export default class Player {
 	/**
 	 * @param {number} cardIndex
 	 */
-	discardCard(cardIndex) {
+	discardCard(cardIndex: number) {
 		const cards = this.hand.splice(cardIndex, 1);
 		console.debug(`Discarding card ${cards[0].name} from player ${this.name}`);
 		this.discard.push(cards[0]);

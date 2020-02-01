@@ -13,7 +13,7 @@ module.exports = {
 	devtool: "source-map",
 
 	resolve: {
-		extensions: [".js", ".jsx"]
+		extensions: [".js", ".jsx", ".ts", ".tsx"]
 	},
 
 
@@ -31,6 +31,11 @@ module.exports = {
 				// options: {
 				// 	presets: ["es2015"]
 				// }
+			},
+			{
+				test: /.tsx?$/,
+				exclude: /node_modules/,
+				loader: "ts-loader"
 			}
 		]
 	}
