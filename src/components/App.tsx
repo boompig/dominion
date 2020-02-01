@@ -1,17 +1,32 @@
-/* eslint react/prop-types: 0 */
-/* eslint-env browser */
-
-import React from "react";
+import React, {Component} from "react";
 import { Game } from "../game";
 import GameOver from "./game-over";
 import Supply from "./supply";
 import InfoPane from "./info-pane";
 import PlayerContainer from "./player-container";
 import ButtonContainer from "./button-container";
+import Player from "../player";
+import {ICard} from "../card";
 
 
-class App extends React.Component {
-	constructor(props) {
+interface IAppProps {};
+interface IAppState {
+	game: Game | null;
+	isGameLoaded: boolean;
+	simMode: boolean;
+
+	// game params
+	numPlayers: number;
+	humanPlayerIndex: number;
+	humanPlayerName: string;
+
+	numCardsToTrash: number;
+	numCardsToDiscard: number;
+};
+
+
+class App extends Component<{}, IAppState> {
+	constructor(props: IAppProps) {
 		super(props);
 
 		this.state = {
@@ -41,9 +56,14 @@ class App extends React.Component {
 		this.endHumanPlayerTurn = this.endHumanPlayerTurn.bind(this);
 		this.stopTrashingCards = this.stopTrashingCards.bind(this);
 		this.stopDiscardingCards = this.stopDiscardingCards.bind(this);
+		this.trashCard = this.trashCard.bind(this);
 	}
 
 	doTurn() {
+		if(!this.state.game) {
+			throw new Error("game not created");
+		}
+
 		if (this.state.game.turn === this.state.humanPlayerIndex) {
 			throw new Error("cannot automate human turn");
 		} else {
@@ -57,6 +77,10 @@ class App extends React.Component {
 	}
 
 	doRound() {
+		if(!this.state.game) {
+			throw new Error("game not created");
+		}
+
 		const round = this.state.game.round;
 		while ((this.state.game.round === round) && !this.state.game.isGameOver &&
 			(this.state.game.turn !== this.state.humanPlayerIndex)) {
@@ -87,6 +111,10 @@ class App extends React.Component {
 	}
 
 	drawCard() {
+		if(!this.state.game) {
+			throw new Error("game not created");
+		}
+
 		if(this.state.game.turn !== this.state.humanPlayerIndex) {
 			throw new Error("can only draw on your turn");
 		}
@@ -103,6 +131,10 @@ class App extends React.Component {
 	}
 
 	endActionPhase() {
+		if(!this.state.game) {
+			throw new Error("game not created");
+		}
+
 		if(this.state.game.turn !== this.state.humanPlayerIndex) {
 			throw new Error("can only end action phase on your turn");
 		}
@@ -118,12 +150,50 @@ class App extends React.Component {
 		});
 	}
 
+	trashCard(card: ICard, cardIndex: number) {
+		if(!this.state.game) {
+			throw new Error("game not created");
+		}
+
+		if (this.state.numCardsToTrash === 0) {
+			throw new Error("Cannot trash cards right now");
+		}
+		const player = this.state.game.players[this.state.game.turn];
+		this.state.game.trashCards(player, [cardIndex], false);
+
+		// hard reset game
+		this.setState({
+			game: this.state.game,
+			numCardsToTrash: this.state.numCardsToTrash - 1
+		});
+	}
+
+	discardCard(card: ICard, cardIndex: number) {
+		if(!this.state.game) {
+			throw new Error("game not created");
+		}
+
+		if (this.state.numCardsToDiscard === 0) {
+			throw new Error("Cannot discard cards right now");
+		}
+
+		const player = this.state.game.players[this.state.game.turn];
+		this.state.game.discardCards(player, [cardIndex]);
+
+		// hard reset game
+		this.setState({
+			game: this.state.game,
+			numCardsToDiscard: this.state.numCardsToDiscard - 1
+		});
+	}
+
 	componentDidMount() {
 		// grab the name, if set, from URL params
 		const url = new URL(window.location.href);
-		if(url.searchParams.get("name")) {
+		let name = url.searchParams.get("name");
+		if(name) {
 			this.setState({
-				humanPlayerName: url.searchParams.get("name")
+				humanPlayerName: name
 			}, () => {
 				this.resetSim();
 			});
@@ -132,10 +202,11 @@ class App extends React.Component {
 		}
 	}
 
-	/**
-	 * @param {string} cardName
-	 */
-	onClickSupplyCard(cardName) {
+	onClickSupplyCard(cardName: string) {
+		if(!this.state.game) {
+			throw new Error("game not created");
+		}
+
 		if (this.state.game.turn !== this.state.humanPlayerIndex) {
 			console.warn("can only buy on your turn");
 			return;
@@ -168,13 +239,11 @@ class App extends React.Component {
 		return true;
 	}
 
-	/**
-	 * @param {Player} player
-	 * @param {number} playerIndex
-	 * @param {Card} card
-	 * @param {number} cardIndex
-	 */
-	onClickHandCard(player, playerIndex, card, cardIndex) {
+	onClickHandCard(player: Player, playerIndex: number, card: ICard, cardIndex: number) {
+		if(!this.state.game) {
+			throw new Error("game not created");
+		}
+
 		if (playerIndex !== this.state.humanPlayerIndex) {
 			console.warn("can only play cards on behalf of human player");
 			return;
@@ -237,7 +306,11 @@ class App extends React.Component {
 	 * @param {string} source - either "hand" or "supply"
 	 * @returns {string[]}
 	 */
-	getCardClasses(card, source) {
+	getCardClasses(card: ICard, source: string): string[] {
+		if(!this.state.game) {
+			throw new Error("game not created");
+		}
+
 		const classes = [
 			"card",
 		];
@@ -265,6 +338,10 @@ class App extends React.Component {
 	}
 
 	endHumanPlayerTurn() {
+		if(!this.state.game) {
+			throw new Error("game not created");
+		}
+
 		if (this.state.game.turn !== this.state.humanPlayerIndex) {
 			console.warn("can only end turn on your turn");
 			return;
@@ -296,12 +373,15 @@ class App extends React.Component {
 	}
 
 	render() {
-		if(this.state.isGameLoaded) {
+		if(this.state.isGameLoaded && this.state.game) {
+			if(!this.state.game) {
+				throw new Error("game not loaded");
+			}
 			let playerContainers = this.state.game.players.map((player, index) => {
 				return <PlayerContainer
 					player={player}
 					playerIndex={index}
-					turn={this.state.game.turn}
+					turn={(this.state.game as Game).turn}
 					getCardClasses={this.getCardClasses}
 					key={player.name}
 					onClick={this.onClickHandCard} />;

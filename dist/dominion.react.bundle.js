@@ -49092,426 +49092,389 @@ module.exports = function(module) {
 
 /***/ }),
 
-/***/ "./src/components/App.jsx":
+/***/ "./src/components/App.tsx":
 /*!********************************!*\
-  !*** ./src/components/App.jsx ***!
+  !*** ./src/components/App.tsx ***!
   \********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _game__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../game */ "./src/game.js");
-/* harmony import */ var _game_over__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./game-over */ "./src/components/game-over.tsx");
-/* harmony import */ var _game_over__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_game_over__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _supply__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./supply */ "./src/components/supply.tsx");
-/* harmony import */ var _supply__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_supply__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _info_pane__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./info-pane */ "./src/components/info-pane.tsx");
-/* harmony import */ var _info_pane__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_info_pane__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _player_container__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./player-container */ "./src/components/player-container.tsx");
-/* harmony import */ var _player_container__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_player_container__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var _button_container__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./button-container */ "./src/components/button-container.tsx");
-/* harmony import */ var _button_container__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_button_container__WEBPACK_IMPORTED_MODULE_6__);
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-/* eslint react/prop-types: 0 */
-
-/* eslint-env browser */
-
-
-
-
-
-
-
-
-var App =
-/*#__PURE__*/
-function (_React$Component) {
-  _inherits(App, _React$Component);
-
-  function App(props) {
-    var _this;
-
-    _classCallCheck(this, App);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(App).call(this, props));
-    _this.state = {
-      game: null,
-      isGameLoaded: false,
-      simMode: false,
-      numCardsToTrash: 0,
-      numCardsToDiscard: 0,
-      // game parameters
-      numPlayers: 4,
-      humanPlayerIndex: 0,
-      humanPlayerName: "Joe America"
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
     };
-    _this.onClickSupplyCard = _this.onClickSupplyCard.bind(_assertThisInitialized(_this));
-    _this.onClickHandCard = _this.onClickHandCard.bind(_assertThisInitialized(_this));
-    _this.getCardClasses = _this.getCardClasses.bind(_assertThisInitialized(_this));
-    _this.doTurn = _this.doTurn.bind(_assertThisInitialized(_this));
-    _this.doRound = _this.doRound.bind(_assertThisInitialized(_this));
-    _this.resetSim = _this.resetSim.bind(_assertThisInitialized(_this));
-    _this.drawCard = _this.drawCard.bind(_assertThisInitialized(_this));
-    _this.endActionPhase = _this.endActionPhase.bind(_assertThisInitialized(_this));
-    _this.endHumanPlayerTurn = _this.endHumanPlayerTurn.bind(_assertThisInitialized(_this));
-    _this.stopTrashingCards = _this.stopTrashingCards.bind(_assertThisInitialized(_this));
-    _this.stopDiscardingCards = _this.stopDiscardingCards.bind(_assertThisInitialized(_this));
-    return _this;
-  }
-
-  _createClass(App, [{
-    key: "doTurn",
-    value: function doTurn() {
-      if (this.state.game.turn === this.state.humanPlayerIndex) {
-        throw new Error("cannot automate human turn");
-      } else {
-        this.state.game.doTurn(); // hard reset game
-
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+var game_1 = __webpack_require__(/*! ../game */ "./src/game.js");
+var game_over_1 = __importDefault(__webpack_require__(/*! ./game-over */ "./src/components/game-over.tsx"));
+var supply_1 = __importDefault(__webpack_require__(/*! ./supply */ "./src/components/supply.tsx"));
+var info_pane_1 = __importDefault(__webpack_require__(/*! ./info-pane */ "./src/components/info-pane.tsx"));
+var player_container_1 = __importDefault(__webpack_require__(/*! ./player-container */ "./src/components/player-container.tsx"));
+var button_container_1 = __importDefault(__webpack_require__(/*! ./button-container */ "./src/components/button-container.tsx"));
+;
+;
+var App = /** @class */ (function (_super) {
+    __extends(App, _super);
+    function App(props) {
+        var _this = _super.call(this, props) || this;
+        _this.state = {
+            game: null,
+            isGameLoaded: false,
+            simMode: false,
+            numCardsToTrash: 0,
+            numCardsToDiscard: 0,
+            // game parameters
+            numPlayers: 4,
+            humanPlayerIndex: 0,
+            humanPlayerName: "Joe America"
+        };
+        _this.onClickSupplyCard = _this.onClickSupplyCard.bind(_this);
+        _this.onClickHandCard = _this.onClickHandCard.bind(_this);
+        _this.getCardClasses = _this.getCardClasses.bind(_this);
+        _this.doTurn = _this.doTurn.bind(_this);
+        _this.doRound = _this.doRound.bind(_this);
+        _this.resetSim = _this.resetSim.bind(_this);
+        _this.drawCard = _this.drawCard.bind(_this);
+        _this.endActionPhase = _this.endActionPhase.bind(_this);
+        _this.endHumanPlayerTurn = _this.endHumanPlayerTurn.bind(_this);
+        _this.stopTrashingCards = _this.stopTrashingCards.bind(_this);
+        _this.stopDiscardingCards = _this.stopDiscardingCards.bind(_this);
+        _this.trashCard = _this.trashCard.bind(_this);
+        return _this;
+    }
+    App.prototype.doTurn = function () {
+        if (!this.state.game) {
+            throw new Error("game not created");
+        }
+        if (this.state.game.turn === this.state.humanPlayerIndex) {
+            throw new Error("cannot automate human turn");
+        }
+        else {
+            this.state.game.doTurn();
+            // hard reset game
+            this.setState({
+                game: this.state.game
+            });
+        }
+    };
+    App.prototype.doRound = function () {
+        if (!this.state.game) {
+            throw new Error("game not created");
+        }
+        var round = this.state.game.round;
+        while ((this.state.game.round === round) && !this.state.game.isGameOver &&
+            (this.state.game.turn !== this.state.humanPlayerIndex)) {
+            this.state.game.doTurn();
+        }
+        // hard reset game
         this.setState({
-          game: this.state.game
+            game: this.state.game
         });
-      }
-    }
-  }, {
-    key: "doRound",
-    value: function doRound() {
-      var round = this.state.game.round;
-
-      while (this.state.game.round === round && !this.state.game.isGameOver && this.state.game.turn !== this.state.humanPlayerIndex) {
-        this.state.game.doTurn();
-      } // hard reset game
-
-
-      this.setState({
-        game: this.state.game
-      });
-    }
-  }, {
-    key: "resetSim",
-    value: function resetSim() {
-      var game = new _game__WEBPACK_IMPORTED_MODULE_1__["Game"]({
-        humanPlayerIndex: this.state.humanPlayerIndex,
-        humanPlayerName: this.state.humanPlayerName,
-        numPlayers: this.state.numPlayers
-      });
-      this.setState({
-        simMode: false,
-        game: game,
-        numCardsToTrash: 0,
-        numCardsToDiscard: 0,
-        isGameLoaded: true
-      });
-    }
-  }, {
-    key: "drawCard",
-    value: function drawCard() {
-      if (this.state.game.turn !== this.state.humanPlayerIndex) {
-        throw new Error("can only draw on your turn");
-      }
-
-      if (this.state.game.phase !== "draw") {
-        throw new Error("cannot draw card outside of draw phase using this method - phase ".concat(this.state.game.phase));
-      }
-
-      this.state.game.drawPhase(); // hard reset game
-
-      this.setState({
-        game: this.state.game
-      });
-    }
-  }, {
-    key: "endActionPhase",
-    value: function endActionPhase() {
-      if (this.state.game.turn !== this.state.humanPlayerIndex) {
-        throw new Error("can only end action phase on your turn");
-      }
-
-      if (this.state.game.phase !== "action") {
-        throw new Error("cannot end action phase outside of action phase using this method");
-      }
-
-      this.state.game.endActionPhase(); // hard reset game
-
-      this.setState({
-        game: this.state.game
-      });
-    }
-  }, {
-    key: "componentDidMount",
-    value: function componentDidMount() {
-      var _this2 = this;
-
-      // grab the name, if set, from URL params
-      var url = new URL(window.location.href);
-
-      if (url.searchParams.get("name")) {
+    };
+    App.prototype.resetSim = function () {
+        var game = new game_1.Game({
+            humanPlayerIndex: this.state.humanPlayerIndex,
+            humanPlayerName: this.state.humanPlayerName,
+            numPlayers: this.state.numPlayers
+        });
         this.setState({
-          humanPlayerName: url.searchParams.get("name")
-        }, function () {
-          _this2.resetSim();
+            simMode: false,
+            game: game,
+            numCardsToTrash: 0,
+            numCardsToDiscard: 0,
+            isGameLoaded: true,
         });
-      } else {
-        window.location.href = "/";
-      }
-    }
-    /**
-     * @param {string} cardName
-     */
-
-  }, {
-    key: "onClickSupplyCard",
-    value: function onClickSupplyCard(cardName) {
-      if (this.state.game.turn !== this.state.humanPlayerIndex) {
-        console.warn("can only buy on your turn");
-        return;
-      }
-
-      if (this.state.game.phase !== "buy" && this.state.game.phase !== "gain") {
-        console.warn("cannot buy/gain card outside buy/gain phase using this method - phase was ".concat(this.state.game.phase));
-        return;
-      }
-
-      if (this.state.game.phase === "buy") {
-        try {
-          this.state.game.buyCard(cardName, this.state.humanPlayerIndex);
-        } catch (e) {
-          window.alert(e.message);
-          return false;
+    };
+    App.prototype.drawCard = function () {
+        if (!this.state.game) {
+            throw new Error("game not created");
         }
-      } else if (this.state.game.phase === "gain") {
-        try {
-          this.state.game.gainCardWithCheck(cardName, this.state.humanPlayerIndex);
-        } catch (e) {
-          window.alert(e.message);
-          return false;
+        if (this.state.game.turn !== this.state.humanPlayerIndex) {
+            throw new Error("can only draw on your turn");
         }
-      } // hard reset game
-
-
-      this.setState({
-        game: this.state.game
-      });
-      return true;
-    }
-    /**
-     * @param {Player} player
-     * @param {number} playerIndex
-     * @param {Card} card
-     * @param {number} cardIndex
-     */
-
-  }, {
-    key: "onClickHandCard",
-    value: function onClickHandCard(player, playerIndex, card, cardIndex) {
-      if (playerIndex !== this.state.humanPlayerIndex) {
-        console.warn("can only play cards on behalf of human player");
-        return;
-      }
-
-      if (this.state.game.turn !== this.state.humanPlayerIndex) {
-        console.warn("can only play cards on your turn");
-        return;
-      }
-
-      if (!card) {
-        console.warn("Card is undefined");
-        return;
-      }
-
-      var numCardsToTrash = this.state.numCardsToTrash;
-      var numCardsToDiscard = this.state.numCardsToDiscard;
-
-      if (this.state.game.phase === "trash") {
-        console.debug("Trying to trash card ".concat(card.name, "..."));
-        this.trashCard(card, cardIndex);
-      } else if (this.state.game.phase === "discard") {
-        console.debug("Trying to discard card ".concat(card.name, "..."));
-        this.discardCard(card, cardIndex);
-      } else if (card.type === "treasure") {
-        try {
-          this.state.game.playTreasureCard(cardIndex);
-        } catch (e) {
-          console.error(e);
-          window.alert(e.message);
-          return;
+        if (this.state.game.phase !== "draw") {
+            throw new Error("cannot draw card outside of draw phase using this method - phase " + this.state.game.phase);
         }
-      } else if (card.type === "action") {
-        try {
-          this.state.game.playActionCard(player, playerIndex, card);
-
-          if (this.state.game.phase === "trash") {
-            numCardsToTrash = this.state.game.numTrash;
-          } else if (this.state.game.phase === "discard") {
-            numCardsToDiscard = this.state.game.numDiscard;
-          }
-        } catch (e) {
-          console.error(e);
-          window.alert(e.message);
-          return;
+        this.state.game.drawPhase();
+        // hard reset game
+        this.setState({
+            game: this.state.game
+        });
+    };
+    App.prototype.endActionPhase = function () {
+        if (!this.state.game) {
+            throw new Error("game not created");
         }
-      } else {
-        throw new Error("Unsupported card type: ".concat(card.type));
-      } // hard reset game
-
-
-      this.setState({
-        game: this.state.game,
-        numCardsToTrash: numCardsToTrash,
-        numCardsToDiscard: numCardsToDiscard
-      });
-    }
+        if (this.state.game.turn !== this.state.humanPlayerIndex) {
+            throw new Error("can only end action phase on your turn");
+        }
+        if (this.state.game.phase !== "action") {
+            throw new Error("cannot end action phase outside of action phase using this method");
+        }
+        this.state.game.endActionPhase();
+        // hard reset game
+        this.setState({
+            game: this.state.game
+        });
+    };
+    App.prototype.trashCard = function (card, cardIndex) {
+        if (!this.state.game) {
+            throw new Error("game not created");
+        }
+        if (this.state.numCardsToTrash === 0) {
+            throw new Error("Cannot trash cards right now");
+        }
+        var player = this.state.game.players[this.state.game.turn];
+        this.state.game.trashCards(player, [cardIndex], false);
+        // hard reset game
+        this.setState({
+            game: this.state.game,
+            numCardsToTrash: this.state.numCardsToTrash - 1
+        });
+    };
+    App.prototype.discardCard = function (card, cardIndex) {
+        if (!this.state.game) {
+            throw new Error("game not created");
+        }
+        if (this.state.numCardsToDiscard === 0) {
+            throw new Error("Cannot discard cards right now");
+        }
+        var player = this.state.game.players[this.state.game.turn];
+        this.state.game.discardCards(player, [cardIndex]);
+        // hard reset game
+        this.setState({
+            game: this.state.game,
+            numCardsToDiscard: this.state.numCardsToDiscard - 1
+        });
+    };
+    App.prototype.componentDidMount = function () {
+        var _this = this;
+        // grab the name, if set, from URL params
+        var url = new URL(window.location.href);
+        var name = url.searchParams.get("name");
+        if (name) {
+            this.setState({
+                humanPlayerName: name
+            }, function () {
+                _this.resetSim();
+            });
+        }
+        else {
+            window.location.href = "/";
+        }
+    };
+    App.prototype.onClickSupplyCard = function (cardName) {
+        if (!this.state.game) {
+            throw new Error("game not created");
+        }
+        if (this.state.game.turn !== this.state.humanPlayerIndex) {
+            console.warn("can only buy on your turn");
+            return;
+        }
+        if (this.state.game.phase !== "buy" && this.state.game.phase !== "gain") {
+            console.warn("cannot buy/gain card outside buy/gain phase using this method - phase was " + this.state.game.phase);
+            return;
+        }
+        if (this.state.game.phase === "buy") {
+            try {
+                this.state.game.buyCard(cardName, this.state.humanPlayerIndex);
+            }
+            catch (e) {
+                window.alert(e.message);
+                return false;
+            }
+        }
+        else if (this.state.game.phase === "gain") {
+            try {
+                this.state.game.gainCardWithCheck(cardName, this.state.humanPlayerIndex);
+            }
+            catch (e) {
+                window.alert(e.message);
+                return false;
+            }
+        }
+        // hard reset game
+        this.setState({
+            game: this.state.game
+        });
+        return true;
+    };
+    App.prototype.onClickHandCard = function (player, playerIndex, card, cardIndex) {
+        if (!this.state.game) {
+            throw new Error("game not created");
+        }
+        if (playerIndex !== this.state.humanPlayerIndex) {
+            console.warn("can only play cards on behalf of human player");
+            return;
+        }
+        if (this.state.game.turn !== this.state.humanPlayerIndex) {
+            console.warn("can only play cards on your turn");
+            return;
+        }
+        if (!card) {
+            console.warn("Card is undefined");
+            return;
+        }
+        var numCardsToTrash = this.state.numCardsToTrash;
+        var numCardsToDiscard = this.state.numCardsToDiscard;
+        if (this.state.game.phase === "trash") {
+            console.debug("Trying to trash card " + card.name + "...");
+            this.trashCard(card, cardIndex);
+        }
+        else if (this.state.game.phase === "discard") {
+            console.debug("Trying to discard card " + card.name + "...");
+            this.discardCard(card, cardIndex);
+        }
+        else if (card.type === "treasure") {
+            try {
+                this.state.game.playTreasureCard(cardIndex);
+            }
+            catch (e) {
+                console.error(e);
+                window.alert(e.message);
+                return;
+            }
+        }
+        else if (card.type === "action") {
+            try {
+                this.state.game.playActionCard(player, playerIndex, card);
+                if (this.state.game.phase === "trash") {
+                    numCardsToTrash = this.state.game.numTrash;
+                }
+                else if (this.state.game.phase === "discard") {
+                    numCardsToDiscard = this.state.game.numDiscard;
+                }
+            }
+            catch (e) {
+                console.error(e);
+                window.alert(e.message);
+                return;
+            }
+        }
+        else {
+            throw new Error("Unsupported card type: " + card.type);
+        }
+        // hard reset game
+        this.setState({
+            game: this.state.game,
+            numCardsToTrash: numCardsToTrash,
+            numCardsToDiscard: numCardsToDiscard,
+        });
+    };
     /**
      * @param {Card} card can be either a string or Card object
      * @param {string} source - either "hand" or "supply"
      * @returns {string[]}
      */
-
-  }, {
-    key: "getCardClasses",
-    value: function getCardClasses(card, source) {
-      var classes = ["card"];
-
-      if (source === "supply") {
-        classes.push("supply-card");
-      } else if (source === "hand") {
-        classes.push("player-card");
-      }
-
-      classes.push(card.type);
-      classes.push(card.name);
-      var isHumanPlayerTurn = this.state.game.turn === this.state.humanPlayerIndex;
-
-      if (source === "hand" && card.type === "action") {
-        if (isHumanPlayerTurn && this.state.game.phase === "action") {
-          classes.push("active");
+    App.prototype.getCardClasses = function (card, source) {
+        if (!this.state.game) {
+            throw new Error("game not created");
         }
-      } else if (source === "supply" || card.type === "treasure") {
-        if (isHumanPlayerTurn && this.state.game.phase === "buy") {
-          classes.push("active");
+        var classes = [
+            "card",
+        ];
+        if (source === "supply") {
+            classes.push("supply-card");
         }
-      }
-
-      return classes;
-    }
-  }, {
-    key: "endHumanPlayerTurn",
-    value: function endHumanPlayerTurn() {
-      if (this.state.game.turn !== this.state.humanPlayerIndex) {
-        console.warn("can only end turn on your turn");
-        return;
-      }
-
-      if (this.state.game.phase !== "buy") {
-        console.warn("cannot end turn in ".concat(this.state.game.phase, " phase"));
-        return;
-      }
-
-      this.state.game.endTurn(); // hard reset game
-
-      this.setState({
-        game: this.state.game
-      });
-    }
-  }, {
-    key: "stopTrashingCards",
-    value: function stopTrashingCards() {
-      this.setState({
-        numCardsToTrash: 0
-      });
-    }
-  }, {
-    key: "stopDiscardingCards",
-    value: function stopDiscardingCards() {
-      this.setState({
-        numCardsToDiscard: 0
-      });
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var _this3 = this;
-
-      if (this.state.isGameLoaded) {
-        var playerContainers = this.state.game.players.map(function (player, index) {
-          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_player_container__WEBPACK_IMPORTED_MODULE_5___default.a, {
-            player: player,
-            playerIndex: index,
-            turn: _this3.state.game.turn,
-            getCardClasses: _this3.getCardClasses,
-            key: player.name,
-            onClick: _this3.onClickHandCard
-          });
+        else if (source === "hand") {
+            classes.push("player-card");
+        }
+        classes.push(card.type);
+        classes.push(card.name);
+        var isHumanPlayerTurn = (this.state.game.turn === this.state.humanPlayerIndex);
+        if (source === "hand" && card.type === "action") {
+            if (isHumanPlayerTurn && this.state.game.phase === "action") {
+                classes.push("active");
+            }
+        }
+        else if (source === "supply" || card.type === "treasure") {
+            if (isHumanPlayerTurn && this.state.game.phase === "buy") {
+                classes.push("active");
+            }
+        }
+        return classes;
+    };
+    App.prototype.endHumanPlayerTurn = function () {
+        if (!this.state.game) {
+            throw new Error("game not created");
+        }
+        if (this.state.game.turn !== this.state.humanPlayerIndex) {
+            console.warn("can only end turn on your turn");
+            return;
+        }
+        if (this.state.game.phase !== "buy") {
+            console.warn("cannot end turn in " + this.state.game.phase + " phase");
+            return;
+        }
+        this.state.game.endTurn();
+        // hard reset game
+        this.setState({
+            game: this.state.game
         });
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          id: "app-container",
-          className: "container container-fluid"
-        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
-          className: "title"
-        }, "Dominion Simulation - Round ", this.state.game.round), this.state.game.isGameOver ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_game_over__WEBPACK_IMPORTED_MODULE_2___default.a, {
-          winArr: this.state.game.winArr
-        }) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          className: "sim-container"
-        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          className: "supply-outer-container"
-        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Supply"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_supply__WEBPACK_IMPORTED_MODULE_3___default.a, {
-          supply: this.state.game.supply,
-          phase: this.state.game.phase,
-          cards: this.state.game.cards,
-          isHumanPlayerTurn: this.state.game.turn === this.state.humanPlayerIndex,
-          onClick: this.onClickSupplyCard,
-          getCardClasses: this.getCardClasses
-        })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_info_pane__WEBPACK_IMPORTED_MODULE_4___default.a, {
-          game: this.state.game,
-          numCardsToDiscard: this.state.numCardsToDiscard,
-          numCardsToTrash: this.state.numCardsToTrash,
-          humanPlayerIndex: this.state.humanPlayerIndex
-        }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-          className: "player-container"
-        }, playerContainers)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_button_container__WEBPACK_IMPORTED_MODULE_6___default.a, {
-          game: this.state.game,
-          isHumanPlayerTurn: this.state.game.turn === this.state.humanPlayerIndex,
-          numCardsToTrash: this.state.numCardsToTrash,
-          numCardsToDiscard: this.state.numCardsToDiscard,
-          simMode: this.state.simMode,
-          drawCard: this.drawCard,
-          endActionPhase: this.endActionPhase,
-          endHumanPlayerTurn: this.endHumanPlayerTurn,
-          stopTrashingCards: this.stopTrashingCards,
-          stopDiscardingCards: this.stopDiscardingCards,
-          doTurn: this.doTurn,
-          doRound: this.doRound,
-          resetSim: this.resetSim
-        }));
-      } else {
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Loading...");
-      }
-    }
-  }]);
+    };
+    App.prototype.stopTrashingCards = function () {
+        this.setState({
+            numCardsToTrash: 0
+        });
+    };
+    App.prototype.stopDiscardingCards = function () {
+        this.setState({
+            numCardsToDiscard: 0
+        });
+    };
+    App.prototype.render = function () {
+        var _this = this;
+        if (this.state.isGameLoaded && this.state.game) {
+            if (!this.state.game) {
+                throw new Error("game not loaded");
+            }
+            var playerContainers = this.state.game.players.map(function (player, index) {
+                return react_1.default.createElement(player_container_1.default, { player: player, playerIndex: index, turn: _this.state.game.turn, getCardClasses: _this.getCardClasses, key: player.name, onClick: _this.onClickHandCard });
+            });
+            return (react_1.default.createElement("div", { id: "app-container", className: "container container-fluid" },
+                react_1.default.createElement("h1", { className: "title" },
+                    "Dominion Simulation - Round ",
+                    this.state.game.round),
+                this.state.game.isGameOver ?
+                    react_1.default.createElement(game_over_1.default, { winArr: this.state.game.winArr }) :
+                    null,
+                react_1.default.createElement("div", { className: "sim-container" },
+                    react_1.default.createElement("div", { className: "supply-outer-container" },
+                        react_1.default.createElement("h5", null, "Supply"),
+                        react_1.default.createElement(supply_1.default, { supply: this.state.game.supply, phase: this.state.game.phase, cards: this.state.game.cards, isHumanPlayerTurn: this.state.game.turn === this.state.humanPlayerIndex, onClick: this.onClickSupplyCard, getCardClasses: this.getCardClasses })),
+                    react_1.default.createElement(info_pane_1.default, { game: this.state.game, numCardsToDiscard: this.state.numCardsToDiscard, numCardsToTrash: this.state.numCardsToTrash, humanPlayerIndex: this.state.humanPlayerIndex }),
+                    react_1.default.createElement("div", { className: "player-container" }, playerContainers)),
+                react_1.default.createElement(button_container_1.default, { game: this.state.game, isHumanPlayerTurn: this.state.game.turn === this.state.humanPlayerIndex, numCardsToTrash: this.state.numCardsToTrash, numCardsToDiscard: this.state.numCardsToDiscard, simMode: this.state.simMode, drawCard: this.drawCard, endActionPhase: this.endActionPhase, endHumanPlayerTurn: this.endHumanPlayerTurn, stopTrashingCards: this.stopTrashingCards, stopDiscardingCards: this.stopDiscardingCards, doTurn: this.doTurn, doRound: this.doRound, resetSim: this.resetSim })));
+        }
+        else {
+            return react_1.default.createElement("div", null, "Loading...");
+        }
+    };
+    return App;
+}(react_1.Component));
+exports.default = App;
 
-  return App;
-}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
-
-/* harmony default export */ __webpack_exports__["default"] = (App);
 
 /***/ }),
 
@@ -51913,12 +51876,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react_dom__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _components_App__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/App */ "./src/components/App.jsx");
+/* harmony import */ var _components_App__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/App */ "./src/components/App.tsx");
+/* harmony import */ var _components_App__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_components_App__WEBPACK_IMPORTED_MODULE_2__);
 /* eslint-env browser */
 
 
 
-react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_App__WEBPACK_IMPORTED_MODULE_2__["default"], null), document.getElementById("react-root"));
+react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_components_App__WEBPACK_IMPORTED_MODULE_2___default.a, null), document.getElementById("react-root"));
 
 /***/ }),
 
