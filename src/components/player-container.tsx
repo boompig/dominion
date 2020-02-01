@@ -1,19 +1,22 @@
-/* eslint react/prop-types: 0 */
-
-import React from "react";
+import React, {Component} from "react";
 import { HandCard } from "./card";
+import { ICard } from "../card";
+import Player from "../player";
 
-/**
- * props:
- *
- * - player: Player
- * - playerIndex: number
- * - getCardClasses: function
- * - onClick: function
- * - turn: number
- */
-export default class PlayerContainer extends React.Component {
-	constructor(props) {
+
+interface IPlayerContainerProps {
+	turn: number;
+	playerIndex: number;
+	player: Player;
+
+	/* functions */
+	onClick: any;
+	getCardClasses: any;
+}
+
+
+export default class PlayerContainer extends Component<IPlayerContainerProps, {}> {
+	constructor(props: IPlayerContainerProps) {
 		super(props);
 
 		this.clickCard = this.clickCard.bind(this);
@@ -23,7 +26,7 @@ export default class PlayerContainer extends React.Component {
 	 * @param {Card} card
 	 * @param {number} cardIndex
 	 */
-	clickCard(card, cardIndex) {
+	clickCard(card: ICard, cardIndex: number) {
 		this.props.onClick(
 			this.props.player,
 			this.props.playerIndex,

@@ -1,6 +1,7 @@
 export interface ICard {
 	name: string;
     type: string;
+    cost: number;
 
     // treasure only
     value?: number;

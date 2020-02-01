@@ -1,19 +1,27 @@
-/* eslint react/prop-types: 0 */
-
-import React from "react";
+import React, {Component} from "react";
 import { SupplyCard } from "./card";
+import { ICard } from "../card";
 
-/**
- * props:
- *
- * - isHumanPlayerTurn: boolean
- * - phase: string
- * - supply: object - Map<string, number>
- * - cards: object - Map<string, Card>
- * - onClick: function
- * - getCardClasses: function
- */
-export default class Supply extends React.Component {
+
+type TStringNumberMap = {[key: string]: number};
+type TStringCardMap = {[key: string]: ICard};
+
+
+interface ISupplyProps {
+	isHumanPlayerTurn: boolean;
+	phase: string;
+
+	/* maps */
+	supply: TStringNumberMap;
+	cards: TStringCardMap;
+
+	/* functions */
+	onClick: any;
+	getCardClasses: any;
+}
+
+
+export default class Supply extends Component<ISupplyProps, {}> {
 
 	render() {
 		const classes = ["supply-container"];

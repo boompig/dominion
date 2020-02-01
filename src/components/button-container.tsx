@@ -1,28 +1,31 @@
-/* eslint react/prop-types: 0 */
+import React, {Component} from "react";
+import {Game} from "../game";
 
-import React from "react";
 
-/**
- * props:
- *
- * - game: Game
- * - numCardsToTrash: number
- * - numCardsToDiscard: number
- * - isHumanPlayerTurn: boolean
- * - simMode: boolean
- *
- * - drawCard: function
- * - endActionPhase: function
- * - endHumanPlayerTurn: function
- * - stopTrashingCards: function
- * - stopDiscardingCards: function
- *
- * - doTurn: function
- * - doRound: function
- * - resetSim: function
- */
-export default class ButtonContainer extends React.Component {
-	constructor(props) {
+interface IButtonContainerProps {
+	game: Game;
+	simMode: boolean;
+	isHumanPlayerTurn: boolean;
+
+	numCardsToTrash: number;
+	numCardsToDiscard: number;
+
+	/* functions */
+	drawCard: any;
+	endActionPhase: any;
+	endHumanPlayerTurn: any;
+	stopTrashingCards: any;
+	stopDiscardingCards: any;
+
+	doTurn: any;
+	resetSim: any;
+	doRound: any;
+};
+
+
+export default class ButtonContainer extends Component<IButtonContainerProps, {}> {
+
+	constructor(props: IButtonContainerProps) {
 		super(props);
 
 		this.isButtonDisabled = this.isButtonDisabled.bind(this);

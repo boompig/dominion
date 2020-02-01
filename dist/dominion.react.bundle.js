@@ -49104,11 +49104,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _game__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../game */ "./src/game.js");
-/* harmony import */ var _game_over__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./game-over */ "./src/components/game-over.jsx");
-/* harmony import */ var _supply__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./supply */ "./src/components/supply.jsx");
-/* harmony import */ var _info_pane__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./info-pane */ "./src/components/info-pane.jsx");
-/* harmony import */ var _player_container__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./player-container */ "./src/components/player-container.jsx");
-/* harmony import */ var _button_container__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./button-container */ "./src/components/button-container.jsx");
+/* harmony import */ var _game_over__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./game-over */ "./src/components/game-over.tsx");
+/* harmony import */ var _game_over__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_game_over__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _supply__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./supply */ "./src/components/supply.tsx");
+/* harmony import */ var _supply__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_supply__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _info_pane__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./info-pane */ "./src/components/info-pane.tsx");
+/* harmony import */ var _info_pane__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_info_pane__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _player_container__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./player-container */ "./src/components/player-container.tsx");
+/* harmony import */ var _player_container__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_player_container__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _button_container__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./button-container */ "./src/components/button-container.tsx");
+/* harmony import */ var _button_container__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_button_container__WEBPACK_IMPORTED_MODULE_6__);
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -49448,7 +49453,7 @@ function (_React$Component) {
 
       if (this.state.isGameLoaded) {
         var playerContainers = this.state.game.players.map(function (player, index) {
-          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_player_container__WEBPACK_IMPORTED_MODULE_5__["default"], {
+          return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_player_container__WEBPACK_IMPORTED_MODULE_5___default.a, {
             player: player,
             playerIndex: index,
             turn: _this3.state.game.turn,
@@ -49462,27 +49467,27 @@ function (_React$Component) {
           className: "container container-fluid"
         }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h1", {
           className: "title"
-        }, "Dominion Simulation - Round ", this.state.game.round), this.state.game.isGameOver ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_game_over__WEBPACK_IMPORTED_MODULE_2__["default"], {
+        }, "Dominion Simulation - Round ", this.state.game.round), this.state.game.isGameOver ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_game_over__WEBPACK_IMPORTED_MODULE_2___default.a, {
           winArr: this.state.game.winArr
         }) : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           className: "sim-container"
         }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           className: "supply-outer-container"
-        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Supply"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_supply__WEBPACK_IMPORTED_MODULE_3__["default"], {
+        }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h5", null, "Supply"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_supply__WEBPACK_IMPORTED_MODULE_3___default.a, {
           supply: this.state.game.supply,
           phase: this.state.game.phase,
           cards: this.state.game.cards,
           isHumanPlayerTurn: this.state.game.turn === this.state.humanPlayerIndex,
           onClick: this.onClickSupplyCard,
           getCardClasses: this.getCardClasses
-        })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_info_pane__WEBPACK_IMPORTED_MODULE_4__["default"], {
+        })), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_info_pane__WEBPACK_IMPORTED_MODULE_4___default.a, {
           game: this.state.game,
           numCardsToDiscard: this.state.numCardsToDiscard,
           numCardsToTrash: this.state.numCardsToTrash,
           humanPlayerIndex: this.state.humanPlayerIndex
         }), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
           className: "player-container"
-        }, playerContainers)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_button_container__WEBPACK_IMPORTED_MODULE_6__["default"], {
+        }, playerContainers)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_button_container__WEBPACK_IMPORTED_MODULE_6___default.a, {
           game: this.state.game,
           isHumanPlayerTurn: this.state.game.turn === this.state.humanPlayerIndex,
           numCardsToTrash: this.state.numCardsToTrash,
@@ -49510,618 +49515,427 @@ function (_React$Component) {
 
 /***/ }),
 
-/***/ "./src/components/button-container.jsx":
+/***/ "./src/components/button-container.tsx":
 /*!*********************************************!*\
-  !*** ./src/components/button-container.jsx ***!
+  !*** ./src/components/button-container.tsx ***!
   \*********************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ButtonContainer; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-/* eslint react/prop-types: 0 */
-
-/**
- * props:
- *
- * - game: Game
- * - numCardsToTrash: number
- * - numCardsToDiscard: number
- * - isHumanPlayerTurn: boolean
- * - simMode: boolean
- *
- * - drawCard: function
- * - endActionPhase: function
- * - endHumanPlayerTurn: function
- * - stopTrashingCards: function
- * - stopDiscardingCards: function
- *
- * - doTurn: function
- * - doRound: function
- * - resetSim: function
- */
-
-var ButtonContainer =
-/*#__PURE__*/
-function (_React$Component) {
-  _inherits(ButtonContainer, _React$Component);
-
-  function ButtonContainer(props) {
-    var _this;
-
-    _classCallCheck(this, ButtonContainer);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(ButtonContainer).call(this, props));
-    _this.isButtonDisabled = _this.isButtonDisabled.bind(_assertThisInitialized(_this));
-    return _this;
-  }
-
-  _createClass(ButtonContainer, [{
-    key: "isButtonDisabled",
-    value: function isButtonDisabled() {
-      return this.props.game.isGameOver || this.props.simMode || this.props.isHumanPlayerTurn;
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+;
+var ButtonContainer = /** @class */ (function (_super) {
+    __extends(ButtonContainer, _super);
+    function ButtonContainer(props) {
+        var _this = _super.call(this, props) || this;
+        _this.isButtonDisabled = _this.isButtonDisabled.bind(_this);
+        return _this;
     }
-  }, {
-    key: "render",
-    value: function render() {
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        id: "btn-container"
-      }, this.props.game.phase === "draw" && this.props.isHumanPlayerTurn ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        className: "btn btn-info",
-        type: "button",
-        onClick: this.props.drawCard
-      }, "Draw Card") : null, this.props.numCardsToTrash > 0 && this.props.isHumanPlayerTurn ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        className: "btn btn-info",
-        type: "button",
-        onClick: this.props.stopTrashingCards
-      }, "Stop Trashing Cards") : null, this.props.numCardsToDiscard > 0 && this.props.isHumanPlayerTurn ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        className: "btn btn-info",
-        type: "button",
-        onClick: this.props.stopDiscardingCards
-      }, "Stop Discarding Cards") : null, this.props.game.phase === "action" && this.props.isHumanPlayerTurn ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        className: "btn btn-info",
-        type: "button",
-        onClick: this.props.endActionPhase
-      }, "End Action Phase") : null, this.props.game.phase === "buy" && this.props.isHumanPlayerTurn ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        className: "btn btn-info",
-        type: "button",
-        onClick: this.props.endHumanPlayerTurn
-      }, "End Turn") : null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        className: "btn btn-primary",
-        type: "button",
-        onClick: this.props.doTurn,
-        disabled: this.isButtonDisabled()
-      }, "AI Turn"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        className: "btn btn-primary",
-        type: "button",
-        onClick: this.props.doRound,
-        disabled: this.isButtonDisabled()
-      }, "Run Simulation (1 Round)"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("button", {
-        className: "btn btn-danger",
-        type: "button",
-        onClick: this.props.resetSim,
-        disabled: this.props.simMode
-      }, "Reset"));
-    }
-  }]);
-
-  return ButtonContainer;
-}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
-
+    ButtonContainer.prototype.isButtonDisabled = function () {
+        return this.props.game.isGameOver || this.props.simMode || this.props.isHumanPlayerTurn;
+    };
+    ButtonContainer.prototype.render = function () {
+        return (react_1.default.createElement("div", { id: "btn-container" },
+            this.props.game.phase === "draw" && this.props.isHumanPlayerTurn ?
+                react_1.default.createElement("button", { className: "btn btn-info", type: "button", onClick: this.props.drawCard }, "Draw Card") :
+                null,
+            this.props.numCardsToTrash > 0 && this.props.isHumanPlayerTurn ?
+                react_1.default.createElement("button", { className: "btn btn-info", type: "button", onClick: this.props.stopTrashingCards }, "Stop Trashing Cards") :
+                null,
+            this.props.numCardsToDiscard > 0 && this.props.isHumanPlayerTurn ?
+                react_1.default.createElement("button", { className: "btn btn-info", type: "button", onClick: this.props.stopDiscardingCards }, "Stop Discarding Cards") :
+                null,
+            this.props.game.phase === "action" && this.props.isHumanPlayerTurn ?
+                react_1.default.createElement("button", { className: "btn btn-info", type: "button", onClick: this.props.endActionPhase }, "End Action Phase") :
+                null,
+            this.props.game.phase === "buy" && this.props.isHumanPlayerTurn ?
+                react_1.default.createElement("button", { className: "btn btn-info", type: "button", onClick: this.props.endHumanPlayerTurn }, "End Turn") :
+                null,
+            react_1.default.createElement("button", { className: "btn btn-primary", type: "button", onClick: this.props.doTurn, disabled: this.isButtonDisabled() }, "AI Turn"),
+            react_1.default.createElement("button", { className: "btn btn-primary", type: "button", onClick: this.props.doRound, disabled: this.isButtonDisabled() }, "Run Simulation (1 Round)"),
+            react_1.default.createElement("button", { className: "btn btn-danger", type: "button", onClick: this.props.resetSim, disabled: this.props.simMode }, "Reset")));
+    };
+    return ButtonContainer;
+}(react_1.Component));
+exports.default = ButtonContainer;
 
 
 /***/ }),
 
-/***/ "./src/components/card.jsx":
+/***/ "./src/components/card.tsx":
 /*!*********************************!*\
-  !*** ./src/components/card.jsx ***!
+  !*** ./src/components/card.tsx ***!
   \*********************************/
-/*! exports provided: HandCard, SupplyCard */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HandCard", function() { return HandCard; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SupplyCard", function() { return SupplyCard; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-/* eslint react/prop-types: 0 */
-
-/**
- * props:
- *
- * - card: Card
- * - cardIndex: number
- * - getCardClasses: function
- * - onClick: function
- */
-
-var HandCard =
-/*#__PURE__*/
-function (_React$Component) {
-  _inherits(HandCard, _React$Component);
-
-  function HandCard(props) {
-    var _this;
-
-    _classCallCheck(this, HandCard);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(HandCard).call(this, props));
-    _this.clickCard = _this.clickCard.bind(_assertThisInitialized(_this));
-    return _this;
-  }
-
-  _createClass(HandCard, [{
-    key: "clickCard",
-    value: function clickCard() {
-      this.props.onClick(this.props.card, this.props.cardIndex);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+;
+var HandCard = /** @class */ (function (_super) {
+    __extends(HandCard, _super);
+    function HandCard(props) {
+        var _this = _super.call(this, props) || this;
+        _this.clickCard = _this.clickCard.bind(_this);
+        return _this;
     }
-  }, {
-    key: "render",
-    value: function render() {
-      var classes = this.props.getCardClasses(this.props.card, "hand");
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: classes.join(" "),
-        onClick: this.clickCard
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "card-name"
-      }, this.props.card.name));
+    HandCard.prototype.clickCard = function () {
+        this.props.onClick(this.props.card, this.props.cardIndex);
+    };
+    HandCard.prototype.render = function () {
+        var classes = this.props.getCardClasses(this.props.card, "hand");
+        return react_1.default.createElement("div", { className: classes.join(" "), onClick: this.clickCard },
+            react_1.default.createElement("div", { className: "card-name" }, this.props.card.name));
+    };
+    return HandCard;
+}(react_1.Component));
+exports.HandCard = HandCard;
+var SupplyCard = /** @class */ (function (_super) {
+    __extends(SupplyCard, _super);
+    function SupplyCard(props) {
+        var _this = _super.call(this, props) || this;
+        _this.clickSupplyCard = _this.clickSupplyCard.bind(_this);
+        return _this;
     }
-  }]);
+    SupplyCard.prototype.clickSupplyCard = function () {
+        this.props.onClick(this.props.card.name, "supply");
+    };
+    SupplyCard.prototype.render = function () {
+        var classes = this.props.getCardClasses(this.props.card, "supply");
+        return (react_1.default.createElement("div", { className: classes.join(" "), onClick: this.clickSupplyCard },
+            this.props.card.name,
+            " (",
+            this.props.card.cost,
+            ") - ",
+            this.props.numRemaining,
+            " left"));
+    };
+    return SupplyCard;
+}(react_1.Component));
+exports.SupplyCard = SupplyCard;
 
-  return HandCard;
-}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
-/**
- * props:
- *
- * - card: Card
- * - numRemaining: number
- * - phase: string
- * - onClick: function
- * - getCardClasses: function
- */
-
-var SupplyCard =
-/*#__PURE__*/
-function (_React$Component2) {
-  _inherits(SupplyCard, _React$Component2);
-
-  function SupplyCard(props) {
-    var _this2;
-
-    _classCallCheck(this, SupplyCard);
-
-    _this2 = _possibleConstructorReturn(this, _getPrototypeOf(SupplyCard).call(this, props));
-    _this2.clickSupplyCard = _this2.clickSupplyCard.bind(_assertThisInitialized(_this2));
-    return _this2;
-  }
-
-  _createClass(SupplyCard, [{
-    key: "clickSupplyCard",
-    value: function clickSupplyCard() {
-      this.props.onClick(this.props.card.name, "supply");
-    }
-  }, {
-    key: "render",
-    value: function render() {
-      var classes = this.props.getCardClasses(this.props.card, "supply");
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: classes.join(" "),
-        onClick: this.clickSupplyCard
-      }, this.props.card.name, " (", this.props.card.cost, ") - ", this.props.numRemaining, " left");
-    }
-  }]);
-
-  return SupplyCard;
-}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
 
 /***/ }),
 
-/***/ "./src/components/game-over.jsx":
+/***/ "./src/components/game-over.tsx":
 /*!**************************************!*\
-  !*** ./src/components/game-over.jsx ***!
+  !*** ./src/components/game-over.tsx ***!
   \**************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GameOver; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-
-/**
- * props:
- *      - winArr: array of winning players
- */
-
-var GameOver =
-/*#__PURE__*/
-function (_React$Component) {
-  _inherits(GameOver, _React$Component);
-
-  function GameOver() {
-    _classCallCheck(this, GameOver);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(GameOver).apply(this, arguments));
-  }
-
-  _createClass(GameOver, [{
-    key: "render",
-    value: function render() {
-      var winElems = this.props.winArr.map(function (player) {
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("li", null, player.name);
-      });
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("h4", null, "Winners (", this.props.winArr.length, ")"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("ul", null, winElems));
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+var GameOver = /** @class */ (function (_super) {
+    __extends(GameOver, _super);
+    function GameOver() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-  }]);
-
-  return GameOver;
-}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
-
+    GameOver.prototype.render = function () {
+        var winElems = this.props.winArr.map(function (player) {
+            return react_1.default.createElement("li", null, player.name);
+        });
+        return (react_1.default.createElement("div", null,
+            react_1.default.createElement("h4", null,
+                "Winners (",
+                this.props.winArr.length,
+                ")"),
+            react_1.default.createElement("ul", null, winElems)));
+    };
+    return GameOver;
+}(react_1.Component));
+exports.default = GameOver;
 
 
 /***/ }),
 
-/***/ "./src/components/info-pane.jsx":
+/***/ "./src/components/info-pane.tsx":
 /*!**************************************!*\
-  !*** ./src/components/info-pane.jsx ***!
+  !*** ./src/components/info-pane.tsx ***!
   \**************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return InfoPane; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-/* eslint react/prop-types: 0 */
-
-/**
- * props:
- *
- * - game: Game
- * - numCardsToTrash: number
- * - numCardsToDiscard: number
- * - humanPlayerIndex: number
- */
-
-var InfoPane =
-/*#__PURE__*/
-function (_React$Component) {
-  _inherits(InfoPane, _React$Component);
-
-  function InfoPane() {
-    _classCallCheck(this, InfoPane);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(InfoPane).apply(this, arguments));
-  }
-
-  _createClass(InfoPane, [{
-    key: "render",
-    value: function render() {
-      var activeElems = null;
-
-      if (this.props.game.turn === this.props.humanPlayerIndex) {
-        activeElems = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "# buys: ", this.props.game.players[this.props.game.turn].numBuys), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "# actions: ", this.props.game.players[this.props.game.turn].numActions));
-      }
-
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "info-container"
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Phase: ", this.props.game.phase), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Treasure Pot: ", this.props.game.treasurePot), activeElems, this.props.numCardsToTrash > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "num-trash-cards"
-      }, "# cards to trash: ", this.props.numCardsToTrash) : null, this.props.numCardsToDiscard > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "num-discard-cards"
-      }, "# cards to discard: ", this.props.numCardsToDiscard) : null, this.props.game.numGain > 0 ? react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "num-gain-cards"
-      }, "# cards to gain: ", this.props.game.numGain) : null);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+var InfoPane = /** @class */ (function (_super) {
+    __extends(InfoPane, _super);
+    function InfoPane() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-  }]);
-
-  return InfoPane;
-}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
-
+    InfoPane.prototype.render = function () {
+        var activeElems = null;
+        if (this.props.game.turn === this.props.humanPlayerIndex) {
+            activeElems = (react_1.default.createElement("div", null,
+                react_1.default.createElement("div", null,
+                    "# buys: ",
+                    this.props.game.players[this.props.game.turn].numBuys),
+                react_1.default.createElement("div", null,
+                    "# actions: ",
+                    this.props.game.players[this.props.game.turn].numActions)));
+        }
+        return (react_1.default.createElement("div", { className: "info-container" },
+            react_1.default.createElement("div", null,
+                "Phase: ",
+                this.props.game.phase),
+            react_1.default.createElement("div", null,
+                "Treasure Pot: ",
+                this.props.game.treasurePot),
+            activeElems,
+            this.props.numCardsToTrash > 0 ?
+                react_1.default.createElement("div", { className: "num-trash-cards" },
+                    "# cards to trash: ",
+                    this.props.numCardsToTrash) :
+                null,
+            this.props.numCardsToDiscard > 0 ?
+                react_1.default.createElement("div", { className: "num-discard-cards" },
+                    "# cards to discard: ",
+                    this.props.numCardsToDiscard) :
+                null,
+            this.props.game.numGain > 0 ?
+                react_1.default.createElement("div", { className: "num-gain-cards" },
+                    "# cards to gain: ",
+                    this.props.game.numGain) :
+                null));
+    };
+    return InfoPane;
+}(react_1.Component));
+exports.default = InfoPane;
 
 
 /***/ }),
 
-/***/ "./src/components/player-container.jsx":
+/***/ "./src/components/player-container.tsx":
 /*!*********************************************!*\
-  !*** ./src/components/player-container.jsx ***!
+  !*** ./src/components/player-container.tsx ***!
   \*********************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return PlayerContainer; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _card__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./card */ "./src/components/card.jsx");
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-/* eslint react/prop-types: 0 */
-
-
-/**
- * props:
- *
- * - player: Player
- * - playerIndex: number
- * - getCardClasses: function
- * - onClick: function
- * - turn: number
- */
-
-var PlayerContainer =
-/*#__PURE__*/
-function (_React$Component) {
-  _inherits(PlayerContainer, _React$Component);
-
-  function PlayerContainer(props) {
-    var _this;
-
-    _classCallCheck(this, PlayerContainer);
-
-    _this = _possibleConstructorReturn(this, _getPrototypeOf(PlayerContainer).call(this, props));
-    _this.clickCard = _this.clickCard.bind(_assertThisInitialized(_this));
-    return _this;
-  }
-  /**
-   * @param {Card} card
-   * @param {number} cardIndex
-   */
-
-
-  _createClass(PlayerContainer, [{
-    key: "clickCard",
-    value: function clickCard(card, cardIndex) {
-      this.props.onClick(this.props.player, this.props.playerIndex, card, cardIndex);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+var card_1 = __webpack_require__(/*! ./card */ "./src/components/card.tsx");
+var PlayerContainer = /** @class */ (function (_super) {
+    __extends(PlayerContainer, _super);
+    function PlayerContainer(props) {
+        var _this = _super.call(this, props) || this;
+        _this.clickCard = _this.clickCard.bind(_this);
+        return _this;
     }
-  }, {
-    key: "render",
-    value: function render() {
-      var _this2 = this;
-
-      var cardElems = this.props.player.hand.map(function (card, index) {
-        return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_card__WEBPACK_IMPORTED_MODULE_1__["HandCard"], {
-          card: card,
-          cardIndex: index,
-          key: index,
-          getCardClasses: _this2.props.getCardClasses,
-          onClick: _this2.clickCard
+    /**
+     * @param {Card} card
+     * @param {number} cardIndex
+     */
+    PlayerContainer.prototype.clickCard = function (card, cardIndex) {
+        this.props.onClick(this.props.player, this.props.playerIndex, card, cardIndex);
+    };
+    PlayerContainer.prototype.render = function () {
+        var _this = this;
+        var cardElems = this.props.player.hand.map(function (card, index) {
+            return react_1.default.createElement(card_1.HandCard, { card: card, cardIndex: index, key: index, getCardClasses: _this.props.getCardClasses, onClick: _this.clickCard });
         });
-      });
-      var classes = ["player"];
-
-      if (this.props.turn === this.props.playerIndex) {
-        classes.push("active");
-      }
-
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: classes.join(" ")
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "player-name"
-      }, this.props.player.name, " (", this.props.player.isHuman ? "Human" : "AI", ")"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Discard size: ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, this.props.player.discard.length)), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", null, "Points: ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("span", null, this.props.player.points)), cardElems);
-    }
-  }]);
-
-  return PlayerContainer;
-}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
-
+        var classes = ["player"];
+        if (this.props.turn === this.props.playerIndex) {
+            classes.push("active");
+        }
+        return (react_1.default.createElement("div", { className: classes.join(" ") },
+            react_1.default.createElement("div", { className: "player-name" },
+                this.props.player.name,
+                " (",
+                this.props.player.isHuman ? "Human" : "AI",
+                ")"),
+            react_1.default.createElement("div", null,
+                "Discard size: ",
+                react_1.default.createElement("span", null, this.props.player.discard.length)),
+            react_1.default.createElement("div", null,
+                "Points: ",
+                react_1.default.createElement("span", null, this.props.player.points)),
+            cardElems));
+    };
+    return PlayerContainer;
+}(react_1.Component));
+exports.default = PlayerContainer;
 
 
 /***/ }),
 
-/***/ "./src/components/supply.jsx":
+/***/ "./src/components/supply.tsx":
 /*!***********************************!*\
-  !*** ./src/components/supply.jsx ***!
+  !*** ./src/components/supply.tsx ***!
   \***********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Supply; });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _card__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./card */ "./src/components/card.jsx");
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
-
-function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
-
-function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
-
-function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
-
-function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
-
-/* eslint react/prop-types: 0 */
-
-
-/**
- * props:
- *
- * - isHumanPlayerTurn: boolean
- * - phase: string
- * - supply: object - Map<string, number>
- * - cards: object - Map<string, Card>
- * - onClick: function
- * - getCardClasses: function
- */
-
-var Supply =
-/*#__PURE__*/
-function (_React$Component) {
-  _inherits(Supply, _React$Component);
-
-  function Supply() {
-    _classCallCheck(this, Supply);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(Supply).apply(this, arguments));
-  }
-
-  _createClass(Supply, [{
-    key: "render",
-    value: function render() {
-      var classes = ["supply-container"];
-
-      if (this.props.isHumanPlayerTurn && this.props.phase === "buy") {
-        classes.push("active");
-      }
-
-      var standardSupplyCards = [];
-      var kingdomSupplyCards = [];
-
-      for (var _i = 0, _Object$entries = Object.entries(this.props.supply); _i < _Object$entries.length; _i++) {
-        var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
-            cardName = _Object$entries$_i[0],
-            numRemaining = _Object$entries$_i[1];
-
-        var card = this.props.cards[cardName];
-
-        if (!card) {
-          throw new Error("cannot find card with name " + cardName);
-        }
-
-        var elem = react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement(_card__WEBPACK_IMPORTED_MODULE_1__["SupplyCard"], {
-          card: card,
-          numRemaining: numRemaining,
-          isHumanPlayerTurn: this.props.isHumanPlayerTurn,
-          phase: this.props.phase,
-          key: cardName,
-          onClick: this.props.onClick,
-          getCardClasses: this.props.getCardClasses
-        });
-
-        if (card.type === "action") {
-          kingdomSupplyCards.push(elem);
-        } else {
-          standardSupplyCards.push(elem);
-        }
-      }
-
-      ;
-      return react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: classes.join(" ")
-      }, react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "supply-inner-container"
-      }, standardSupplyCards), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("div", {
-        className: "supply-inner-container"
-      }, kingdomSupplyCards));
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
+var card_1 = __webpack_require__(/*! ./card */ "./src/components/card.tsx");
+var Supply = /** @class */ (function (_super) {
+    __extends(Supply, _super);
+    function Supply() {
+        return _super !== null && _super.apply(this, arguments) || this;
     }
-  }]);
-
-  return Supply;
-}(react__WEBPACK_IMPORTED_MODULE_0___default.a.Component);
-
+    Supply.prototype.render = function () {
+        var classes = ["supply-container"];
+        if (this.props.isHumanPlayerTurn && this.props.phase === "buy") {
+            classes.push("active");
+        }
+        var standardSupplyCards = [];
+        var kingdomSupplyCards = [];
+        for (var _i = 0, _a = Object.entries(this.props.supply); _i < _a.length; _i++) {
+            var _b = _a[_i], cardName = _b[0], numRemaining = _b[1];
+            var card = this.props.cards[cardName];
+            if (!card) {
+                throw new Error("cannot find card with name " + cardName);
+            }
+            var elem = react_1.default.createElement(card_1.SupplyCard, { card: card, numRemaining: numRemaining, isHumanPlayerTurn: this.props.isHumanPlayerTurn, phase: this.props.phase, key: cardName, onClick: this.props.onClick, getCardClasses: this.props.getCardClasses });
+            if (card.type === "action") {
+                kingdomSupplyCards.push(elem);
+            }
+            else {
+                standardSupplyCards.push(elem);
+            }
+        }
+        ;
+        return (react_1.default.createElement("div", { className: classes.join(" ") },
+            react_1.default.createElement("div", { className: "supply-inner-container" }, standardSupplyCards),
+            react_1.default.createElement("div", { className: "supply-inner-container" }, kingdomSupplyCards)));
+    };
+    return Supply;
+}(react_1.Component));
+exports.default = Supply;
 
 
 /***/ }),

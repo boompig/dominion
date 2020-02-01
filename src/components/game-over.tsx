@@ -1,10 +1,13 @@
-import React from "react";
+import React, {Component} from "react";
+import Player from "../player";
 
-/**
- * props:
- *      - winArr: array of winning players
- */
-export default class GameOver extends React.Component {
+
+interface IGameOverProps {
+    winArr: Player[];
+}
+
+
+export default class GameOver extends Component<IGameOverProps, {}> {
     render() {
         const winElems = this.props.winArr.map(player => {
             return <li>{ player.name }</li>

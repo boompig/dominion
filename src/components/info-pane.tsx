@@ -1,16 +1,16 @@
-/* eslint react/prop-types: 0 */
+import React, {Component} from "react";
+import { Game } from "../game";
 
-import React from "react";
 
-/**
- * props:
- *
- * - game: Game
- * - numCardsToTrash: number
- * - numCardsToDiscard: number
- * - humanPlayerIndex: number
- */
-export default class InfoPane extends React.Component {
+interface IInfoPaneProps {
+	game: Game;
+	numCardsToTrash: number;
+	numCardsToDiscard: number;
+	humanPlayerIndex: number;
+}
+
+
+export default class InfoPane extends Component<IInfoPaneProps, {}> {
 	render() {
 		let activeElems = null;
 		if(this.props.game.turn === this.props.humanPlayerIndex) {

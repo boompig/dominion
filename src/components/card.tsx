@@ -1,17 +1,19 @@
-/* eslint react/prop-types: 0 */
+import React, {Component} from "react";
+import { ICard } from "../card";
 
-import React from "react";
 
-/**
- * props:
- *
- * - card: Card
- * - cardIndex: number
- * - getCardClasses: function
- * - onClick: function
- */
-export class HandCard extends React.Component {
-	constructor(props) {
+interface IHandCardProps {
+	card: ICard;
+	cardIndex: number;
+
+	/* functions */
+	onClick: any;
+	getCardClasses: any;
+};
+
+
+export class HandCard extends Component<IHandCardProps, {}> {
+	constructor(props: IHandCardProps) {
 		super(props);
 
 		this.clickCard = this.clickCard.bind(this);
@@ -29,17 +31,21 @@ export class HandCard extends React.Component {
 	}
 }
 
-/**
- * props:
- *
- * - card: Card
- * - numRemaining: number
- * - phase: string
- * - onClick: function
- * - getCardClasses: function
- */
-export class SupplyCard extends React.Component {
-	constructor(props) {
+
+interface ISupplyCardProps {
+	card: ICard;
+	numRemaining: number;
+	phase: string;
+	isHumanPlayerTurn: boolean;
+
+	/* functions */
+	onClick: any;
+	getCardClasses: any;
+}
+
+
+export class SupplyCard extends Component<ISupplyCardProps, {}> {
+	constructor(props: ISupplyCardProps) {
 		super(props);
 
 		this.clickSupplyCard = this.clickSupplyCard.bind(this);
