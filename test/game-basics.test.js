@@ -1,6 +1,6 @@
-const Game = require("../src/game");
-const Player = require("../src/player");
-const { SimpleTestStrategy } = require("./test-strategies");
+import { Game } from "../src/game";
+import Player from "../src/player";
+import { SimpleTestStrategy } from "./test-strategies";
 
 const playAllTreasureCards = (game, player) => {
 	// TODO

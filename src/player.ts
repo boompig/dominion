@@ -1,14 +1,37 @@
+import {ICard, ITreasureCard} from "./card";
+import {TSupplyMap, TStringCardMap} from "./types";
+
 // debugging
 console.debug = function() {};
 
 
-class Player {
+export interface IPlayerStrategy {
+	buyTurn(player: Player, supply: TSupplyMap, treasurePot: number): string | null;
+	playTreasures(player: Player, supply: TSupplyMap, cards: TStringCardMap, treasurePot: number): number[];
+	trashCardForGain(player: Player, gainBonusCost: number, trashType: string | null, gainType: string | null): number[];
+	actionTurn(player: Player): ICard | null;
+	gainCard(player: Player, maxGainCost: number): string | null;
+};
+
+
+export default class Player {
+	name: string;
+	strategy: IPlayerStrategy | null;
+	deck: ICard[];
+	hand: ICard[];
+	discard: ICard[];
+	revealedCards: ICard[];
+	points: number;
+	isHuman: boolean;
+	numBuys: number;
+	numActions: number;
+
 	/**
 	 * @param {string} name
 	 * @param {PlayerStrategy} strategy
 	 * @param {boolean} isHuman
 	 */
-	constructor(name, strategy, isHuman) {
+	constructor(name: string, strategy: IPlayerStrategy | null, isHuman?: boolean) {
 		this.name = name;
 		this.strategy = strategy;
 
@@ -66,11 +89,11 @@ class Player {
 	/**
 	 * @returns {number}
 	 */
-	getMoneyInHand() {
+	getMoneyInHand(): number {
 		let money = 0;
 		for (let i = 0; i < this.hand.length; i++) {
 			if (this.hand[i].type === "treasure") {
-				money += this.hand[i].value;
+				money += (this.hand[i] as ITreasureCard).value;
 			}
 		}
 		return money;
@@ -79,11 +102,9 @@ class Player {
 	/**
 	 * @param {number} cardIndex
 	 */
-	discardCard(cardIndex) {
+	discardCard(cardIndex: number) {
 		const cards = this.hand.splice(cardIndex, 1);
 		console.debug(`Discarding card ${cards[0].name} from player ${this.name}`);
 		this.discard.push(cards[0]);
 	}
 }
-
-module.exports = Player;

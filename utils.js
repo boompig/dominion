@@ -17,7 +17,7 @@ Utils.printWinners = (game) => {
 
 /**
  * Print results with best strategies first
- * @param {results} Map from player name to how often they won
+ * @param {any} results map from player name to how often they won
  */
 Utils.printResults = (results) => {
 	const l = Object.keys(results).map((name) => {

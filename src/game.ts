@@ -1,12 +1,63 @@
-const _ = require("lodash");
-const { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy, PointsOnlyStrategy } = require("./player-strategies.js");
+import _ from "lodash";
+import { BigMoneyStrategy, SmartBigMoneyStrategy, SmartDuchyStrategy, SmartSmithyStrategy, BigMoneySmithyStrategy, PointsOnlyStrategy } from "./player-strategies";
+import Player from "./player";
+import {TStringCardMap, TSupplyMap} from "./types";
+import {ICard, IVictoryCard, ITreasureCard} from "./card";
+
 
 // for debugging
 console.debug = function() {};
 
-const Player = require("./player.js");
 
-class Game {
+interface IGameOptions {
+	numPlayers?: number;
+	humanPlayerName?: string;
+	humanPlayerIndex?: number;
+	players?: Player[];
+	supplyCards?: string[];
+};
+
+
+interface IRange {
+	start: number;
+	end: number;
+};
+
+
+export class Game {
+	// parameters passed via options
+	numPlayers: number;
+	humanPlayerName: string | null;
+	humanPlayerIndex: number;
+	hasHumanPlayer: boolean;
+
+	// core game properties
+	players: Player[];
+	supply: TSupplyMap;
+	cards: TStringCardMap;
+	trash: ICard[];
+	playArea: ICard[];
+	turn: number;
+	phase: string;
+	round: number;
+
+	// book-keeping & action
+	isGameOver: boolean;
+	treasurePot: number;
+	firstPlayBonus: any; // TODO
+	endPhaseCallback: any; // TODO
+	numGain: number;
+	numTrash: number;
+	numDiscard: number;
+	gainType: string | null;
+	discardType: string | null;
+	trashType: string | null;
+	maxGainCost: number;
+	trashName: string | null;
+	discardRange: IRange | null;
+	winArr: Player[];
+	canCleanupActionStack: boolean;
+
 	/**
 	 * Game will *automatically* be created with random AI unless the human parameters are passed
 	 *
@@ -17,7 +68,7 @@ class Game {
 	 * 		- players: array of players to use; length should == numPlayers
 	 * 		- supplyCards: array of strings of cards to include in supply. can be any length and automatically filled to 10 randomly
 	 */
-	constructor(options) {
+	constructor(options: IGameOptions) {
 		options = options || {};
 
 		/**
@@ -55,7 +106,7 @@ class Game {
 		this.humanPlayerName = options.humanPlayerName || null;
 
 		// humanPlayerIndex may be 0
-		if ("humanPlayerIndex" in options) {
+		if ("humanPlayerIndex" in options && typeof options.humanPlayerIndex !== "undefined") {
 			this.humanPlayerIndex = options.humanPlayerIndex;
 			this.hasHumanPlayer = true;
 		} else {
@@ -125,7 +176,7 @@ class Game {
 
 		this.winArr = [];
 
-		this.setup(options.players, options.supplyCards);
+		this.setup(options.players || null, options.supplyCards || null);
 	}
 
 	/** *************** CARD EFFECTS **************** */
@@ -150,7 +201,7 @@ class Game {
 	 * Draw 3 cards
 	 * @param {number} playerIndex
 	 */
-	smithyCardEffect(playerIndex) {
+	smithyCardEffect(playerIndex: number) {
 		this.drawCards(playerIndex, 3);
 		return {};
 	}
@@ -160,7 +211,7 @@ class Game {
 	 * Each player (including you)
 	 * reveals the top card of his deck and either discards it or puts it back, your choice.
 	 */
-	spyCardEffect(playerIndex) {
+	spyCardEffect(playerIndex: number) {
 		// +1 card
 		this.drawCards(playerIndex, 1);
 		// reveal 1 card for each player
@@ -171,15 +222,18 @@ class Game {
 			/**
 			 * After playing the spy card (in the spy phase) can set the spy choice
 			 * Acceptable choices are "discard" and "deck"
-			 * @param {any} choices Map from player index to choice: "discard" or "deck"
+			 * @param {any} choices map from player index to choice: "discard" or "deck"
 			 */
-			(spyChoices) => {
+			(spyChoices: any) => {
 				if (!spyChoices) {
 					throw new Error("Spy choices expected in spy callback to endActionCardPhase");
 				}
 
 				for (let i = 0; i < this.numPlayers; i++) {
 					const card = this.players[i].revealedCards.pop();
+					if(!card) {
+						throw new Error("no revealed cards with spy");
+					}
 					if (spyChoices[i] === "deck") {
 						this.players[i].deck.push(card);
 					} else {
@@ -200,7 +254,7 @@ class Game {
 	 * They discard the other revealed cards.
 	 * @param {number} playerIndex
 	 */
-	thiefCardEffect(playerIndex) {
+	thiefCardEffect(playerIndex: number) {
 		for(let i = 0; i < this.numPlayers; i++) {
 			if(i != playerIndex) {
 				// reveal top 2 cards from OTHER players
@@ -213,9 +267,9 @@ class Game {
 			 * After playing the thief card (in the thief phase) can set the thief choice
 			 * For each player specify which treasure cards (if any) to trash
 			 * For the trashed cards, specify if they should be trashed or gained
-			 * @param {any} choices Map from player index to {index: <number>, action: "trash" | "gain"}
+			 * @param {any} choices map from player index to {index: <number>, action: "trash" | "gain"}
 			 */
-			(choices) => {
+			(choices: any) => {
 				for(let i = 0; i < this.numPlayers; i++) {
 					if(choices[i]) {
 						let j = choices[i].index;
@@ -239,7 +293,9 @@ class Game {
 					// discard all revealed cards that haven't been trashed/gained
 					while(this.players[i].revealedCards.length > 0) {
 						let card = this.players[i].revealedCards.pop();
-						this.players[i].discard.push(card);
+						if(card) {
+							this.players[i].discard.push(card);
+						}
 					}
 				}
 			}
@@ -252,7 +308,7 @@ class Game {
 	 * +1 action
 	 * @param {number} playerIndex
 	 */
-	laboratoryCardEffect(playerIndex) {
+	laboratoryCardEffect(playerIndex: number) {
 		this.drawCards(playerIndex, 2);
 		return {
 			actions: 1,
@@ -264,7 +320,7 @@ class Game {
 	 * +1 buy
 	 * +2 gold
 	 */
-	festivalCardEffect() {
+	festivalCardEffect(playerIndex: number) {
 		return {
 			actions: 2,
 			buys: 1,
@@ -276,7 +332,7 @@ class Game {
 	 * +2 actions
 	 * +1 card
 	 */
-	villageCardEffect(playerIndex) {
+	villageCardEffect(playerIndex: number) {
 		this.drawCards(playerIndex, 1);
 		return {
 			actions: 2,
@@ -286,7 +342,7 @@ class Game {
 	/**
 	 * +1 buy, +2 gold
 	 */
-	woodcutterCardEffect() {
+	woodcutterCardEffect(playerIndex: number) {
 		return {
 			buys: 1,
 			gold: 2
@@ -297,7 +353,7 @@ class Game {
 	 * Trash a card from your hand.
 	 * Gain a card costing up to $2 more than the trashed card.
 	 */
-	remodelCardEffect() {
+	remodelCardEffect(playerIndex: number) {
 		this.changePhaseUsingActionCard("trash", {
 			numTrash: 1,
 			trashType: "any",
@@ -322,7 +378,7 @@ class Game {
 	 * +1 card, +1 action, +1 buy, +1 gold
 	 * @param {number} playerIndex
 	 */
-	marketCardEffect(playerIndex) {
+	marketCardEffect(playerIndex: number) {
 		this.drawCards(playerIndex, 1);
 		return {
 			actions: 1,
@@ -335,7 +391,7 @@ class Game {
 	 * Trash a Copper from your hand. If you do, +$3.
 	 * @param {number} playerIndex
 	 */
-	moneylenderCardEffect() {
+	moneylenderCardEffect(playerIndex: number) {
 		const trashCount = this.trash.length;
 		this.changePhaseUsingActionCard("trash", {
 			trashName: "copper",
@@ -356,7 +412,7 @@ class Game {
 	 * discard the set aside cards after you finish drawing.
 	 * @param {number} playerIndex
 	 */
-	libraryCardEffect(playerIndex) {
+	libraryCardEffect(playerIndex: number) {
 		const numCardsInHand = this.players[playerIndex].hand.length;
 		this.drawCards(playerIndex, 7 - numCardsInHand);
 		this.changePhaseUsingActionCard("discard", {
@@ -374,7 +430,7 @@ class Game {
 	 * NOTE: this card is not in the standard set
 	 * +1 card, +1 action, +1 gold if you play a silver this turn
 	 */
-	merchantCardEffect(playerIndex) {
+	merchantCardEffect(playerIndex: number) {
 		this.drawCards(playerIndex, 1);
 		return {
 			actions: 1,
@@ -390,7 +446,7 @@ class Game {
 	 * +4 Cards; +1 Buy
 	 * Each other player draws a card.
 	 */
-	councilRoomCardEffect(playerIndex) {
+	councilRoomCardEffect(playerIndex: number) {
 		for(let i = 0; i < this.numPlayers; i++) {
 			if(i != playerIndex) {
 				this.drawCard(i);
@@ -405,7 +461,7 @@ class Game {
 	/**
 	 * trash 4 cards
 	 */
-	chapelCardEffect() {
+	chapelCardEffect(playerIndex: number) {
 		this.changePhaseUsingActionCard("trash", {
 			numTrash: 4,
 			trashType: "any"
@@ -417,7 +473,7 @@ class Game {
 	 * +2 Cards
 	 * Each other player gains a Curse card.
 	 */
-	witchCardEffect(playerIndex) {
+	witchCardEffect(playerIndex: number) {
 		for (let i = 0; i < 2; i++) {
 			this.drawCard(playerIndex);
 		}
@@ -432,7 +488,7 @@ class Game {
 	/**
 	 * Gain a card costing up to $4.
 	 */
-	workshopCardEffect() {
+	workshopCardEffect(playerIndex: number) {
 		this.changePhaseUsingActionCard("gain", {
 			maxGainCost: 4,
 			gainType: "any",
@@ -445,7 +501,7 @@ class Game {
 	 * Trash a Treasure card from your hand.
 	 * Gain a Treasure card costing up to $3 more; put it into your hand.
 	 */
-	mineCardEffect() {
+	mineCardEffect(playerIndex: number) {
 		this.changePhaseUsingActionCard("trash", {
 			numTrash: 1,
 			trashType: "treasure"
@@ -469,7 +525,7 @@ class Game {
 	 * Trash this card. Gain a card costing up to $5.
 	 * @param {number} playerIndex
 	 */
-	feastCardEffect() {
+	feastCardEffect(playerIndex: number) {
 		this.changePhaseUsingActionCard("gain", {
 			maxGainCost: 5,
 			gainType: "any",
@@ -486,7 +542,7 @@ class Game {
 	 * +1 Card per card discarded.
 	 * @param {number} playerIndex
 	 */
-	cellarCardEffect(playerIndex) {
+	cellarCardEffect(playerIndex: number) {
 		const discardPileSizeStart = this.players[playerIndex].discard.length;
 		this.changePhaseUsingActionCard("discard", {
 			// means functionally unlimited
@@ -507,13 +563,13 @@ class Game {
 	 * @param {number} playerIndex
 	 * @returns {number} number of points to add
 	 */
-	gardensCardEffect(playerIndex) {
+	gardensCardEffect(playerIndex: number) {
 		const player = this.players[playerIndex];
 		const numCards = player.hand.length + player.discard.length + player.deck.length;
 		return Math.floor(numCards / 10);
 	}
 
-	militiaCardEffect() {
+	militiaCardEffect(playerIndex: number) {
 		throw new Error("not implemented");
 	// for(let i = 0; i < this.numPlayers; i++) {
 	// 	if(i != playerIndex) {
@@ -527,13 +583,13 @@ class Game {
 	 * Each other player reveals a Victory card from his hand and puts it on his deck
 	 * (or reveals a hand with no Victory cards).
 	 */
-	bureaucratCardEffect(playerIndex) {
+	bureaucratCardEffect(playerIndex: number) {
 		this.gainCard("silver", playerIndex, {location: "deck-top"});
 
 		// TODO - right now automatically reveals the 1st victory card found in hand...
 		// rather than have player choose
 		// this player has revealed a card
-		const r = {};
+		const r = {} as any;
 		for(let i = 0; i < this.numPlayers; i++) {
 			if(i === playerIndex) {
 				continue;
@@ -556,6 +612,9 @@ class Game {
 						let player = this.players[i];
 						// take the
 						let card = player.revealedCards.pop();
+						if(!card) {
+							throw new Error("no revealed cards for bureaucrat");
+						}
 						player.deck.push(card);
 					}
 				}
@@ -569,7 +628,7 @@ class Game {
 	 * +$2
 	 * You may immediately put your deck into your discard pile.
 	 */
-	chancellorCardEffect() {
+	chancellorCardEffect(playerIndex: number) {
 		this.changePhaseUsingActionCard("discard-deck", {}, () => {
 		});
 		return {
@@ -581,10 +640,13 @@ class Game {
 	 * Reveal cards from your deck until you reveal 2 Treasure cards.
 	 * Put those Treasure cards in your hand and discard the other revealed cards.
 	 */
-	adventurerCardEffect(playerIndex) {
+	adventurerCardEffect(playerIndex: number) {
 		let numTreasures = 0;
 		while(numTreasures < 2) {
 			let card = this.drawCard(playerIndex, true);
+			if(!card) {
+				throw new Error("failed to draw using adventurer");
+			}
 			if(card.type === "treasure") {
 				numTreasures++;
 			}
@@ -593,6 +655,9 @@ class Game {
 			const player = this.players[playerIndex];
 			while(player.revealedCards.length > 0) {
 				let card = player.revealedCards.pop();
+				if(!card) {
+					throw new Error("no revealed cards");
+				}
 				if(card.type === "treasure") {
 					player.hand.push(card);
 				} else {
@@ -609,7 +674,7 @@ class Game {
 	 * Initialize mapping of card names to cards.
 	 */
 	initCards() {
-		const cards = {};
+		const cards = {} as TStringCardMap;
 
 		// treasures
 		cards.copper = {
@@ -841,7 +906,7 @@ class Game {
 			name: "moat",
 			cost: 2,
 			type: "action",
-			reaction: true,
+			isReaction: true,
 			effect: () => {}
 		};
 
@@ -850,7 +915,7 @@ class Game {
 			name: "militia",
 			cost: 4,
 			type: "action",
-			attack: true,
+			isAttack: true,
 			effect: militiaEffect
 		};
 
@@ -871,8 +936,8 @@ class Game {
 	 * @param {string[] | null} kingdomCardPiles
 	 * @returns {any} mapping of card names to their quantity
 	 */
-	initSupply(numPlayers, kingdomCardPiles) {
-		const supply = {};
+	initSupply(numPlayers: number, kingdomCardPiles: string[] | null) {
+		const supply = {} as TSupplyMap;
 		kingdomCardPiles = kingdomCardPiles || [];
 
 		// treasure cards
@@ -987,7 +1052,7 @@ class Game {
 	 *
 	 * @param {Player[] | null} players
 	 */
-	initPlayers(players) {
+	initPlayers(players: Player[] | null) {
 		// not all of these will play
 		const aiPlayers = [
 			new Player(
@@ -1027,6 +1092,9 @@ class Game {
 			if (players && players.length > i) {
 				p = players[i];
 			} else if (this.hasHumanPlayer && this.humanPlayerIndex === i) {
+				if(!this.humanPlayerName) {
+					throw new Error("must specify human player name when humanPlayerIndex is set");
+				}
 				p = new Player(
 					this.humanPlayerName,
 					null,
@@ -1070,7 +1138,7 @@ class Game {
 	 * @returns {Card} card object on success
 	 * @throws Error when pile empty
 	 */
-	takeCard(cardName, playerIndex) {
+	takeCard(cardName: string, playerIndex: number) {
 		if (this.supply[cardName] === 0) {
 			throw new Error(`Cannot take ${cardName} from deck, pile empty`);
 		}
@@ -1081,7 +1149,7 @@ class Game {
 
 		// points are added on here
 		if (card.type === "victory") {
-			player.points += card.points;
+			player.points += (card as IVictoryCard).points;
 		}
 
 		return card;
@@ -1116,7 +1184,9 @@ class Game {
 	 * @param {any} params
 	 * @param {callable} callback
 	 */
-	changePhaseUsingActionCard(phaseName, params, callback) {
+	changePhaseUsingActionCard(phaseName: string, params: any, callback?: any) {
+		callback = callback || null;
+
 		this.canCleanupActionStack = false;
 		this.phase = phaseName;
 		if(params.maxGainCost) {
@@ -1154,7 +1224,9 @@ class Game {
 	 * Pass options to the callback for that action card
 	 * @param {any} endPhaseOptions
 	 */
-	endActionCardPhase(endPhaseOptions) {
+	endActionCardPhase(endPhaseOptions?: any) {
+		endPhaseOptions = endPhaseOptions || {};
+
 		this.canCleanupActionStack = true;
 		if (this.endPhaseCallback) {
 			this.endPhaseCallback(endPhaseOptions);
@@ -1194,7 +1266,7 @@ class Game {
 	 * @param {boolean} addToRevealed If true, instead of adding the card to hand, add to the revealed cards
 	 * @returns {Card} Return the card that was drawn
 	 */
-	drawCard(playerIndex, addToRevealed) {
+	drawCard(playerIndex: number, addToRevealed?: boolean): ICard | null {
 		addToRevealed = addToRevealed || false;
 
 		const player = this.players[playerIndex];
@@ -1206,7 +1278,7 @@ class Game {
 		}
 
 		if (player.deck.length === 0) {
-			return false;
+			return null;
 		}
 
 		const card = player.deck.pop();
@@ -1236,11 +1308,12 @@ class Game {
 	 * @param {Player[] | null} players
 	 * @param {string[] | null} supplyCards
 	 */
-	setup(players, supplyCards) {
+	setup(players: Player[] | null, supplyCards: string[] | null) {
 		this.cards = this.initCards();
 		this.supply = this.initSupply(this.numPlayers, supplyCards);
 		this.initPlayers(players);
 		this.dealHands();
+		console.debug("Setup complete.");
 	}
 
 	/**
@@ -1249,7 +1322,7 @@ class Game {
 	 * @param {number} playerIndex
 	 * @returns {Card}
 	 */
-	gainCardWithCheck(cardName, playerIndex) {
+	gainCardWithCheck(cardName: string, playerIndex: number) {
 		if(this.phase !== "gain") {
 			throw new Error(`Cannot gain cards outside of gain phase - phase is ${this.phase}`);
 		}
@@ -1277,7 +1350,9 @@ class Game {
 	 * @param {any} options {location: "deck-top"} supported
 	 * @returns {Card}
 	 */
-	gainCard(cardName, playerIndex, options) {
+	gainCard(cardName: string, playerIndex: number, options?: any): ICard {
+		options = options || {};
+
 		const player = this.players[playerIndex];
 		const card = this.takeCard(cardName, playerIndex);
 		if (card === null) {
@@ -1301,7 +1376,7 @@ class Game {
 	 * @param {number} playerIndex
 	 * @throws An error on various failures {boolean}
 	 */
-	buyCard(cardName, playerIndex) {
+	buyCard(cardName: string, playerIndex: number) {
 		if(this.phase !== "buy") {
 			throw new Error("cannot buy cards outside of buy phase");
 		}
@@ -1329,7 +1404,7 @@ class Game {
 	 * Current player plays a treasure card
 	 * @param {number} cardIndex
 	 */
-	playTreasureCard(cardIndex) {
+	playTreasureCard(cardIndex: number) {
 		if(this.phase !== "buy") {
 			throw new Error(`cannot play treasure cards outside the buy phase (${this.phase} phase)`);
 		}
@@ -1342,7 +1417,7 @@ class Game {
 			this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
 			delete this.firstPlayBonus[card.name];
 		}
-		this.treasurePot += card.value;
+		this.treasurePot += (card as ITreasureCard).value;
 		console.debug(`Player ${player.name} played treasure ${card.name}. Treasure pot now ${this.treasurePot}`);
 		player.discard.push(card);
 	}
@@ -1351,14 +1426,14 @@ class Game {
 	 * For now, this only checks the province pile
 	 * @returns {boolean}
 	 */
-	checkGameEnd() {
+	checkGameEnd(): boolean {
 		return this.supply.province === 0;
 	}
 
 	/**
 	 * Run the game to completion. If the game is over, return the winning players
 	 */
-	playGame() {
+	playGame(): Player[] {
 		while (!this.isGameOver) {
 			this.doTurn();
 		}
@@ -1416,9 +1491,10 @@ class Game {
 			throw new Error(`cannot end turn in ${this.phase} phase`);
 		}
 
-		this.phase = "cleanup";
-
 		const player = this.players[this.turn];
+		console.debug(`Player ${player.name} is ending their turn. Cleaning up.`);
+
+		this.phase = "cleanup";
 
 		player.numActions = 0;
 		player.numBuys = 0;
@@ -1439,6 +1515,7 @@ class Game {
 			this.calculateGameEnd();
 		} else {
 			this.turn = (this.turn + 1) % this.numPlayers;
+			console.debug(`Starting turn for player ${player.name}`);
 		}
 
 		this.phase = "draw";
@@ -1448,7 +1525,7 @@ class Game {
 	 * Put entire deck into discard stack
 	 * @param {Player} player
 	 */
-	discardDeck(player) {
+	discardDeck(player: Player) {
 		if(this.phase !== "discard-deck") {
 			throw new Error("cannot discard deck outside of discard-deck phase");
 		}
@@ -1464,7 +1541,7 @@ class Game {
 	 * @param {boolean} noVerify - whether to run checks
 	 * @returns {Card[]} trashed cards
 	 */
-	trashCards(player, cardIndexes, noVerify) {
+	trashCards(player: Player, cardIndexes: number[], noVerify?: boolean): ICard[] {
 		noVerify = noVerify || false;
 		const runChecks = !noVerify;
 		if(runChecks && this.phase !== "trash") {
@@ -1498,7 +1575,7 @@ class Game {
 	 * @param {Player} player
 	 * @param {number[]} cardIndexes
 	 */
-	discardCards(player, cardIndexes) {
+	discardCards(player: Player, cardIndexes: number[]) {
 		if(this.phase !== "discard") {
 			throw new Error("Can only discard cards in discard phase");
 		}
@@ -1512,8 +1589,8 @@ class Game {
 
 		// reverse order
 		for(let cardIndex of cardIndexes) {
-			if(this.discardRange && (cardIndex < this.discardRange.min || cardIndex >= this.discardRange.max)) {
-				throw new Error(`discard range is [${this.discardRange.min}, ${this.discardRange.max}). Tried to discard at index ${cardIndex}`);
+			if(this.discardRange && (cardIndex < this.discardRange.start || cardIndex >= this.discardRange.end)) {
+				throw new Error(`discard range is [${this.discardRange.start}, ${this.discardRange.end}). Tried to discard at index ${cardIndex}`);
 			}
 			const card = player.hand[cardIndex];
 			if(this.discardType != "any" && this.discardType != card.type) {
@@ -1528,7 +1605,7 @@ class Game {
 	 * @param {number} playerIndex
 	 * @param {number} numCards
 	 */
-	drawCards(playerIndex, numCards) {
+	drawCards(playerIndex: number, numCards: number) {
 		for(let i = 0; i < numCards; i++) {
 			this.drawCard(playerIndex);
 		}
@@ -1543,7 +1620,7 @@ class Game {
 	 * @param {Card} card
 	 * @returns {any} Effect of the card
 	 */
-	playActionCard(player, playerIndex, card) {
+	playActionCard(player: Player, playerIndex: number, card: ICard) {
 		if(this.phase !== "action") {
 			throw new Error(`cannot play action cards outside of action phase (${this.phase} phase)`);
 		}
@@ -1552,7 +1629,7 @@ class Game {
 			throw new Error("card cannot be null");
 		}
 
-		if(this.numActions === 0) {
+		if(player.numActions === 0) {
 			throw new Error("no more actions!");
 		}
 
@@ -1617,10 +1694,14 @@ class Game {
 	 */
 	doTurn() {
 		if (this.isGameOver) {
+			console.warn("Cannot do turn when the game is over - nothing to do");
 			return;
 		}
 
-		if(this.turn === this.humanPlayerIndex) {
+		const p = this.turn;
+		const player = this.players[p];
+
+		if(this.turn === this.humanPlayerIndex || !player.strategy) {
 			throw new Error("Cannot automate human player turn");
 		}
 
@@ -1628,7 +1709,6 @@ class Game {
 			throw new Error(`Cannot call doTurn in phase ${this.phase}`);
 		}
 
-		const p = this.turn;
 		if (p === 0) {
 			this.round++;
 			console.debug("");
@@ -1638,21 +1718,19 @@ class Game {
 		// draw a card and automatically transition to next phase
 		this.drawPhase();
 
-		const player = this.players[p];
-
 		while (player.numActions > 0) {
 			const card = player.strategy.actionTurn(player);
 			if (card) {
 				console.debug(`Player ${player.name} played action card ${card.name} on round ${this.round}`);
 				const effect = this.playActionCard(player, p, card);
-				while(this.phase !== "action") {
-					if (this.phase === "gain") {
+				while((this.phase as string) !== "action") {
+					if ((this.phase as string) === "gain") {
 						const gainCardName = player.strategy.gainCard(player, this.maxGainCost);
 						if (gainCardName) {
 							this.gainCardWithCheck(gainCardName, p);
 							console.debug(`Player ${player.name} gained card ${gainCardName}`);
 						}
-					} else if (this.phase === "trash") {
+					} else if ((this.phase as string) === "trash") {
 						const trashCardIndexes = player.strategy.trashCardForGain(
 							player,
 							effect.gainBonusCost,
@@ -1672,16 +1750,16 @@ class Game {
 		}
 		this.endActionPhase();
 
-		if(this.phase !== "buy") {
+		if((this.phase as string) !== "buy") {
 			throw new Error(`should be buy phase after action phase, got ${this.phase} phase`);
 		}
 
 		// buy phase
 		while (player.numBuys > 0) {
-			let treasureCards = player.strategy.playTreasures(player, this.supply, this.treasurePot);
+			let treasureCards = player.strategy.playTreasures(player, this.supply, this.cards, this.treasurePot);
 			// sort in reverse order, in place
 			// reverse order to keep indexes valid
-			treasureCards.sort((a, b) => {
+			treasureCards.sort((a: number, b: number) => {
 				return b - a;
 			});
 			for(let cardIndex of treasureCards) {
@@ -1702,5 +1780,3 @@ class Game {
 		this.endTurn();
 	}
 }
-
-module.exports = Game;

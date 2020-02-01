@@ -1,4 +1,11 @@
-class PlayerStrategy {
+import {ICard, IVictoryCard, ITreasureCard} from "./card";
+import Player, {IPlayerStrategy} from "./player";
+import { TSupplyMap, TStringCardMap } from "./types";
+
+
+export class PlayerStrategy implements IPlayerStrategy {
+	buyGoalCard: string | null;
+
 	/**
 	 * @param {string} name
 	 */
@@ -18,11 +25,11 @@ class PlayerStrategy {
 	 * @param {number} numCards
 	 * @returns {number[]} indices
 	 */
-	trashCards(player, numCards) {
+	trashCards(player: Player, numCards: number): number[] {
 		const trash = [];
 
 		for(let i = 0; i < player.hand.length; i++) {
-			if(player.hand[i].type === "treasure" && player.hand[i].points < 0 && trash.length < numCards) {
+			if(player.hand[i].type === "victory" && (player.hand[i] as IVictoryCard).points < 0 && trash.length < numCards) {
 				trash.push(i);
 			}
 			if(player.hand[i].name === "copper" && trash.length < numCards) {
@@ -33,13 +40,17 @@ class PlayerStrategy {
 		return trash;
 	}
 
+	trashCardForGain(player: Player, gainBonusCost: number, trashType: string | null, gainType: string): number[] {
+		throw new Error("implement in subclass");
+	}
+
 	/**
 	 * A basic implementation of gaining cards
 	 * @param {Player} player
 	 * @param {number} maxGainCost
-	 * @returns {string}
+	 * @returns {string | null}
 	 */
-	gainCard(player, maxGainCost) {
+	gainCard(player: Player, maxGainCost: number): string | null {
 		if (maxGainCost >= 3) {
 			return "silver";
 		}
@@ -47,35 +58,36 @@ class PlayerStrategy {
 	}
 
 	/**
-	 * @returns {Card}
+	 * @returns {Card | null}
 	 */
-	actionTurn() {
+	actionTurn(player: Player): ICard | null {
 		throw new Error("must subclass");
 	}
 
 	/**
 	 * @param {Player} player
-	 * @param {any} supply
+	 * @param {TSupplyMap} supply
+	 * @param {TStringCardMap} cards
 	 * @param {number} treasurePot
 	 * @returns {number[]} array of card indexes
 	 */
-	playTreasures(player, supply, treasurePot) {
-		const cardName = this.getBuyGoal(player, supply, treasurePot);
+	playTreasures(player: Player, supply: TSupplyMap, cards: TStringCardMap, treasurePot: number): number[] {
+		this.buyGoalCard = this.getBuyGoal(player, supply, treasurePot);
 
 		if(!supply) {
 			throw new Error("supply not set");
 		}
 
-		this.buyGoalCard = cardName;
 		const treasures = [];
 
 		if (this.buyGoalCard) {
-			const buyGoalCost = supply[cardName].cost;
+			console.debug(`AI player ${player.name} trying to buy ${this.buyGoalCard}`);
+			const buyGoalCost = cards[this.buyGoalCard].cost;
 			let total = 0;
 			for(let i = 0; i < player.hand.length; i++) {
 				let card = player.hand[i];
 				if (card.type === "treasure") {
-					total += card.value;
+					total += (card as ITreasureCard).value;
 					treasures.push(i);
 				}
 				if (total >= buyGoalCost) {
@@ -87,32 +99,32 @@ class PlayerStrategy {
 	}
 
 	/**
-	 * @returns {string}
+	 * @returns {string | null}
 	 */
-	buyTurn() {
+	buyTurn(player: Player, supply: TSupplyMap, treasurePot: number): string | null {
 		return this.buyGoalCard;
 	}
 
-	getBuyGoal() {
+	getBuyGoal(player: Player, supply: TSupplyMap, treasurePot: number): string | null {
 		throw new Error("must subclass");
 	}
 }
 
 
-class BigMoneyStrategy extends PlayerStrategy {
+export class BigMoneyStrategy extends PlayerStrategy {
 
 	/**
-	 * @returns {Card}
+	 * @returns {Card | null}
 	 */
-	actionTurn() {
+	actionTurn(player: Player): ICard | null {
 		return null;
 	}
 
 	/**
 	 * @param {Player} player
-	 * @returns {string}
+	 * @returns {string | null}
 	 */
-	getBuyGoal(player, supply, treasurePot) {
+	getBuyGoal(player: Player, supply: any, treasurePot: number): string | null {
 		const money = player.getMoneyInHand() + treasurePot;
 
 		if (money >= 8) {
@@ -130,22 +142,26 @@ class BigMoneyStrategy extends PlayerStrategy {
 /**
  * Same as big money, but buy duchies near the end
  */
-class SmartBigMoneyStrategy extends PlayerStrategy {
+export class SmartBigMoneyStrategy extends PlayerStrategy {
 
 	/**
-	 * @returns {Card}
+	 * @returns {Card | null}
 	 */
-	actionTurn() {
+	actionTurn(player: Player): ICard | null {
 		return null;
 	}
 
 	/**
 	 * @param {Player} player
+<<<<<<< HEAD:src/player-strategies.js
 	 * @param {any} supply Map from card name to number of cards of that type left
+=======
+	 * @param {any} supply map from card name to number of cards of that type left
+>>>>>>> react:src/player-strategies.ts
 	 * @param {number} treasurePot
 	 * @returns {string | null}
 	 */
-	getBuyGoal(player, supply, treasurePot) {
+	getBuyGoal(player: Player, supply: any, treasurePot: number): string | null {
 		const money = player.getMoneyInHand() + treasurePot;
 
 		// should make sure that these piles exist first, but whatevs...
@@ -172,13 +188,13 @@ class SmartBigMoneyStrategy extends PlayerStrategy {
  * Always go for silver when you have 3
  * Go for gold when you have 6, if there are 4 or more provinces left, otherwise buy a duchy
  */
-class SmartDuchyStrategy extends PlayerStrategy {
+export class SmartDuchyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
 	 * @returns {Card | null}
 	 */
-	actionTurn(player) {
+	actionTurn(player: Player): ICard | null {
 		// if I have an action card, play it
 		for (let i = 0; i < player.hand.length; i++) {
 			if (player.hand[i].type === "action") {
@@ -191,10 +207,14 @@ class SmartDuchyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
+<<<<<<< HEAD:src/player-strategies.js
 	 * @param {any} supply Map from card name to number of cards of that type left
+=======
+	 * @param {any} supply map from card name to number of cards of that type left
+>>>>>>> react:src/player-strategies.ts
 	 * @returns {string | null}
 	 */
-	getBuyGoal(player, supply, treasurePot) {
+	getBuyGoal(player: Player, supply: any, treasurePot: number): string | null {
 		const money = player.getMoneyInHand() + treasurePot;
 
 		if (money >= 8 && supply.province > 0) {
@@ -216,7 +236,11 @@ class SmartDuchyStrategy extends PlayerStrategy {
 	}
 }
 
-class SmartSmithyStrategy extends PlayerStrategy {
+export class SmartSmithyStrategy extends PlayerStrategy {
+	avgValue: number;
+	numCards: number;
+	provinceCutoff: number;
+
 	constructor() {
 		super();
 
@@ -225,7 +249,7 @@ class SmartSmithyStrategy extends PlayerStrategy {
 		this.provinceCutoff = 4;
 	}
 
-	addValue(v) {
+	addValue(v: number) {
 		this.avgValue = (this.numCards * this.avgValue + v) / (this.numCards + 1);
 		this.numCards++;
 	}
@@ -234,7 +258,7 @@ class SmartSmithyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {Card | null}
 	 */
-	actionTurn(player) {
+	actionTurn(player: Player): ICard | null {
 		// if I have an action card, play it
 		for (let i = 0; i < player.hand.length; i++) {
 			if (player.hand[i].type === "action") {
@@ -247,10 +271,14 @@ class SmartSmithyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
+<<<<<<< HEAD:src/player-strategies.js
 	 * @param {any} supply Map from card name to number of cards of that type left
+=======
+	 * @param {any} supply map from card name to number of cards of that type left
+>>>>>>> react:src/player-strategies.ts
 	 * @returns {string | null}
 	 */
-	getBuyGoal(player, supply, treasurePot) {
+	getBuyGoal(player: Player, supply: any, treasurePot: number): string | null {
 		const money = player.getMoneyInHand() + treasurePot;
 		const card = this.buyTurnWrapper(money, player, supply);
 		return card;
@@ -259,9 +287,13 @@ class SmartSmithyStrategy extends PlayerStrategy {
 	/**
 	 * @param {number} money
 	 * @param {Player} player
+<<<<<<< HEAD:src/player-strategies.js
 	 * @param {any} supply Map from card name to number of cards of that type left
+=======
+	 * @param {any} supply map from card name to number of cards of that type left
+>>>>>>> react:src/player-strategies.ts
 	 */
-	buyTurnWrapper(money, player, supply) {
+	buyTurnWrapper(money: number, player: Player, supply: any) {
 		// calculate the avg value of coins in my supply
 		// if the avg value is > (let's say 2)
 		//
@@ -297,7 +329,9 @@ class SmartSmithyStrategy extends PlayerStrategy {
 	}
 }
 
-class BigMoneySmithyStrategy extends PlayerStrategy {
+export class BigMoneySmithyStrategy extends PlayerStrategy {
+	numSmithy: number;
+
 	constructor() {
 		super();
 
@@ -308,7 +342,7 @@ class BigMoneySmithyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {Card | null}
 	 */
-	actionTurn(player) {
+	actionTurn(player: Player): ICard | null {
 		// if I have an action card, play it
 		for (let i = 0; i < player.hand.length; i++) {
 			if (player.hand[i].type === "action") {
@@ -323,7 +357,7 @@ class BigMoneySmithyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {string | null}
 	 */
-	getBuyGoal(player, supply, treasurePot) {
+	getBuyGoal(player: Player, supply: any, treasurePot: number): string | null {
 		const money = player.getMoneyInHand() + treasurePot;
 		// should make sure that these piles exist first, but whatevs...
 		if (money >= 8 && supply.province > 0) {
@@ -340,11 +374,11 @@ class BigMoneySmithyStrategy extends PlayerStrategy {
 	}
 }
 
-class PointsOnlyStrategy extends PlayerStrategy {
+export class PointsOnlyStrategy extends PlayerStrategy {
 	/**
-	 * @returns {Card}
+	 * @returns {Card | null}
 	 */
-	actionTurn() {
+	actionTurn(player: Player): ICard | null {
 		return null;
 	}
 
@@ -352,7 +386,7 @@ class PointsOnlyStrategy extends PlayerStrategy {
 	 * @param {Player} player
 	 * @returns {string | null}
 	 */
-	getBuyGoal(player, supply, treasurePot) {
+	getBuyGoal(player: Player, supply: any, treasurePot: number): string | null {
 		const money = player.getMoneyInHand() + treasurePot;
 
 		if (money >= 8 && supply.province > 0) {
@@ -365,13 +399,3 @@ class PointsOnlyStrategy extends PlayerStrategy {
 		return null;
 	}
 }
-
-module.exports = {
-	PlayerStrategy,
-	PointsOnlyStrategy,
-	SmartBigMoneyStrategy,
-	SmartDuchyStrategy,
-	SmartSmithyStrategy,
-	BigMoneyStrategy,
-	BigMoneySmithyStrategy
-};

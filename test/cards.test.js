@@ -1,6 +1,6 @@
-const Game = require("../src/game");
-const { SimpleTestStrategy, DoNothingStrategy } = require("./test-strategies");
-const Player = require("../src/player");
+import { Game } from "../src/game";
+import { SimpleTestStrategy, DoNothingStrategy } from "./test-strategies";
+import Player from "../src/player";
 
 describe("game", () => {
 
@@ -402,6 +402,7 @@ describe("game", () => {
 			numPlayers: 2,
 			humanPlayerIndex: 0,
 			supplyCards: supply,
+			humanPlayerName: "Joe America"
 		});
 		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
 
@@ -426,6 +427,7 @@ describe("game", () => {
 			numPlayers: 2,
 			humanPlayerIndex: 0,
 			supplyCards: supply,
+			humanPlayerName: "Joe America"
 		});
 		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
 

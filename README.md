@@ -15,7 +15,7 @@ Currently only supports standard cards. Card descriptions can be found [here](ht
 The simulation can be run headless from the command line. Run
 
 ```
-node cli.js
+ts-node cli.js
 ```
 
 The `--help` flag will give you available options.
