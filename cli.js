@@ -1,8 +1,8 @@
 /* eslint-env node */
 
 const flags = require("flags");
-const Game = require("./src/game.js");
-const Utils = require("./utils.js");
+const { Game } = require("./src/game");
+const Utils = require("./utils");
 
 flags.defineNumber(
 	"num-games",
