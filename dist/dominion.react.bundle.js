@@ -49920,9 +49920,8 @@ var lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "./node_modules
 var player_strategies_1 = __webpack_require__(/*! ./player-strategies */ "./src/player-strategies.ts");
 var player_1 = __importDefault(__webpack_require__(/*! ./player */ "./src/player.ts"));
 // for debugging
+// eslint-disable-next-line
 console.debug = function () { };
-;
-;
 var Game = /** @class */ (function () {
     /**
      * Game will *automatically* be created with random AI unless the human parameters are passed
@@ -50456,8 +50455,7 @@ var Game = /** @class */ (function () {
      * You may immediately put your deck into your discard pile.
      */
     Game.prototype.chancellorCardEffect = function (playerIndex) {
-        this.changePhaseUsingActionCard("discard-deck", {}, function () {
-        });
+        this.changePhaseUsingActionCard("discard-deck", {}, null);
         return {
             gold: 2
         };
@@ -50707,7 +50705,7 @@ var Game = /** @class */ (function () {
             cost: 2,
             type: "action",
             isReaction: true,
-            effect: function () { }
+            effect: null
         };
         var militiaEffect = this.militiaCardEffect.bind(this);
         cards.militia = {
@@ -51483,7 +51481,6 @@ exports.Game = Game;
 
 "use strict";
 
-/* eslint-env browser */
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -51931,8 +51928,8 @@ exports.PointsOnlyStrategy = PointsOnlyStrategy;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 // debugging
+// eslint-disable-next-line
 console.debug = function () { };
-;
 var Player = /** @class */ (function () {
     /**
      * @param {string} name

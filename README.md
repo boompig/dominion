@@ -1,6 +1,6 @@
 # Dominion
 
-A bare-bones simulator and visualizer for the card game [Dominion](https://boardgamegeek.com/boardgame/36218/dominion) in JavaScript. Simulator can be run headless from command-line with node.js or in the browser. Visualization powered by Vue.js (v2).
+A bare-bones simulator and visualizer for the card game [Dominion](https://boardgamegeek.com/boardgame/36218/dominion) in JavaScript. Simulator can be run headless from command-line with node.js or in the browser. Visualization powered by React.
 
 Currently only supports standard cards. Card descriptions can be found [here](https://www.ultraboardgames.com/dominion/cards.php).
 

@@ -85,7 +85,7 @@ export class PlayerStrategy implements IPlayerStrategy {
 			const buyGoalCost = cards[this.buyGoalCard].cost;
 			let total = 0;
 			for(let i = 0; i < player.hand.length; i++) {
-				let card = player.hand[i];
+				const card = player.hand[i];
 				if (card.type === "treasure") {
 					total += (card as ITreasureCard).value;
 					treasures.push(i);

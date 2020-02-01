@@ -6,6 +6,7 @@ import {ICard, IVictoryCard, ITreasureCard} from "./card";
 
 
 // for debugging
+// eslint-disable-next-line
 console.debug = function() {};
 
 
@@ -15,13 +16,13 @@ interface IGameOptions {
 	humanPlayerIndex?: number;
 	players?: Player[];
 	supplyCards?: string[];
-};
+}
 
 
 interface IRange {
 	start: number;
 	end: number;
-};
+}
 
 
 export class Game {
@@ -272,11 +273,11 @@ export class Game {
 			(choices: any) => {
 				for(let i = 0; i < this.numPlayers; i++) {
 					if(choices[i]) {
-						let j = choices[i].index;
+						const j = choices[i].index;
 						if(j > this.players[i].revealedCards.length) {
 							throw new Error(`${j} is not a valid index into revealed cards by player ${this.players[i].name}`);
 						}
-						let card = this.players[i].revealedCards[j];
+						const card = this.players[i].revealedCards[j];
 						if(card.type !== "treasure") {
 							throw new Error("selected card must be a treasure card");
 						}
@@ -292,7 +293,7 @@ export class Game {
 					}
 					// discard all revealed cards that haven't been trashed/gained
 					while(this.players[i].revealedCards.length > 0) {
-						let card = this.players[i].revealedCards.pop();
+						const card = this.players[i].revealedCards.pop();
 						if(card) {
 							this.players[i].discard.push(card);
 						}
@@ -594,10 +595,10 @@ export class Game {
 			if(i === playerIndex) {
 				continue;
 			}
-			let player = this.players[i];
+			const player = this.players[i];
 			for(let j = 0; j < player.hand.length; j++) {
 				if(player.hand[j].type === "victory") {
-					let card = player.hand.splice(j, 1)[0];
+					const card = player.hand.splice(j, 1)[0];
 					player.revealedCards.push(card);
 					r[i] = true;
 					break;
@@ -609,9 +610,9 @@ export class Game {
 			() => {
 				for(let i = 0; i < this.numPlayers; i++) {
 					if(r[i]) {
-						let player = this.players[i];
+						const player = this.players[i];
 						// take the
-						let card = player.revealedCards.pop();
+						const card = player.revealedCards.pop();
 						if(!card) {
 							throw new Error("no revealed cards for bureaucrat");
 						}
@@ -629,8 +630,7 @@ export class Game {
 	 * You may immediately put your deck into your discard pile.
 	 */
 	chancellorCardEffect(playerIndex: number) {
-		this.changePhaseUsingActionCard("discard-deck", {}, () => {
-		});
+		this.changePhaseUsingActionCard("discard-deck", {}, null);
 		return {
 			gold: 2
 		};
@@ -643,7 +643,7 @@ export class Game {
 	adventurerCardEffect(playerIndex: number) {
 		let numTreasures = 0;
 		while(numTreasures < 2) {
-			let card = this.drawCard(playerIndex, true);
+			const card = this.drawCard(playerIndex, true);
 			if(!card) {
 				throw new Error("failed to draw using adventurer");
 			}
@@ -654,7 +654,7 @@ export class Game {
 		this.changePhaseUsingActionCard("adventurer", {}, () => {
 			const player = this.players[playerIndex];
 			while(player.revealedCards.length > 0) {
-				let card = player.revealedCards.pop();
+				const card = player.revealedCards.pop();
 				if(!card) {
 					throw new Error("no revealed cards");
 				}
@@ -907,7 +907,7 @@ export class Game {
 			cost: 2,
 			type: "action",
 			isReaction: true,
-			effect: () => {}
+			effect: null
 		};
 
 		const militiaEffect = this.militiaCardEffect.bind(this);
@@ -1006,15 +1006,15 @@ export class Game {
 			"merchant"
 		]);
 
-		for(let cardName of kingdomCardPiles) {
-			let i = implementedKingdomCards.indexOf(cardName);
+		for(const cardName of kingdomCardPiles) {
+			const i = implementedKingdomCards.indexOf(cardName);
 			// find the card
 			if(i === -1) {
 				throw new Error(`Could not find card ${cardName} in card names, possibly not implemented`);
 			}
 			// remove from array
 			implementedKingdomCards.splice(i, 1);
-			let j = baseKingdomCards.indexOf(cardName);
+			const j = baseKingdomCards.indexOf(cardName);
 			if(j >= 0) {
 				baseKingdomCards.splice(j, 1);
 			}
@@ -1029,7 +1029,7 @@ export class Game {
 			throw new Error(`Piles must be exactly of size 10 in setup, found ${piles.length}`);
 		}
 
-		for(let cardName of piles) {
+		for(const cardName of piles) {
 			const card = this.cards[cardName];
 			if(!card) {
 				throw new Error(`Failed to find card ${cardName}`);
@@ -1102,7 +1102,7 @@ export class Game {
 				);
 			} else {
 				// inclusive
-				let j = _.random(0, aiPlayers.length - 1);
+				const j = _.random(0, aiPlayers.length - 1);
 				p = aiPlayers.splice(j, 1)[0];
 			}
 			this.players[i] = p;
@@ -1112,14 +1112,14 @@ export class Game {
 		for (let p = 0; p < this.numPlayers; p++) {
 			// 3 estates and 7 coppers
 			for (let i = 0; i < 3; i++) {
-				let card = this.takeCard("estate", p);
+				const card = this.takeCard("estate", p);
 				if(!card) {
 					throw new Error("took null estate card");
 				}
 				this.players[p].deck.push(card);
 			}
 			for (let j = 0; j < 7; j++) {
-				let card = this.takeCard("copper", p);
+				const card = this.takeCard("copper", p);
 				if(!card) {
 					throw new Error("took null copper card");
 				}
@@ -1331,7 +1331,7 @@ export class Game {
 			throw new Error("cannot gain any more cards");
 		}
 
-		let gainCard = this.cards[cardName];
+		const gainCard = this.cards[cardName];
 		if(gainCard.cost > this.maxGainCost) {
 			throw new Error(`Action card allowed you to gain a card costing up to ${this.maxGainCost} but you tried to gain a card costing ${gainCard.cost}`);
 		}
@@ -1444,18 +1444,18 @@ export class Game {
 		// trigger all the effects for cards
 		for (let playerIndex = 0; playerIndex < this.numPlayers; playerIndex++) {
 			// reset points for this player
-			let player = this.players[playerIndex];
+			const player = this.players[playerIndex];
 			player.points = 0;
 
-			let allCards = player.hand.concat(player.discard, player.deck);
-			for(let card of allCards) {
+			const allCards = player.hand.concat(player.discard, player.deck);
+			for(const card of allCards) {
 				if(card.type === "victory" && card.points) {
 					console.debug(`Added points to player ${player.name} due to ${card.name}`);
 					player.points += card.points;
 				}
 
 				if(card.type === "victory" && card.pointsEffect) {
-					let bonusPoints = card.pointsEffect(playerIndex);
+					const bonusPoints = card.pointsEffect(playerIndex);
 					console.debug(`Added ${bonusPoints} points to player ${player.name} due to gardens card`);
 					player.points += bonusPoints;
 				}
@@ -1555,7 +1555,7 @@ export class Game {
 		cardIndexes.sort((a, b) => {
 			return b - a;
 		});
-		for(let cardIndex of cardIndexes) {
+		for(const cardIndex of cardIndexes) {
 			const card = player.hand.splice(cardIndex, 1)[0];
 			if(runChecks && this.trashType !== "any" && card.type !== this.trashType) {
 				throw new Error(`Can only trash cards of type ${this.trashType} but tried to trash card of type ${card.type}`);
@@ -1588,7 +1588,7 @@ export class Game {
 		});
 
 		// reverse order
-		for(let cardIndex of cardIndexes) {
+		for(const cardIndex of cardIndexes) {
 			if(this.discardRange && (cardIndex < this.discardRange.start || cardIndex >= this.discardRange.end)) {
 				throw new Error(`discard range is [${this.discardRange.start}, ${this.discardRange.end}). Tried to discard at index ${cardIndex}`);
 			}
@@ -1650,16 +1650,16 @@ export class Game {
 		}
 		player.numActions += cardEffect.actions || 0;
 		player.numBuys += cardEffect.buys || 0;
-		let sendToTrash = cardEffect.sendToTrash || false;
+		const sendToTrash = cardEffect.sendToTrash || false;
 		this.treasurePot += cardEffect.gold || 0;
-		let firstPlayBonus = cardEffect.firstPlayBonus || {};
-		for(let cardName in firstPlayBonus) {
+		const firstPlayBonus = cardEffect.firstPlayBonus || {};
+		for(const cardName in firstPlayBonus) {
 			this.firstPlayBonus[cardName] = firstPlayBonus[cardName];
 		}
 
 		if(sendToTrash) {
 			this.trash.push(card);
-			let i = this.playArea.indexOf(card);
+			const i = this.playArea.indexOf(card);
 			this.playArea.splice(i, 1);
 		}
 
@@ -1756,17 +1756,17 @@ export class Game {
 
 		// buy phase
 		while (player.numBuys > 0) {
-			let treasureCards = player.strategy.playTreasures(player, this.supply, this.cards, this.treasurePot);
+			const treasureCards = player.strategy.playTreasures(player, this.supply, this.cards, this.treasurePot);
 			// sort in reverse order, in place
 			// reverse order to keep indexes valid
 			treasureCards.sort((a: number, b: number) => {
 				return b - a;
 			});
-			for(let cardIndex of treasureCards) {
+			for(const cardIndex of treasureCards) {
 				this.playTreasureCard(cardIndex);
 			}
 
-			let cardName = player.strategy.buyTurn(player, this.supply, this.treasurePot);
+			const cardName = player.strategy.buyTurn(player, this.supply, this.treasurePot);
 			if (cardName) {
 				// numBuys deducted here
 				this.buyCard(cardName, p);

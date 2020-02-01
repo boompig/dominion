@@ -14,11 +14,11 @@ export interface ICard {
     effect?: any;
     isAttack?: boolean;
     isReaction?: boolean;
-};
+}
 
 export interface ITreasureCard extends ICard {
     value: number;
-};
+}
 
 export interface IVictoryCard extends ICard {
     points: number;

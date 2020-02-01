@@ -1,8 +1,9 @@
 /* eslint-env node */
 
-const flags = require("flags");
-const { Game } = require("./src/game");
-const Utils = require("./utils");
+import flags from "flags";
+import { Game } from "./src/game";
+import Utils from "./utils";
+
 
 flags.defineNumber(
 	"num-games",
@@ -27,7 +28,7 @@ for(let i = 0; i < numGames; i++) {
 		numPlayers: numPlayers
 	});
 	game.playGame();
-	for(let p of game.winArr) {
+	for(const p of game.winArr) {
 		if(!(p.name in results)) {
 			results[p.name] = 0;
 		}

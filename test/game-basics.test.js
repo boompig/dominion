@@ -5,7 +5,7 @@ import { SimpleTestStrategy } from "./test-strategies";
 const playAllTreasureCards = (game, player) => {
 	// TODO
 	for(let i = player.hand.length - 1; i >= 0; i--) {
-		let card = player.hand[i];
+		const card = player.hand[i];
 		if(card.type === "treasure") {
 			game.playTreasureCard(i);
 		}
@@ -20,8 +20,8 @@ describe("game", () => {
 		});
 
 		for(let i = 0; i < 2; i++) {
-			let player = game.players[i];
-			let allCards = player.deck.concat(player.hand);
+			const player = game.players[i];
+			const allCards = player.deck.concat(player.hand);
 			expect(allCards.length).toBe(10);
 		}
 
@@ -37,7 +37,7 @@ describe("game", () => {
 		// set the AI
 
 		while(!game.isGameOver) {
-			let player = game.players[game.turn];
+			const player = game.players[game.turn];
 
 			// we have a very stupid AI
 			game.drawPhase();

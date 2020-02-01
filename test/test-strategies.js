@@ -1,4 +1,5 @@
-const { PlayerStrategy } = require("../src/player-strategies");
+import { PlayerStrategy } from "../src/player-strategies";
+
 
 class SimpleTestStrategy extends PlayerStrategy {
 	actionTurn() {

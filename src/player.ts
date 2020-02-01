@@ -2,6 +2,7 @@ import {ICard, ITreasureCard} from "./card";
 import {TSupplyMap, TStringCardMap} from "./types";
 
 // debugging
+// eslint-disable-next-line
 console.debug = function() {};
 
 
@@ -11,7 +12,7 @@ export interface IPlayerStrategy {
 	trashCardForGain(player: Player, gainBonusCost: number, trashType: string | null, gainType: string | null): number[];
 	actionTurn(player: Player): ICard | null;
 	gainCard(player: Player, maxGainCost: number): string | null;
-};
+}
 
 
 export default class Player {
@@ -102,7 +103,7 @@ export default class Player {
 	/**
 	 * @param {number} cardIndex
 	 */
-	discardCard(cardIndex: number) {
+	discardCard(cardIndex: number): void {
 		const cards = this.hand.splice(cardIndex, 1);
 		console.debug(`Discarding card ${cards[0].name} from player ${this.name}`);
 		this.discard.push(cards[0]);

@@ -6,9 +6,11 @@ module.exports = {
 	"extends": [
 		"eslint:recommended",
 		"plugin:jest/recommended",
-		"plugin:react/recommended"
+		"plugin:react/recommended",
+		"plugin:@typescript-eslint/recommended"
 	],
-	"plugins": ["jest"],
+	"parser": "@typescript-eslint/parser",
+	"plugins": ["jest", "@typescript-eslint"],
 	"globals": {
 		"Atomics": "readonly",
 		"SharedArrayBuffer": "readonly"
@@ -35,6 +37,10 @@ module.exports = {
 			"always"
 		],
 		"no-console": 0,
-		"curly": ["error"]
+		"curly": ["error"],
+		"@typescript-eslint/interface-name-prefix": [
+			"error",
+			"always"
+		]
 	}
 };
