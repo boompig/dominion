@@ -8,8 +8,8 @@ import { SupplyCard } from "./card";
  *
  * - isHumanPlayerTurn: boolean
  * - phase: string
- * - supply: Map<string, number>
- * - cards: Map<string, Card>
+ * - supply: object - Map<string, number>
+ * - cards: object - Map<string, Card>
  * - onClick: function
  * - getCardClasses: function
  */
@@ -23,7 +23,7 @@ export default class Supply extends React.Component {
 
 		let standardSupplyCards = [];
 		let kingdomSupplyCards = [];
-		this.props.supply.forEach((numRemaining, cardName) => {
+		for(let [cardName, numRemaining] of Object.entries(this.props.supply)) {
 			let card = this.props.cards[cardName];
 			if(!card) {
 				throw new Error("cannot find card with name " + cardName);
@@ -42,7 +42,7 @@ export default class Supply extends React.Component {
 			} else {
 				standardSupplyCards.push(elem);
 			}
-		});
+		};
 
 		return (
 			<div className={ classes.join(" ") }>

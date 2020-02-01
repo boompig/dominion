@@ -55,25 +55,22 @@ class PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {Map<string, number>} supply
+	 * @param {any} supply
 	 * @param {number} treasurePot
 	 * @returns {number[]} array of card indexes
 	 */
 	playTreasures(player, supply, treasurePot) {
-		const cardName = this.getBuyGoal(player, supply, treasurePot);
-		if(!cardName) {
-			throw new Error("cardName is not set");
-		}
+		this.buyGoalCard = this.getBuyGoal(player, supply, treasurePot);
 
 		if(!supply) {
 			throw new Error("supply not set");
 		}
 
-		this.buyGoalCard = cardName;
 		const treasures = [];
 
 		if (this.buyGoalCard) {
-			const buyGoalCost = supply[cardName].cost;
+			console.debug(`AI player ${player.name} trying to buy ${this.buyGoalCard}`);
+			const buyGoalCost = supply[this.buyGoalCard].cost;
 			let total = 0;
 			for(let i = 0; i < player.hand.length; i++) {
 				let card = player.hand[i];
@@ -144,7 +141,7 @@ class SmartBigMoneyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {Map<string, number>} supply Map from card name to number of cards of that type left
+	 * @param {any} supply map from card name to number of cards of that type left
 	 * @param {number} treasurePot
 	 * @returns {string | null}
 	 */
@@ -194,7 +191,7 @@ class SmartDuchyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {Map<string, number>} supply Map from card name to number of cards of that type left
+	 * @param {any} supply map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
 	getBuyGoal(player, supply, treasurePot) {
@@ -250,7 +247,7 @@ class SmartSmithyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {Map<string, number>} supply Map from card name to number of cards of that type left
+	 * @param {any} supply map from card name to number of cards of that type left
 	 * @returns {string | null}
 	 */
 	getBuyGoal(player, supply, treasurePot) {
@@ -262,7 +259,7 @@ class SmartSmithyStrategy extends PlayerStrategy {
 	/**
 	 * @param {number} money
 	 * @param {Player} player
-	 * @param {Map<string, number>} supply Map from card name to number of cards of that type left
+	 * @param {any} supply map from card name to number of cards of that type left
 	 */
 	buyTurnWrapper(money, player, supply) {
 		// calculate the avg value of coins in my supply

@@ -171,7 +171,7 @@ export class Game {
 			/**
 			 * After playing the spy card (in the spy phase) can set the spy choice
 			 * Acceptable choices are "discard" and "deck"
-			 * @param {any} choices Map from player index to choice: "discard" or "deck"
+			 * @param {any} choices map from player index to choice: "discard" or "deck"
 			 */
 			(spyChoices) => {
 				if (!spyChoices) {
@@ -213,7 +213,7 @@ export class Game {
 			 * After playing the thief card (in the thief phase) can set the thief choice
 			 * For each player specify which treasure cards (if any) to trash
 			 * For the trashed cards, specify if they should be trashed or gained
-			 * @param {any} choices Map from player index to {index: <number>, action: "trash" | "gain"}
+			 * @param {any} choices map from player index to {index: <number>, action: "trash" | "gain"}
 			 */
 			(choices) => {
 				for(let i = 0; i < this.numPlayers; i++) {
@@ -869,16 +869,16 @@ export class Game {
 	 * Initialize mapping of card names to their quantity
 	 * @param {number} numPlayers
 	 * @param {string[] | null} kingdomCardPiles
-	 * @returns {Map<string, number>} mapping of card names to their quantity
+	 * @returns {any} mapping of card names to their quantity
 	 */
 	initSupply(numPlayers, kingdomCardPiles) {
-		const supply = new Map();
+		const supply = {};
 		kingdomCardPiles = kingdomCardPiles || [];
 
 		// treasure cards
-		supply.set("copper",  60 + numPlayers * 7);
-		supply.set("silver", 40);
-		supply.set("gold", 30);
+		supply.copper = 60 + numPlayers * 7;
+		supply.silver = 40;
+		supply.gold = 30;
 
 		// victory cards
 		// they have different numbers depending on # of players
@@ -890,10 +890,10 @@ export class Game {
 		}
 
 		// per the rules, starting cards do not come from supply
-		supply.set("estate", numVictoryCards + numPlayers * 3);
-		supply.set("duchy", numVictoryCards);
-		supply.set("province", numVictoryCards);
-		supply.set("curse", (numPlayers - 1) * 10);
+		supply.estate = numVictoryCards + numPlayers * 3;
+		supply.duchy = numVictoryCards;
+		supply.province = numVictoryCards;
+		supply.curse = (numPlayers - 1) * 10;
 
 		if(kingdomCardPiles.length > 10) {
 			throw new Error("Cannot have more than 10 kingdom card piles");
@@ -970,9 +970,9 @@ export class Game {
 				throw new Error(`Failed to find card ${cardName}`);
 			}
 			if(card.type === "action") {
-				supply.set(cardName, 10);
+				supply[cardName] = 10;
 			} else if(card.type === "victory") {
-				supply.set(cardName, numVictoryCards);
+				supply[cardName] = numVictoryCards;
 			} else {
 				throw new Error();
 			}
@@ -1241,6 +1241,7 @@ export class Game {
 		this.supply = this.initSupply(this.numPlayers, supplyCards);
 		this.initPlayers(players);
 		this.dealHands();
+		console.debug("Setup complete.");
 	}
 
 	/**
@@ -1416,9 +1417,10 @@ export class Game {
 			throw new Error(`cannot end turn in ${this.phase} phase`);
 		}
 
-		this.phase = "cleanup";
-
 		const player = this.players[this.turn];
+		console.debug(`Player ${player.name} is ending their turn. Cleaning up.`);
+
+		this.phase = "cleanup";
 
 		player.numActions = 0;
 		player.numBuys = 0;
@@ -1439,6 +1441,7 @@ export class Game {
 			this.calculateGameEnd();
 		} else {
 			this.turn = (this.turn + 1) % this.numPlayers;
+			console.debug(`Starting turn for player ${player.name}`);
 		}
 
 		this.phase = "draw";
@@ -1617,6 +1620,7 @@ export class Game {
 	 */
 	doTurn() {
 		if (this.isGameOver) {
+			console.warn("Cannot do turn when the game is over - nothing to do");
 			return;
 		}
 

@@ -62,11 +62,12 @@ class App extends React.Component {
 			(this.state.game.turn !== this.state.humanPlayerIndex)) {
 			this.state.game.doTurn();
 
-			// hard reset game
-			this.setState({
-				game: this.state.game
-			});
 		}
+
+		// hard reset game
+		this.setState({
+			game: this.state.game
+		});
 	}
 
 	resetSim() {
@@ -307,7 +308,7 @@ class App extends React.Component {
 			});
 
 			return (
-				<div className="container container-fluid">
+				<div id="app-container" className="container container-fluid">
 					<h1 className="title">Dominion Simulation - Round { this.state.game.round }</h1>
 					{this.state.game.isGameOver ?
 						<GameOver winArr={this.state.game.winArr} /> :
