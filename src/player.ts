@@ -1,15 +1,22 @@
 import {ICard, ITreasureCard} from "./card";
+import {TSupplyMap, TStringCardMap} from "./types";
 
 // debugging
 console.debug = function() {};
 
 
-interface IPlayerStrategy {};
+export interface IPlayerStrategy {
+	buyTurn(player: Player, supply: TSupplyMap, treasurePot: number): string | null;
+	playTreasures(player: Player, supply: TSupplyMap, cards: TStringCardMap, treasurePot: number): number[];
+	trashCardForGain(player: Player, gainBonusCost: number, trashType: string | null, gainType: string | null): number[];
+	actionTurn(player: Player): ICard | null;
+	gainCard(player: Player, maxGainCost: number): string | null;
+};
 
 
 export default class Player {
 	name: string;
-	strategy: IPlayerStrategy;
+	strategy: IPlayerStrategy | null;
 	deck: ICard[];
 	hand: ICard[];
 	discard: ICard[];
@@ -24,7 +31,7 @@ export default class Player {
 	 * @param {PlayerStrategy} strategy
 	 * @param {boolean} isHuman
 	 */
-	constructor(name: string, strategy: IPlayerStrategy, isHuman: boolean) {
+	constructor(name: string, strategy: IPlayerStrategy | null, isHuman?: boolean) {
 		this.name = name;
 		this.strategy = strategy;
 

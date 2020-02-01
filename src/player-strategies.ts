@@ -1,8 +1,9 @@
 import {ICard, IVictoryCard, ITreasureCard} from "./card";
-import Player from "./player";
+import Player, {IPlayerStrategy} from "./player";
+import { TSupplyMap, TStringCardMap } from "./types";
 
 
-export class PlayerStrategy {
+export class PlayerStrategy implements IPlayerStrategy {
 	buyGoalCard: string | null;
 
 	/**
@@ -39,6 +40,10 @@ export class PlayerStrategy {
 		return trash;
 	}
 
+	trashCardForGain(player: Player, gainBonusCost: number, trashType: string | null, gainType: string): number[] {
+		throw new Error("implement in subclass");
+	}
+
 	/**
 	 * A basic implementation of gaining cards
 	 * @param {Player} player
@@ -61,11 +66,12 @@ export class PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-	 * @param {any} supply
+	 * @param {TSupplyMap} supply
+	 * @param {TStringCardMap} cards
 	 * @param {number} treasurePot
 	 * @returns {number[]} array of card indexes
 	 */
-	playTreasures(player: Player, supply: any, treasurePot: number): number[] {
+	playTreasures(player: Player, supply: TSupplyMap, cards: TStringCardMap, treasurePot: number): number[] {
 		this.buyGoalCard = this.getBuyGoal(player, supply, treasurePot);
 
 		if(!supply) {
@@ -76,7 +82,7 @@ export class PlayerStrategy {
 
 		if (this.buyGoalCard) {
 			console.debug(`AI player ${player.name} trying to buy ${this.buyGoalCard}`);
-			const buyGoalCost = supply[this.buyGoalCard].cost;
+			const buyGoalCost = cards[this.buyGoalCard].cost;
 			let total = 0;
 			for(let i = 0; i < player.hand.length; i++) {
 				let card = player.hand[i];
@@ -95,11 +101,11 @@ export class PlayerStrategy {
 	/**
 	 * @returns {string | null}
 	 */
-	buyTurn(): string | null {
+	buyTurn(player: Player, supply: TSupplyMap, treasurePot: number): string | null {
 		return this.buyGoalCard;
 	}
 
-	getBuyGoal(player: Player, supply: any, treasurePot: number): string | null {
+	getBuyGoal(player: Player, supply: TSupplyMap, treasurePot: number): string | null {
 		throw new Error("must subclass");
 	}
 }

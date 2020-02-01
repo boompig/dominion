@@ -402,6 +402,7 @@ describe("game", () => {
 			numPlayers: 2,
 			humanPlayerIndex: 0,
 			supplyCards: supply,
+			humanPlayerName: "Joe America"
 		});
 		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
 
@@ -426,6 +427,7 @@ describe("game", () => {
 			numPlayers: 2,
 			humanPlayerIndex: 0,
 			supplyCards: supply,
+			humanPlayerName: "Joe America"
 		});
 		expect(Object.keys(game.supply)).toEqual(expect.arrayContaining(supply));
 

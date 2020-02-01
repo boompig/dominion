@@ -377,7 +377,7 @@ class App extends Component<{}, IAppState> {
 			if(!this.state.game) {
 				throw new Error("game not loaded");
 			}
-			let playerContainers = this.state.game.players.map((player, index) => {
+			let playerContainers = this.state.game.players.map((player: Player, index: number) => {
 				return <PlayerContainer
 					player={player}
 					playerIndex={index}

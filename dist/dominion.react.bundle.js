@@ -49126,7 +49126,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var react_1 = __importStar(__webpack_require__(/*! react */ "./node_modules/react/index.js"));
-var game_1 = __webpack_require__(/*! ../game */ "./src/game.js");
+var game_1 = __webpack_require__(/*! ../game */ "./src/game.ts");
 var game_over_1 = __importDefault(__webpack_require__(/*! ./game-over */ "./src/components/game-over.tsx"));
 var supply_1 = __importDefault(__webpack_require__(/*! ./supply */ "./src/components/supply.tsx"));
 var info_pane_1 = __importDefault(__webpack_require__(/*! ./info-pane */ "./src/components/info-pane.tsx"));
@@ -49903,237 +49903,197 @@ exports.default = Supply;
 
 /***/ }),
 
-/***/ "./src/game.js":
+/***/ "./src/game.ts":
 /*!*********************!*\
-  !*** ./src/game.js ***!
+  !*** ./src/game.ts ***!
   \*********************/
-/*! exports provided: Game */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Game", function() { return Game; });
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _player_strategies__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./player-strategies */ "./src/player-strategies.ts");
-/* harmony import */ var _player_strategies__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_player_strategies__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./player */ "./src/player.ts");
-/* harmony import */ var _player__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_player__WEBPACK_IMPORTED_MODULE_2__);
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
 
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
-
-function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
- // for debugging
-
-console.debug = function () {};
-
-var Game =
-/*#__PURE__*/
-function () {
-  /**
-   * Game will *automatically* be created with random AI unless the human parameters are passed
-   *
-   * @param {any} options Some options to initialize the game
-   * 		- numPlayers: # of players
-   * 		- humanPlayerIndex: index of human player
-   * 		- humanPlayerName: name of human player
-   * 		- players: array of players to use; length should == numPlayers
-   * 		- supplyCards: array of strings of cards to include in supply. can be any length and automatically filled to 10 randomly
-   */
-  function Game(options) {
-    _classCallCheck(this, Game);
-
-    options = options || {};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js"));
+var player_strategies_1 = __webpack_require__(/*! ./player-strategies */ "./src/player-strategies.ts");
+var player_1 = __importDefault(__webpack_require__(/*! ./player */ "./src/player.ts"));
+// for debugging
+console.debug = function () { };
+;
+;
+var Game = /** @class */ (function () {
     /**
-     * array of player objects
-     * @type {Player[]}
-     */
-
-    this.players = [];
-    /**
-     * map from card names to their quantity in the deck
-     * @type { {[key: string] : number}}
-     */
-
-    this.supply = {};
-    /**
-     * map from card names to their properties
-     * @type { {[key: string] : Card} }
-     */
-
-    this.cards = {};
-    /**
-     * array of cards that have been trashed
-     * @type {Card[]}
-     */
-
-    this.trash = [];
-    /**
-     * @type {number}
-     */
-
-    this.numPlayers = options.numPlayers || 5;
-    /**
-     * @type {string | null}
-     */
-
-    this.humanPlayerName = options.humanPlayerName || null; // humanPlayerIndex may be 0
-
-    if ("humanPlayerIndex" in options) {
-      this.humanPlayerIndex = options.humanPlayerIndex;
-      this.hasHumanPlayer = true;
-    } else {
-      this.humanPlayerIndex = -1;
-      this.hasHumanPlayer = false;
-    }
-    /**
-     * index into this.players
-     * @type {number}
-     */
-
-
-    this.turn = 0;
-    /**
-     * @type {number}
-     */
-
-    this.treasurePot = 0;
-    /**
-     * map from card names to bonus
-     */
-
-    this.firstPlayBonus = {};
-    /**
-     * There are 4 phases:
-     * - draw
-     * - action
-     * - buy
-     * - cleanup
+     * Game will *automatically* be created with random AI unless the human parameters are passed
      *
-     * other phases are enabled via action cards:
-     * - gain
-     * - trash
-     * - discard
-     * - discard-deck
-     * - adventurer
-     * - spy
-     * - thief
-     * - bureaucrat
-     *
-     * @type {string}
+     * @param {any} options Some options to initialize the game
+     * 		- numPlayers: # of players
+     * 		- humanPlayerIndex: index of human player
+     * 		- humanPlayerName: name of human player
+     * 		- players: array of players to use; length should == numPlayers
+     * 		- supplyCards: array of strings of cards to include in supply. can be any length and automatically filled to 10 randomly
      */
-
-    this.phase = "draw";
-    this.endPhaseCallback = null;
-    this.round = 0;
-    this.isGameOver = false;
-    /**
-     * @type {Card[]}
-     */
-
-    this.playArea = []; // gain-phase specific
-
-    this.numGain = 0;
-    this.gainType = null;
-    this.maxGainCost = 0; // trash-phase specific
-
-    this.numTrash = 0;
-    this.trashType = null;
-    this.trashName = null; // discard-phase specific
-
-    this.numDiscard = 0;
-    this.discardType = null;
-    this.discardRange = null; // this is a little hack to make sure action stack cleaned up only when all card effects are processed
-
-    this.canCleanupActionStack = true;
-    this.winArr = [];
-    this.setup(options.players, options.supplyCards);
-  }
-  /** *************** CARD EFFECTS **************** */
-
-  /*
-   * The way this section works is each card has a few numerical effects
-   * It only works for cards with straightforward effects
-   *
-   * First, the effect is called. It's a callable that takes `playerIndex` parameter
-   * Second, the effect returns the resultant change to the player as a dictionary of numbers
-   *
-   * - actions: + how many actions
-   * - buys: + how many buys
-   * - gold: + how much gold/money
-   * - trash: how many cards you may trash (up to)
-   * - gainAction: what you must do to gain a card
-   * - gainBonus: in addition to the value of the card(s) discarded or trashed, how much money is added to gain
-   * - gain: maximum value of card to gain
-   */
-
-  /**
-   * Draw 3 cards
-   * @param {number} playerIndex
-   */
-
-
-  _createClass(Game, [{
-    key: "smithyCardEffect",
-    value: function smithyCardEffect(playerIndex) {
-      this.drawCards(playerIndex, 3);
-      return {};
+    function Game(options) {
+        options = options || {};
+        /**
+         * array of player objects
+         * @type {Player[]}
+         */
+        this.players = [];
+        /**
+         * map from card names to their quantity in the deck
+         * @type { {[key: string] : number}}
+         */
+        this.supply = {};
+        /**
+         * map from card names to their properties
+         * @type { {[key: string] : Card} }
+         */
+        this.cards = {};
+        /**
+         * array of cards that have been trashed
+         * @type {Card[]}
+         */
+        this.trash = [];
+        /**
+         * @type {number}
+         */
+        this.numPlayers = options.numPlayers || 5;
+        /**
+         * @type {string | null}
+         */
+        this.humanPlayerName = options.humanPlayerName || null;
+        // humanPlayerIndex may be 0
+        if ("humanPlayerIndex" in options && typeof options.humanPlayerIndex !== "undefined") {
+            this.humanPlayerIndex = options.humanPlayerIndex;
+            this.hasHumanPlayer = true;
+        }
+        else {
+            this.humanPlayerIndex = -1;
+            this.hasHumanPlayer = false;
+        }
+        /**
+         * index into this.players
+         * @type {number}
+         */
+        this.turn = 0;
+        /**
+         * @type {number}
+         */
+        this.treasurePot = 0;
+        /**
+         * map from card names to bonus
+         */
+        this.firstPlayBonus = {};
+        /**
+         * There are 4 phases:
+         * - draw
+         * - action
+         * - buy
+         * - cleanup
+         *
+         * other phases are enabled via action cards:
+         * - gain
+         * - trash
+         * - discard
+         * - discard-deck
+         * - adventurer
+         * - spy
+         * - thief
+         * - bureaucrat
+         *
+         * @type {string}
+         */
+        this.phase = "draw";
+        this.endPhaseCallback = null;
+        this.round = 0;
+        this.isGameOver = false;
+        /**
+         * @type {Card[]}
+         */
+        this.playArea = [];
+        // gain-phase specific
+        this.numGain = 0;
+        this.gainType = null;
+        this.maxGainCost = 0;
+        // trash-phase specific
+        this.numTrash = 0;
+        this.trashType = null;
+        this.trashName = null;
+        // discard-phase specific
+        this.numDiscard = 0;
+        this.discardType = null;
+        this.discardRange = null;
+        // this is a little hack to make sure action stack cleaned up only when all card effects are processed
+        this.canCleanupActionStack = true;
+        this.winArr = [];
+        this.setup(options.players || null, options.supplyCards || null);
     }
+    /** *************** CARD EFFECTS **************** */
+    /*
+     * The way this section works is each card has a few numerical effects
+     * It only works for cards with straightforward effects
+     *
+     * First, the effect is called. It's a callable that takes `playerIndex` parameter
+     * Second, the effect returns the resultant change to the player as a dictionary of numbers
+     *
+     * - actions: + how many actions
+     * - buys: + how many buys
+     * - gold: + how much gold/money
+     * - trash: how many cards you may trash (up to)
+     * - gainAction: what you must do to gain a card
+     * - gainBonus: in addition to the value of the card(s) discarded or trashed, how much money is added to gain
+     * - gain: maximum value of card to gain
+     */
+    /**
+     * Draw 3 cards
+     * @param {number} playerIndex
+     */
+    Game.prototype.smithyCardEffect = function (playerIndex) {
+        this.drawCards(playerIndex, 3);
+        return {};
+    };
     /**
      * +1 Card; +1 Action
      * Each player (including you)
      * reveals the top card of his deck and either discards it or puts it back, your choice.
      */
-
-  }, {
-    key: "spyCardEffect",
-    value: function spyCardEffect(playerIndex) {
-      var _this = this;
-
-      // +1 card
-      this.drawCards(playerIndex, 1); // reveal 1 card for each player
-
-      for (var i = 0; i < this.numPlayers; i++) {
-        this.drawCard(i, true);
-      }
-
-      this.changePhaseUsingActionCard("spy", {},
-      /**
-       * After playing the spy card (in the spy phase) can set the spy choice
-       * Acceptable choices are "discard" and "deck"
-       * @param {any} choices map from player index to choice: "discard" or "deck"
-       */
-      function (spyChoices) {
-        if (!spyChoices) {
-          throw new Error("Spy choices expected in spy callback to endActionCardPhase");
+    Game.prototype.spyCardEffect = function (playerIndex) {
+        var _this = this;
+        // +1 card
+        this.drawCards(playerIndex, 1);
+        // reveal 1 card for each player
+        for (var i = 0; i < this.numPlayers; i++) {
+            this.drawCard(i, true);
         }
-
-        for (var _i = 0; _i < _this.numPlayers; _i++) {
-          var card = _this.players[_i].revealedCards.pop();
-
-          if (spyChoices[_i] === "deck") {
-            _this.players[_i].deck.push(card);
-          } else {
-            _this.players[_i].discard.push(card);
-          }
-        }
-      });
-      return {
-        actions: 1
-      };
-    }
+        this.changePhaseUsingActionCard("spy", {}, 
+        /**
+         * After playing the spy card (in the spy phase) can set the spy choice
+         * Acceptable choices are "discard" and "deck"
+         * @param {any} choices map from player index to choice: "discard" or "deck"
+         */
+        function (spyChoices) {
+            if (!spyChoices) {
+                throw new Error("Spy choices expected in spy callback to endActionCardPhase");
+            }
+            for (var i = 0; i < _this.numPlayers; i++) {
+                var card = _this.players[i].revealedCards.pop();
+                if (!card) {
+                    throw new Error("no revealed cards with spy");
+                }
+                if (spyChoices[i] === "deck") {
+                    _this.players[i].deck.push(card);
+                }
+                else {
+                    _this.players[i].discard.push(card);
+                }
+            }
+        });
+        return {
+            actions: 1
+        };
+    };
     /**
      * Each other player reveals the top 2 cards of his deck.
      * If they revealed any Treasure cards, they trash one of them that you choose.
@@ -50141,910 +50101,790 @@ function () {
      * They discard the other revealed cards.
      * @param {number} playerIndex
      */
-
-  }, {
-    key: "thiefCardEffect",
-    value: function thiefCardEffect(playerIndex) {
-      var _this2 = this;
-
-      for (var i = 0; i < this.numPlayers; i++) {
-        if (i != playerIndex) {
-          // reveal top 2 cards from OTHER players
-          this.drawCard(i, true);
-          this.drawCard(i, true);
-        }
-      }
-
-      this.changePhaseUsingActionCard("thief", {},
-      /**
-       * After playing the thief card (in the thief phase) can set the thief choice
-       * For each player specify which treasure cards (if any) to trash
-       * For the trashed cards, specify if they should be trashed or gained
-       * @param {any} choices map from player index to {index: <number>, action: "trash" | "gain"}
-       */
-      function (choices) {
-        for (var _i2 = 0; _i2 < _this2.numPlayers; _i2++) {
-          if (choices[_i2]) {
-            var j = choices[_i2].index;
-
-            if (j > _this2.players[_i2].revealedCards.length) {
-              throw new Error("".concat(j, " is not a valid index into revealed cards by player ").concat(_this2.players[_i2].name));
+    Game.prototype.thiefCardEffect = function (playerIndex) {
+        var _this = this;
+        for (var i = 0; i < this.numPlayers; i++) {
+            if (i != playerIndex) {
+                // reveal top 2 cards from OTHER players
+                this.drawCard(i, true);
+                this.drawCard(i, true);
             }
-
-            var card = _this2.players[_i2].revealedCards[j];
-
-            if (card.type !== "treasure") {
-              throw new Error("selected card must be a treasure card");
-            } // remove from revealed cards
-
-
-            _this2.players[_i2].revealedCards.splice(j, 1);
-
-            if (choices[_i2].action === "trash") {
-              // trash that card
-              _this2.trash.push(card);
-            } else {
-              // gain that card
-              _this2.gainCard(card.name, playerIndex);
-            }
-          } // discard all revealed cards that haven't been trashed/gained
-
-
-          while (_this2.players[_i2].revealedCards.length > 0) {
-            var _card = _this2.players[_i2].revealedCards.pop();
-
-            _this2.players[_i2].discard.push(_card);
-          }
         }
-      });
-      return {};
-    }
+        this.changePhaseUsingActionCard("thief", {}, 
+        /**
+         * After playing the thief card (in the thief phase) can set the thief choice
+         * For each player specify which treasure cards (if any) to trash
+         * For the trashed cards, specify if they should be trashed or gained
+         * @param {any} choices map from player index to {index: <number>, action: "trash" | "gain"}
+         */
+        function (choices) {
+            for (var i = 0; i < _this.numPlayers; i++) {
+                if (choices[i]) {
+                    var j = choices[i].index;
+                    if (j > _this.players[i].revealedCards.length) {
+                        throw new Error(j + " is not a valid index into revealed cards by player " + _this.players[i].name);
+                    }
+                    var card = _this.players[i].revealedCards[j];
+                    if (card.type !== "treasure") {
+                        throw new Error("selected card must be a treasure card");
+                    }
+                    // remove from revealed cards
+                    _this.players[i].revealedCards.splice(j, 1);
+                    if (choices[i].action === "trash") {
+                        // trash that card
+                        _this.trash.push(card);
+                    }
+                    else {
+                        // gain that card
+                        _this.gainCard(card.name, playerIndex);
+                    }
+                }
+                // discard all revealed cards that haven't been trashed/gained
+                while (_this.players[i].revealedCards.length > 0) {
+                    var card = _this.players[i].revealedCards.pop();
+                    if (card) {
+                        _this.players[i].discard.push(card);
+                    }
+                }
+            }
+        });
+        return {};
+    };
     /**
      * +2 cards
      * +1 action
      * @param {number} playerIndex
      */
-
-  }, {
-    key: "laboratoryCardEffect",
-    value: function laboratoryCardEffect(playerIndex) {
-      this.drawCards(playerIndex, 2);
-      return {
-        actions: 1
-      };
-    }
+    Game.prototype.laboratoryCardEffect = function (playerIndex) {
+        this.drawCards(playerIndex, 2);
+        return {
+            actions: 1,
+        };
+    };
     /**
      * +2 actions
      * +1 buy
      * +2 gold
      */
-
-  }, {
-    key: "festivalCardEffect",
-    value: function festivalCardEffect() {
-      return {
-        actions: 2,
-        buys: 1,
-        gold: 2
-      };
-    }
+    Game.prototype.festivalCardEffect = function (playerIndex) {
+        return {
+            actions: 2,
+            buys: 1,
+            gold: 2
+        };
+    };
     /**
      * +2 actions
      * +1 card
      */
-
-  }, {
-    key: "villageCardEffect",
-    value: function villageCardEffect(playerIndex) {
-      this.drawCards(playerIndex, 1);
-      return {
-        actions: 2
-      };
-    }
+    Game.prototype.villageCardEffect = function (playerIndex) {
+        this.drawCards(playerIndex, 1);
+        return {
+            actions: 2,
+        };
+    };
     /**
      * +1 buy, +2 gold
      */
-
-  }, {
-    key: "woodcutterCardEffect",
-    value: function woodcutterCardEffect() {
-      return {
-        buys: 1,
-        gold: 2
-      };
-    }
+    Game.prototype.woodcutterCardEffect = function (playerIndex) {
+        return {
+            buys: 1,
+            gold: 2
+        };
+    };
     /**
      * Trash a card from your hand.
      * Gain a card costing up to $2 more than the trashed card.
      */
-
-  }, {
-    key: "remodelCardEffect",
-    value: function remodelCardEffect() {
-      var _this3 = this;
-
-      this.changePhaseUsingActionCard("trash", {
-        numTrash: 1,
-        trashType: "any"
-      }, function () {
-        // TODO this will give incorrect results if player does not trash a card
-        var trashedCard = _this3.trash[_this3.trash.length - 1];
-
-        _this3.changePhaseUsingActionCard("gain", {
-          maxGainCost: trashedCard.cost + 2,
-          gainType: "any",
-          numGain: 1
+    Game.prototype.remodelCardEffect = function (playerIndex) {
+        var _this = this;
+        this.changePhaseUsingActionCard("trash", {
+            numTrash: 1,
+            trashType: "any",
+        }, function () {
+            // TODO this will give incorrect results if player does not trash a card
+            var trashedCard = _this.trash[_this.trash.length - 1];
+            _this.changePhaseUsingActionCard("gain", {
+                maxGainCost: trashedCard.cost + 2,
+                gainType: "any",
+                numGain: 1
+            });
         });
-      });
-      return {
-        gainBonusCost: 2,
-        gainType: "any",
-        numGain: 1
-      };
-    }
+        return {
+            gainBonusCost: 2,
+            gainType: "any",
+            numGain: 1
+        };
+    };
     /**
      * +1 card, +1 action, +1 buy, +1 gold
      * @param {number} playerIndex
      */
-
-  }, {
-    key: "marketCardEffect",
-    value: function marketCardEffect(playerIndex) {
-      this.drawCards(playerIndex, 1);
-      return {
-        actions: 1,
-        buys: 1,
-        gold: 1
-      };
-    }
+    Game.prototype.marketCardEffect = function (playerIndex) {
+        this.drawCards(playerIndex, 1);
+        return {
+            actions: 1,
+            buys: 1,
+            gold: 1
+        };
+    };
     /**
      * Trash a Copper from your hand. If you do, +$3.
      * @param {number} playerIndex
      */
-
-  }, {
-    key: "moneylenderCardEffect",
-    value: function moneylenderCardEffect() {
-      var _this4 = this;
-
-      var trashCount = this.trash.length;
-      this.changePhaseUsingActionCard("trash", {
-        trashName: "copper",
-        numTrash: 1,
-        trashType: "treasure"
-      }, function () {
-        if (_this4.trash.length > trashCount) {
-          // copper was trashed
-          _this4.treasurePot += 3;
-        }
-      });
-      return {};
-    }
+    Game.prototype.moneylenderCardEffect = function (playerIndex) {
+        var _this = this;
+        var trashCount = this.trash.length;
+        this.changePhaseUsingActionCard("trash", {
+            trashName: "copper",
+            numTrash: 1,
+            trashType: "treasure"
+        }, function () {
+            if (_this.trash.length > trashCount) {
+                // copper was trashed
+                _this.treasurePot += 3;
+            }
+        });
+        return {};
+    };
     /**
      * Draw until you have 7 cards in hand.
      * You may set aside any Action cards drawn this way, as you draw them;
      * discard the set aside cards after you finish drawing.
      * @param {number} playerIndex
      */
-
-  }, {
-    key: "libraryCardEffect",
-    value: function libraryCardEffect(playerIndex) {
-      var numCardsInHand = this.players[playerIndex].hand.length;
-      this.drawCards(playerIndex, 7 - numCardsInHand);
-      this.changePhaseUsingActionCard("discard", {
-        discardRange: {
-          start: numCardsInHand,
-          end: 7
-        },
-        discardType: "action",
-        numDiscard: 999
-      });
-      return {};
-    }
+    Game.prototype.libraryCardEffect = function (playerIndex) {
+        var numCardsInHand = this.players[playerIndex].hand.length;
+        this.drawCards(playerIndex, 7 - numCardsInHand);
+        this.changePhaseUsingActionCard("discard", {
+            discardRange: {
+                start: numCardsInHand,
+                end: 7
+            },
+            discardType: "action",
+            numDiscard: 999
+        });
+        return {};
+    };
     /**
      * NOTE: this card is not in the standard set
      * +1 card, +1 action, +1 gold if you play a silver this turn
      */
-
-  }, {
-    key: "merchantCardEffect",
-    value: function merchantCardEffect(playerIndex) {
-      this.drawCards(playerIndex, 1);
-      return {
-        actions: 1,
-        firstPlayBonus: {
-          "silver": {
-            gold: 1
-          }
-        }
-      };
-    }
+    Game.prototype.merchantCardEffect = function (playerIndex) {
+        this.drawCards(playerIndex, 1);
+        return {
+            actions: 1,
+            firstPlayBonus: {
+                "silver": {
+                    gold: 1
+                }
+            }
+        };
+    };
     /**
      * +4 Cards; +1 Buy
      * Each other player draws a card.
      */
-
-  }, {
-    key: "councilRoomCardEffect",
-    value: function councilRoomCardEffect(playerIndex) {
-      for (var i = 0; i < this.numPlayers; i++) {
-        if (i != playerIndex) {
-          this.drawCard(i);
+    Game.prototype.councilRoomCardEffect = function (playerIndex) {
+        for (var i = 0; i < this.numPlayers; i++) {
+            if (i != playerIndex) {
+                this.drawCard(i);
+            }
         }
-      }
-
-      this.drawCards(playerIndex, 4);
-      return {
-        buys: 1
-      };
-    }
+        this.drawCards(playerIndex, 4);
+        return {
+            buys: 1
+        };
+    };
     /**
      * trash 4 cards
      */
-
-  }, {
-    key: "chapelCardEffect",
-    value: function chapelCardEffect() {
-      this.changePhaseUsingActionCard("trash", {
-        numTrash: 4,
-        trashType: "any"
-      });
-      return {};
-    }
+    Game.prototype.chapelCardEffect = function (playerIndex) {
+        this.changePhaseUsingActionCard("trash", {
+            numTrash: 4,
+            trashType: "any"
+        });
+        return {};
+    };
     /**
      * +2 Cards
      * Each other player gains a Curse card.
      */
-
-  }, {
-    key: "witchCardEffect",
-    value: function witchCardEffect(playerIndex) {
-      for (var i = 0; i < 2; i++) {
-        this.drawCard(playerIndex);
-      }
-
-      for (var _i3 = 0; _i3 < this.numPlayers; _i3++) {
-        if (_i3 != playerIndex) {
-          this.gainCard("curse", _i3);
+    Game.prototype.witchCardEffect = function (playerIndex) {
+        for (var i = 0; i < 2; i++) {
+            this.drawCard(playerIndex);
         }
-      }
-
-      return {};
-    }
+        for (var i = 0; i < this.numPlayers; i++) {
+            if (i != playerIndex) {
+                this.gainCard("curse", i);
+            }
+        }
+        return {};
+    };
     /**
      * Gain a card costing up to $4.
      */
-
-  }, {
-    key: "workshopCardEffect",
-    value: function workshopCardEffect() {
-      this.changePhaseUsingActionCard("gain", {
-        maxGainCost: 4,
-        gainType: "any",
-        numGain: 1
-      }, null);
-      return {};
-    }
+    Game.prototype.workshopCardEffect = function (playerIndex) {
+        this.changePhaseUsingActionCard("gain", {
+            maxGainCost: 4,
+            gainType: "any",
+            numGain: 1
+        }, null);
+        return {};
+    };
     /**
      * Trash a Treasure card from your hand.
      * Gain a Treasure card costing up to $3 more; put it into your hand.
      */
-
-  }, {
-    key: "mineCardEffect",
-    value: function mineCardEffect() {
-      var _this5 = this;
-
-      this.changePhaseUsingActionCard("trash", {
-        numTrash: 1,
-        trashType: "treasure"
-      }, function () {
-        // TODO this will give incorrect results if player does not trash a card
-        var trashedCard = _this5.trash[_this5.trash.length - 1];
-
-        _this5.changePhaseUsingActionCard("gain", {
-          maxGainCost: trashedCard.cost + 3,
-          gainType: "treasure",
-          numGain: 1
+    Game.prototype.mineCardEffect = function (playerIndex) {
+        var _this = this;
+        this.changePhaseUsingActionCard("trash", {
+            numTrash: 1,
+            trashType: "treasure"
+        }, function () {
+            // TODO this will give incorrect results if player does not trash a card
+            var trashedCard = _this.trash[_this.trash.length - 1];
+            _this.changePhaseUsingActionCard("gain", {
+                maxGainCost: trashedCard.cost + 3,
+                gainType: "treasure",
+                numGain: 1
+            });
         });
-      });
-      return {
-        gainBonusCost: 3,
-        gainType: "treasure",
-        numGain: 1
-      };
-    }
+        return {
+            gainBonusCost: 3,
+            gainType: "treasure",
+            numGain: 1
+        };
+    };
     /**
      * Trash this card. Gain a card costing up to $5.
      * @param {number} playerIndex
      */
-
-  }, {
-    key: "feastCardEffect",
-    value: function feastCardEffect() {
-      this.changePhaseUsingActionCard("gain", {
-        maxGainCost: 5,
-        gainType: "any",
-        numGain: 1
-      });
-      return {
-        sendToTrash: true
-      };
-    }
+    Game.prototype.feastCardEffect = function (playerIndex) {
+        this.changePhaseUsingActionCard("gain", {
+            maxGainCost: 5,
+            gainType: "any",
+            numGain: 1
+        });
+        return {
+            sendToTrash: true
+        };
+    };
     /**
      * +1 Action
      * Discard any number of cards.
      * +1 Card per card discarded.
      * @param {number} playerIndex
      */
-
-  }, {
-    key: "cellarCardEffect",
-    value: function cellarCardEffect(playerIndex) {
-      var _this6 = this;
-
-      var discardPileSizeStart = this.players[playerIndex].discard.length;
-      this.changePhaseUsingActionCard("discard", {
-        // means functionally unlimited
-        numDiscard: 999,
-        discardType: "any"
-      }, function () {
-        var discardPileSizeEnd = _this6.players[playerIndex].discard.length;
-        var numDiscarded = discardPileSizeEnd - discardPileSizeStart;
-
-        for (var i = 0; i < numDiscarded; i++) {
-          _this6.drawCard(playerIndex);
-        }
-      });
-      return {};
-    }
+    Game.prototype.cellarCardEffect = function (playerIndex) {
+        var _this = this;
+        var discardPileSizeStart = this.players[playerIndex].discard.length;
+        this.changePhaseUsingActionCard("discard", {
+            // means functionally unlimited
+            numDiscard: 999,
+            discardType: "any"
+        }, function () {
+            var discardPileSizeEnd = _this.players[playerIndex].discard.length;
+            var numDiscarded = discardPileSizeEnd - discardPileSizeStart;
+            for (var i = 0; i < numDiscarded; i++) {
+                _this.drawCard(playerIndex);
+            }
+        });
+        return {};
+    };
     /**
      * Worth 1 Victory for every 10 cards in your deck (rounded down).
      * @param {number} playerIndex
      * @returns {number} number of points to add
      */
-
-  }, {
-    key: "gardensCardEffect",
-    value: function gardensCardEffect(playerIndex) {
-      var player = this.players[playerIndex];
-      var numCards = player.hand.length + player.discard.length + player.deck.length;
-      return Math.floor(numCards / 10);
-    }
-  }, {
-    key: "militiaCardEffect",
-    value: function militiaCardEffect() {
-      throw new Error("not implemented"); // for(let i = 0; i < this.numPlayers; i++) {
-      // 	if(i != playerIndex) {
-      // 		this.discardCards()
-      // 	}
-      // }
-    }
+    Game.prototype.gardensCardEffect = function (playerIndex) {
+        var player = this.players[playerIndex];
+        var numCards = player.hand.length + player.discard.length + player.deck.length;
+        return Math.floor(numCards / 10);
+    };
+    Game.prototype.militiaCardEffect = function (playerIndex) {
+        throw new Error("not implemented");
+        // for(let i = 0; i < this.numPlayers; i++) {
+        // 	if(i != playerIndex) {
+        // 		this.discardCards()
+        // 	}
+        // }
+    };
     /**
      * Gain a silver card; put it on top of your deck.
      * Each other player reveals a Victory card from his hand and puts it on his deck
      * (or reveals a hand with no Victory cards).
      */
-
-  }, {
-    key: "bureaucratCardEffect",
-    value: function bureaucratCardEffect(playerIndex) {
-      var _this7 = this;
-
-      this.gainCard("silver", playerIndex, {
-        location: "deck-top"
-      }); // TODO - right now automatically reveals the 1st victory card found in hand...
-      // rather than have player choose
-      // this player has revealed a card
-
-      var r = {};
-
-      for (var i = 0; i < this.numPlayers; i++) {
-        if (i === playerIndex) {
-          continue;
+    Game.prototype.bureaucratCardEffect = function (playerIndex) {
+        var _this = this;
+        this.gainCard("silver", playerIndex, { location: "deck-top" });
+        // TODO - right now automatically reveals the 1st victory card found in hand...
+        // rather than have player choose
+        // this player has revealed a card
+        var r = {};
+        for (var i = 0; i < this.numPlayers; i++) {
+            if (i === playerIndex) {
+                continue;
+            }
+            var player = this.players[i];
+            for (var j = 0; j < player.hand.length; j++) {
+                if (player.hand[j].type === "victory") {
+                    var card = player.hand.splice(j, 1)[0];
+                    player.revealedCards.push(card);
+                    r[i] = true;
+                    break;
+                }
+            }
         }
-
-        var player = this.players[i];
-
-        for (var j = 0; j < player.hand.length; j++) {
-          if (player.hand[j].type === "victory") {
-            var card = player.hand.splice(j, 1)[0];
-            player.revealedCards.push(card);
-            r[i] = true;
-            break;
-          }
-        }
-      }
-
-      this.changePhaseUsingActionCard("bureaucrat", {}, function () {
-        for (var _i4 = 0; _i4 < _this7.numPlayers; _i4++) {
-          if (r[_i4]) {
-            var _player = _this7.players[_i4]; // take the
-
-            var _card2 = _player.revealedCards.pop();
-
-            _player.deck.push(_card2);
-          }
-        }
-      });
-      return {};
-    }
+        this.changePhaseUsingActionCard("bureaucrat", {}, function () {
+            for (var i = 0; i < _this.numPlayers; i++) {
+                if (r[i]) {
+                    var player = _this.players[i];
+                    // take the
+                    var card = player.revealedCards.pop();
+                    if (!card) {
+                        throw new Error("no revealed cards for bureaucrat");
+                    }
+                    player.deck.push(card);
+                }
+            }
+        });
+        return {};
+    };
     /**
      * +$2
      * You may immediately put your deck into your discard pile.
      */
-
-  }, {
-    key: "chancellorCardEffect",
-    value: function chancellorCardEffect() {
-      this.changePhaseUsingActionCard("discard-deck", {}, function () {});
-      return {
-        gold: 2
-      };
-    }
+    Game.prototype.chancellorCardEffect = function (playerIndex) {
+        this.changePhaseUsingActionCard("discard-deck", {}, function () {
+        });
+        return {
+            gold: 2
+        };
+    };
     /**
      * Reveal cards from your deck until you reveal 2 Treasure cards.
      * Put those Treasure cards in your hand and discard the other revealed cards.
      */
-
-  }, {
-    key: "adventurerCardEffect",
-    value: function adventurerCardEffect(playerIndex) {
-      var _this8 = this;
-
-      var numTreasures = 0;
-
-      while (numTreasures < 2) {
-        var card = this.drawCard(playerIndex, true);
-
-        if (card.type === "treasure") {
-          numTreasures++;
+    Game.prototype.adventurerCardEffect = function (playerIndex) {
+        var _this = this;
+        var numTreasures = 0;
+        while (numTreasures < 2) {
+            var card = this.drawCard(playerIndex, true);
+            if (!card) {
+                throw new Error("failed to draw using adventurer");
+            }
+            if (card.type === "treasure") {
+                numTreasures++;
+            }
         }
-      }
-
-      this.changePhaseUsingActionCard("adventurer", {}, function () {
-        var player = _this8.players[playerIndex];
-
-        while (player.revealedCards.length > 0) {
-          var _card3 = player.revealedCards.pop();
-
-          if (_card3.type === "treasure") {
-            player.hand.push(_card3);
-          } else {
-            player.discard.push(_card3);
-          }
-        }
-      });
-      return {};
-    }
+        this.changePhaseUsingActionCard("adventurer", {}, function () {
+            var player = _this.players[playerIndex];
+            while (player.revealedCards.length > 0) {
+                var card = player.revealedCards.pop();
+                if (!card) {
+                    throw new Error("no revealed cards");
+                }
+                if (card.type === "treasure") {
+                    player.hand.push(card);
+                }
+                else {
+                    player.discard.push(card);
+                }
+            }
+        });
+        return {};
+    };
     /** ********************************************* */
-
     /**
      * Initialize mapping of card names to cards.
      */
-
-  }, {
-    key: "initCards",
-    value: function initCards() {
-      var cards = {}; // treasures
-
-      cards.copper = {
-        name: "copper",
-        cost: 0,
-        type: "treasure",
-        value: 1
-      };
-      cards.silver = {
-        name: "silver",
-        cost: 3,
-        type: "treasure",
-        value: 2
-      };
-      cards.gold = {
-        name: "gold",
-        cost: 6,
-        type: "treasure",
-        value: 3
-      }; // victory cards
-
-      cards.estate = {
-        name: "estate",
-        cost: 2,
-        type: "victory",
-        points: 1
-      };
-      cards.duchy = {
-        name: "duchy",
-        cost: 5,
-        type: "victory",
-        points: 3
-      };
-      cards.province = {
-        name: "province",
-        cost: 8,
-        type: "victory",
-        points: 6
-      };
-      cards.curse = {
-        name: "curse",
-        cost: 0,
-        type: "victory",
-        points: -1
-      };
-      var gardensEffect = this.gardensCardEffect.bind(this);
-      cards.gardens = {
-        name: "gardens",
-        cost: 4,
-        type: "victory",
-        points: 0,
-        pointsEffect: gardensEffect
-      }; // action cards
-
-      var smithy = this.smithyCardEffect.bind(this);
-      cards.smithy = {
-        name: "smithy",
-        cost: 4,
-        type: "action",
-        effect: smithy
-      };
-      var spy = this.spyCardEffect.bind(this);
-      cards.spy = {
-        name: "spy",
-        cost: 4,
-        type: "action",
-        effect: spy
-      };
-      var thief = this.thiefCardEffect.bind(this);
-      cards.thief = {
-        name: "thief",
-        cost: 4,
-        type: "action",
-        effect: thief
-      };
-      var laboratory = this.laboratoryCardEffect.bind(this);
-      cards.laboratory = {
-        name: "laboratory",
-        cost: 5,
-        type: "action",
-        effect: laboratory
-      };
-      var festival = this.festivalCardEffect.bind(this);
-      cards.festival = {
-        name: "festival",
-        cost: 5,
-        type: "action",
-        effect: festival
-      };
-      var village = this.villageCardEffect.bind(this);
-      cards.village = {
-        name: "village",
-        cost: 3,
-        type: "action",
-        effect: village
-      };
-      var woodcutter = this.woodcutterCardEffect.bind(this);
-      cards.woodcutter = {
-        name: "woodcutter",
-        cost: 3,
-        type: "action",
-        effect: woodcutter
-      };
-      var market = this.marketCardEffect.bind(this);
-      cards.market = {
-        name: "market",
-        cost: 5,
-        type: "action",
-        effect: market
-      };
-      var moneylenderEffect = this.moneylenderCardEffect.bind(this);
-      cards.moneylender = {
-        name: "moneylender",
-        cost: 4,
-        type: "action",
-        effect: moneylenderEffect
-      };
-      var chapelEffect = this.chapelCardEffect.bind(this);
-      cards.chapel = {
-        name: "chapel",
-        cost: 2,
-        type: "action",
-        effect: chapelEffect
-      };
-      var witchEffect = this.witchCardEffect.bind(this);
-      cards.witch = {
-        name: "witch",
-        cost: 5,
-        type: "action",
-        effect: witchEffect
-      };
-      var workshopEffect = this.workshopCardEffect.bind(this);
-      cards.workshop = {
-        name: "workshop",
-        cost: 3,
-        type: "action",
-        effect: workshopEffect
-      };
-      var remodelEffect = this.remodelCardEffect.bind(this);
-      cards.remodel = {
-        name: "remodel",
-        cost: 4,
-        type: "action",
-        effect: remodelEffect
-      };
-      var mineEffect = this.mineCardEffect.bind(this);
-      cards.mine = {
-        name: "mine",
-        cost: 5,
-        type: "action",
-        effect: mineEffect
-      };
-      var cellarEffect = this.cellarCardEffect.bind(this);
-      cards.cellar = {
-        name: "cellar",
-        cost: 2,
-        type: "action",
-        effect: cellarEffect
-      };
-      var feastEffect = this.feastCardEffect.bind(this);
-      cards.feast = {
-        name: "feast",
-        cost: 4,
-        type: "action",
-        effect: feastEffect
-      };
-      var chancellorEffect = this.chancellorCardEffect.bind(this);
-      cards.chancellor = {
-        name: "chancellor",
-        cost: 3,
-        type: "action",
-        effect: chancellorEffect
-      };
-      var libraryEffect = this.libraryCardEffect.bind(this);
-      cards.library = {
-        name: "library",
-        cost: 5,
-        type: "action",
-        effect: libraryEffect
-      };
-      var councilRoomEffect = this.councilRoomCardEffect.bind(this);
-      cards["council room"] = {
-        name: "council room",
-        cost: 5,
-        type: "action",
-        effect: councilRoomEffect
-      };
-      var adventurerEffect = this.adventurerCardEffect.bind(this);
-      cards.adventurer = {
-        name: "adventurer",
-        cost: 6,
-        type: "action",
-        effect: adventurerEffect
-      };
-      var bureaucrat = this.bureaucratCardEffect.bind(this);
-      cards.bureaucrat = {
-        name: "bureaucrat",
-        cost: 4,
-        type: "action",
-        effect: bureaucrat
-      }; // TODO unfinished cards
-
-      cards.moat = {
-        name: "moat",
-        cost: 2,
-        type: "action",
-        reaction: true,
-        effect: function effect() {}
-      };
-      var militiaEffect = this.militiaCardEffect.bind(this);
-      cards.militia = {
-        name: "militia",
-        cost: 4,
-        type: "action",
-        attack: true,
-        effect: militiaEffect
-      };
-      var merchantEffect = this.merchantCardEffect.bind(this);
-      cards.merchant = {
-        name: "merchant",
-        cost: 3,
-        type: "action",
-        effect: merchantEffect
-      };
-      return cards;
-    }
+    Game.prototype.initCards = function () {
+        var cards = {};
+        // treasures
+        cards.copper = {
+            name: "copper",
+            cost: 0,
+            type: "treasure",
+            value: 1,
+        };
+        cards.silver = {
+            name: "silver",
+            cost: 3,
+            type: "treasure",
+            value: 2,
+        };
+        cards.gold = {
+            name: "gold",
+            cost: 6,
+            type: "treasure",
+            value: 3,
+        };
+        // victory cards
+        cards.estate = {
+            name: "estate",
+            cost: 2,
+            type: "victory",
+            points: 1,
+        };
+        cards.duchy = {
+            name: "duchy",
+            cost: 5,
+            type: "victory",
+            points: 3,
+        };
+        cards.province = {
+            name: "province",
+            cost: 8,
+            type: "victory",
+            points: 6,
+        };
+        cards.curse = {
+            name: "curse",
+            cost: 0,
+            type: "victory",
+            points: -1,
+        };
+        var gardensEffect = this.gardensCardEffect.bind(this);
+        cards.gardens = {
+            name: "gardens",
+            cost: 4,
+            type: "victory",
+            points: 0,
+            pointsEffect: gardensEffect
+        };
+        // action cards
+        var smithy = this.smithyCardEffect.bind(this);
+        cards.smithy = {
+            name: "smithy",
+            cost: 4,
+            type: "action",
+            effect: smithy,
+        };
+        var spy = this.spyCardEffect.bind(this);
+        cards.spy = {
+            name: "spy",
+            cost: 4,
+            type: "action",
+            effect: spy
+        };
+        var thief = this.thiefCardEffect.bind(this);
+        cards.thief = {
+            name: "thief",
+            cost: 4,
+            type: "action",
+            effect: thief
+        };
+        var laboratory = this.laboratoryCardEffect.bind(this);
+        cards.laboratory = {
+            name: "laboratory",
+            cost: 5,
+            type: "action",
+            effect: laboratory
+        };
+        var festival = this.festivalCardEffect.bind(this);
+        cards.festival = {
+            name: "festival",
+            cost: 5,
+            type: "action",
+            effect: festival,
+        };
+        var village = this.villageCardEffect.bind(this);
+        cards.village = {
+            name: "village",
+            cost: 3,
+            type: "action",
+            effect: village,
+        };
+        var woodcutter = this.woodcutterCardEffect.bind(this);
+        cards.woodcutter = {
+            name: "woodcutter",
+            cost: 3,
+            type: "action",
+            effect: woodcutter
+        };
+        var market = this.marketCardEffect.bind(this);
+        cards.market = {
+            name: "market",
+            cost: 5,
+            type: "action",
+            effect: market
+        };
+        var moneylenderEffect = this.moneylenderCardEffect.bind(this);
+        cards.moneylender = {
+            name: "moneylender",
+            cost: 4,
+            type: "action",
+            effect: moneylenderEffect
+        };
+        var chapelEffect = this.chapelCardEffect.bind(this);
+        cards.chapel = {
+            name: "chapel",
+            cost: 2,
+            type: "action",
+            effect: chapelEffect,
+        };
+        var witchEffect = this.witchCardEffect.bind(this);
+        cards.witch = {
+            name: "witch",
+            cost: 5,
+            type: "action",
+            effect: witchEffect
+        };
+        var workshopEffect = this.workshopCardEffect.bind(this);
+        cards.workshop = {
+            name: "workshop",
+            cost: 3,
+            type: "action",
+            effect: workshopEffect
+        };
+        var remodelEffect = this.remodelCardEffect.bind(this);
+        cards.remodel = {
+            name: "remodel",
+            cost: 4,
+            type: "action",
+            effect: remodelEffect
+        };
+        var mineEffect = this.mineCardEffect.bind(this);
+        cards.mine = {
+            name: "mine",
+            cost: 5,
+            type: "action",
+            effect: mineEffect
+        };
+        var cellarEffect = this.cellarCardEffect.bind(this);
+        cards.cellar = {
+            name: "cellar",
+            cost: 2,
+            type: "action",
+            effect: cellarEffect
+        };
+        var feastEffect = this.feastCardEffect.bind(this);
+        cards.feast = {
+            name: "feast",
+            cost: 4,
+            type: "action",
+            effect: feastEffect
+        };
+        var chancellorEffect = this.chancellorCardEffect.bind(this);
+        cards.chancellor = {
+            name: "chancellor",
+            cost: 3,
+            type: "action",
+            effect: chancellorEffect
+        };
+        var libraryEffect = this.libraryCardEffect.bind(this);
+        cards.library = {
+            name: "library",
+            cost: 5,
+            type: "action",
+            effect: libraryEffect
+        };
+        var councilRoomEffect = this.councilRoomCardEffect.bind(this);
+        cards["council room"] = {
+            name: "council room",
+            cost: 5,
+            type: "action",
+            effect: councilRoomEffect
+        };
+        var adventurerEffect = this.adventurerCardEffect.bind(this);
+        cards.adventurer = {
+            name: "adventurer",
+            cost: 6,
+            type: "action",
+            effect: adventurerEffect
+        };
+        var bureaucrat = this.bureaucratCardEffect.bind(this);
+        cards.bureaucrat = {
+            name: "bureaucrat",
+            cost: 4,
+            type: "action",
+            effect: bureaucrat
+        };
+        // TODO unfinished cards
+        cards.moat = {
+            name: "moat",
+            cost: 2,
+            type: "action",
+            isReaction: true,
+            effect: function () { }
+        };
+        var militiaEffect = this.militiaCardEffect.bind(this);
+        cards.militia = {
+            name: "militia",
+            cost: 4,
+            type: "action",
+            isAttack: true,
+            effect: militiaEffect
+        };
+        var merchantEffect = this.merchantCardEffect.bind(this);
+        cards.merchant = {
+            name: "merchant",
+            cost: 3,
+            type: "action",
+            effect: merchantEffect
+        };
+        return cards;
+    };
     /**
      * Initialize mapping of card names to their quantity
      * @param {number} numPlayers
      * @param {string[] | null} kingdomCardPiles
      * @returns {any} mapping of card names to their quantity
      */
-
-  }, {
-    key: "initSupply",
-    value: function initSupply(numPlayers, kingdomCardPiles) {
-      var supply = {};
-      kingdomCardPiles = kingdomCardPiles || []; // treasure cards
-
-      supply.copper = 60 + numPlayers * 7;
-      supply.silver = 40;
-      supply.gold = 30; // victory cards
-      // they have different numbers depending on # of players
-
-      var numVictoryCards;
-
-      if (numPlayers === 2) {
-        numVictoryCards = 8;
-      } else {
-        numVictoryCards = 12;
-      } // per the rules, starting cards do not come from supply
-
-
-      supply.estate = numVictoryCards + numPlayers * 3;
-      supply.duchy = numVictoryCards;
-      supply.province = numVictoryCards;
-      supply.curse = (numPlayers - 1) * 10;
-
-      if (kingdomCardPiles.length > 10) {
-        throw new Error("Cannot have more than 10 kingdom card piles");
-      } // commented-out cards are not implemented
-
-
-      var baseKingdomCards = ["adventurer", "bureaucrat", "cellar", "chancellor", "chapel", "council room", "feast", "festival", "gardens", "laboratory", "market", "mine", "library",
-      /*
-       * This is hard because it requires other players to act in the middle of the
-       * current player's turn
-       */
-      // "militia",
-      "moneylender", "remodel", "smithy", "spy", "thief", "village", "witch", "woodcutter", "workshop"
-      /*
-       * This is hard because there is no clear mechanism to play a card twice
-       */
-      // throne room: not implemented
-      ];
-      var implementedKingdomCards = baseKingdomCards.concat([// not part of basic set but implemented:
-      "merchant"]);
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = kingdomCardPiles[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var cardName = _step.value;
-          var i = implementedKingdomCards.indexOf(cardName); // find the card
-
-          if (i === -1) {
-            throw new Error("Could not find card ".concat(cardName, " in card names, possibly not implemented"));
-          } // remove from array
-
-
-          implementedKingdomCards.splice(i, 1);
-          var j = baseKingdomCards.indexOf(cardName);
-
-          if (j >= 0) {
-            baseKingdomCards.splice(j, 1);
-          }
-        } // draw only from base cards
-
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-            _iterator["return"]();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
+    Game.prototype.initSupply = function (numPlayers, kingdomCardPiles) {
+        var supply = {};
+        kingdomCardPiles = kingdomCardPiles || [];
+        // treasure cards
+        supply.copper = 60 + numPlayers * 7;
+        supply.silver = 40;
+        supply.gold = 30;
+        // victory cards
+        // they have different numbers depending on # of players
+        var numVictoryCards;
+        if (numPlayers === 2) {
+            numVictoryCards = 8;
         }
-      }
-
-      var p2 = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.sampleSize(baseKingdomCards, 10 - kingdomCardPiles.length); // @type string[]
-
-
-      var piles = kingdomCardPiles.concat(p2);
-
-      if (piles.length != 10) {
-        throw new Error("Piles must be exactly of size 10 in setup, found ".concat(piles.length));
-      }
-
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = piles[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var _cardName = _step2.value;
-          var card = this.cards[_cardName];
-
-          if (!card) {
-            throw new Error("Failed to find card ".concat(_cardName));
-          }
-
-          if (card.type === "action") {
-            supply[_cardName] = 10;
-          } else if (card.type === "victory") {
-            supply[_cardName] = numVictoryCards;
-          } else {
-            throw new Error();
-          }
+        else {
+            numVictoryCards = 12;
         }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
-            _iterator2["return"]();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
+        // per the rules, starting cards do not come from supply
+        supply.estate = numVictoryCards + numPlayers * 3;
+        supply.duchy = numVictoryCards;
+        supply.province = numVictoryCards;
+        supply.curse = (numPlayers - 1) * 10;
+        if (kingdomCardPiles.length > 10) {
+            throw new Error("Cannot have more than 10 kingdom card piles");
         }
-      }
-
-      return supply;
-    }
+        // commented-out cards are not implemented
+        var baseKingdomCards = [
+            "adventurer",
+            "bureaucrat",
+            "cellar",
+            "chancellor",
+            "chapel",
+            "council room",
+            "feast",
+            "festival",
+            "gardens",
+            "laboratory",
+            "market",
+            "mine",
+            "library",
+            /*
+             * This is hard because it requires other players to act in the middle of the
+             * current player's turn
+             */
+            // "militia",
+            "moneylender",
+            "remodel",
+            "smithy",
+            "spy",
+            "thief",
+            "village",
+            "witch",
+            "woodcutter",
+            "workshop",
+        ];
+        var implementedKingdomCards = baseKingdomCards.concat([
+            // not part of basic set but implemented:
+            "merchant"
+        ]);
+        for (var _i = 0, kingdomCardPiles_1 = kingdomCardPiles; _i < kingdomCardPiles_1.length; _i++) {
+            var cardName = kingdomCardPiles_1[_i];
+            var i = implementedKingdomCards.indexOf(cardName);
+            // find the card
+            if (i === -1) {
+                throw new Error("Could not find card " + cardName + " in card names, possibly not implemented");
+            }
+            // remove from array
+            implementedKingdomCards.splice(i, 1);
+            var j = baseKingdomCards.indexOf(cardName);
+            if (j >= 0) {
+                baseKingdomCards.splice(j, 1);
+            }
+        }
+        // draw only from base cards
+        var p2 = lodash_1.default.sampleSize(baseKingdomCards, 10 - kingdomCardPiles.length);
+        // @type string[]
+        var piles = kingdomCardPiles.concat(p2);
+        if (piles.length != 10) {
+            throw new Error("Piles must be exactly of size 10 in setup, found " + piles.length);
+        }
+        for (var _a = 0, piles_1 = piles; _a < piles_1.length; _a++) {
+            var cardName = piles_1[_a];
+            var card = this.cards[cardName];
+            if (!card) {
+                throw new Error("Failed to find card " + cardName);
+            }
+            if (card.type === "action") {
+                supply[cardName] = 10;
+            }
+            else if (card.type === "victory") {
+                supply[cardName] = numVictoryCards;
+            }
+            else {
+                throw new Error();
+            }
+        }
+        return supply;
+    };
     /**
      * 1. Initialize player array with AI and strategies
      * 2. Give players their initial cards (3 estates and 7 coppers) - shuffled
      *
      * @param {Player[] | null} players
      */
-
-  }, {
-    key: "initPlayers",
-    value: function initPlayers(players) {
-      // not all of these will play
-      var aiPlayers = [new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Big Money", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["BigMoneyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Smart Big Money", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["SmartBigMoneyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Big Money with Smithy", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["BigMoneySmithyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Smart Smithy", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["SmartSmithyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Smart Duchy", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["SmartDuchyStrategy"]()), new _player__WEBPACK_IMPORTED_MODULE_2___default.a("Points Only", new _player_strategies__WEBPACK_IMPORTED_MODULE_1__["PointsOnlyStrategy"]())]; // create generic player objects
-
-      for (var i = 0; i < this.numPlayers; i++) {
-        var p = void 0;
-
-        if (players && players.length > i) {
-          p = players[i];
-        } else if (this.hasHumanPlayer && this.humanPlayerIndex === i) {
-          p = new _player__WEBPACK_IMPORTED_MODULE_2___default.a(this.humanPlayerName, null, true);
-        } else {
-          // inclusive
-          var j = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.random(0, aiPlayers.length - 1);
-
-          p = aiPlayers.splice(j, 1)[0];
+    Game.prototype.initPlayers = function (players) {
+        // not all of these will play
+        var aiPlayers = [
+            new player_1.default("Big Money", new player_strategies_1.BigMoneyStrategy()),
+            new player_1.default("Smart Big Money", new player_strategies_1.SmartBigMoneyStrategy()),
+            new player_1.default("Big Money with Smithy", new player_strategies_1.BigMoneySmithyStrategy()),
+            new player_1.default("Smart Smithy", new player_strategies_1.SmartSmithyStrategy()),
+            new player_1.default("Smart Duchy", new player_strategies_1.SmartDuchyStrategy()),
+            new player_1.default("Points Only", new player_strategies_1.PointsOnlyStrategy())
+        ];
+        // create generic player objects
+        for (var i = 0; i < this.numPlayers; i++) {
+            var p = void 0;
+            if (players && players.length > i) {
+                p = players[i];
+            }
+            else if (this.hasHumanPlayer && this.humanPlayerIndex === i) {
+                if (!this.humanPlayerName) {
+                    throw new Error("must specify human player name when humanPlayerIndex is set");
+                }
+                p = new player_1.default(this.humanPlayerName, null, true);
+            }
+            else {
+                // inclusive
+                var j = lodash_1.default.random(0, aiPlayers.length - 1);
+                p = aiPlayers.splice(j, 1)[0];
+            }
+            this.players[i] = p;
         }
-
-        this.players[i] = p;
-      } // give them their initial cards
-
-
-      for (var _p = 0; _p < this.numPlayers; _p++) {
-        // 3 estates and 7 coppers
-        for (var _i5 = 0; _i5 < 3; _i5++) {
-          var card = this.takeCard("estate", _p);
-
-          if (!card) {
-            throw new Error("took null estate card");
-          }
-
-          this.players[_p].deck.push(card);
+        // give them their initial cards
+        for (var p = 0; p < this.numPlayers; p++) {
+            // 3 estates and 7 coppers
+            for (var i = 0; i < 3; i++) {
+                var card = this.takeCard("estate", p);
+                if (!card) {
+                    throw new Error("took null estate card");
+                }
+                this.players[p].deck.push(card);
+            }
+            for (var j = 0; j < 7; j++) {
+                var card = this.takeCard("copper", p);
+                if (!card) {
+                    throw new Error("took null copper card");
+                }
+                this.players[p].deck.push(card);
+            }
+            // and shuffle
+            this.players[p].deck = lodash_1.default.shuffle(this.players[p].deck);
         }
-
-        for (var _j = 0; _j < 7; _j++) {
-          var _card4 = this.takeCard("copper", _p);
-
-          if (!_card4) {
-            throw new Error("took null copper card");
-          }
-
-          this.players[_p].deck.push(_card4);
-        } // and shuffle
-
-
-        this.players[_p].deck = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.shuffle(this.players[_p].deck);
-      }
-    }
+    };
     /**
      * Remove card from supply.
      * @param {string} cardName
@@ -51052,24 +50892,19 @@ function () {
      * @returns {Card} card object on success
      * @throws Error when pile empty
      */
-
-  }, {
-    key: "takeCard",
-    value: function takeCard(cardName, playerIndex) {
-      if (this.supply[cardName] === 0) {
-        throw new Error("Cannot take ".concat(cardName, " from deck, pile empty"));
-      }
-
-      var player = this.players[playerIndex];
-      this.supply[cardName]--;
-      var card = this.cards[cardName]; // points are added on here
-
-      if (card.type === "victory") {
-        player.points += card.points;
-      }
-
-      return card;
-    }
+    Game.prototype.takeCard = function (cardName, playerIndex) {
+        if (this.supply[cardName] === 0) {
+            throw new Error("Cannot take " + cardName + " from deck, pile empty");
+        }
+        var player = this.players[playerIndex];
+        this.supply[cardName]--;
+        var card = this.cards[cardName];
+        // points are added on here
+        if (card.type === "victory") {
+            player.points += card.points;
+        }
+        return card;
+    };
     /**
      * Draw a card from the current player's deck
      * If the deck is empty, shuffle in cards from discard pile
@@ -51078,118 +50913,94 @@ function () {
      * Initialize numActions to 1
      * @returns {boolean} Return false iff discard and deck are both empty
      */
-
-  }, {
-    key: "drawPhase",
-    value: function drawPhase() {
-      if (this.phase !== "draw") {
-        throw new Error("can only call drawPhase in draw phase");
-      }
-
-      this.drawCard(this.turn);
-      var player = this.players[this.turn]; // start out with 1 buy
-
-      player.numBuys = 1;
-      player.numActions = 1;
-      this.treasurePot = 0;
-      this.firstPlayBonus = {};
-      this.phase = "action";
-      return player.deck.length === 0 && player.discard.length === 0;
-    }
+    Game.prototype.drawPhase = function () {
+        if (this.phase !== "draw") {
+            throw new Error("can only call drawPhase in draw phase");
+        }
+        this.drawCard(this.turn);
+        var player = this.players[this.turn];
+        // start out with 1 buy
+        player.numBuys = 1;
+        player.numActions = 1;
+        this.treasurePot = 0;
+        this.firstPlayBonus = {};
+        this.phase = "action";
+        return player.deck.length === 0 && player.discard.length === 0;
+    };
     /**
      * Change the game phase using an action card
      * @param {string} phaseName
      * @param {any} params
      * @param {callable} callback
      */
-
-  }, {
-    key: "changePhaseUsingActionCard",
-    value: function changePhaseUsingActionCard(phaseName, params, callback) {
-      this.canCleanupActionStack = false;
-      this.phase = phaseName;
-
-      if (params.maxGainCost) {
-        this.maxGainCost = params.maxGainCost;
-      }
-
-      if (params.numGain) {
-        this.numGain = params.numGain;
-      }
-
-      if (params.gainType) {
-        this.gainType = params.gainType;
-      }
-
-      if (params.numTrash) {
-        this.numTrash = params.numTrash;
-      }
-
-      if (params.trashType) {
-        this.trashType = params.trashType;
-      }
-
-      if (params.trashName) {
-        this.trashName = params.trashName;
-      }
-
-      if (params.numDiscard) {
-        this.numDiscard = params.numDiscard;
-      }
-
-      if (params.discardType) {
-        this.discardType = params.discardType;
-      }
-
-      if (params.discardRange) {
-        this.discardRange = params.discardRange;
-      }
-
-      this.endPhaseCallback = callback;
-    }
+    Game.prototype.changePhaseUsingActionCard = function (phaseName, params, callback) {
+        callback = callback || null;
+        this.canCleanupActionStack = false;
+        this.phase = phaseName;
+        if (params.maxGainCost) {
+            this.maxGainCost = params.maxGainCost;
+        }
+        if (params.numGain) {
+            this.numGain = params.numGain;
+        }
+        if (params.gainType) {
+            this.gainType = params.gainType;
+        }
+        if (params.numTrash) {
+            this.numTrash = params.numTrash;
+        }
+        if (params.trashType) {
+            this.trashType = params.trashType;
+        }
+        if (params.trashName) {
+            this.trashName = params.trashName;
+        }
+        if (params.numDiscard) {
+            this.numDiscard = params.numDiscard;
+        }
+        if (params.discardType) {
+            this.discardType = params.discardType;
+        }
+        if (params.discardRange) {
+            this.discardRange = params.discardRange;
+        }
+        this.endPhaseCallback = callback;
+    };
     /**
      * End the current phase that was triggered by an action card
      * Pass options to the callback for that action card
      * @param {any} endPhaseOptions
      */
-
-  }, {
-    key: "endActionCardPhase",
-    value: function endActionCardPhase(endPhaseOptions) {
-      this.canCleanupActionStack = true;
-
-      if (this.endPhaseCallback) {
-        this.endPhaseCallback(endPhaseOptions);
-      }
-
-      if (this.canCleanupActionStack) {
-        this.endPhaseCallback = null;
-        this.maxGainCost = 0;
-        this.gainType = null;
-        this.numTrash = 0;
-        this.trashType = null;
-        this.trashName = null;
-        this.numDiscard = 0;
-        this.discardType = null;
-        this.discardRange = null;
-        this.phase = "action";
-      }
-    }
+    Game.prototype.endActionCardPhase = function (endPhaseOptions) {
+        endPhaseOptions = endPhaseOptions || {};
+        this.canCleanupActionStack = true;
+        if (this.endPhaseCallback) {
+            this.endPhaseCallback(endPhaseOptions);
+        }
+        if (this.canCleanupActionStack) {
+            this.endPhaseCallback = null;
+            this.maxGainCost = 0;
+            this.gainType = null;
+            this.numTrash = 0;
+            this.trashType = null;
+            this.trashName = null;
+            this.numDiscard = 0;
+            this.discardType = null;
+            this.discardRange = null;
+            this.phase = "action";
+        }
+    };
     /**
      * End the action phase for the current player
      * Transition to buy phase
      * Initializes treasure pot
      */
-
-  }, {
-    key: "endActionPhase",
-    value: function endActionPhase() {
-      if (this.phase !== "action") {
-        throw new Error("can only end action phase in action phase, current phase is ".concat(this.phase));
-      }
-
-      this.phase = "buy";
-    }
+    Game.prototype.endActionPhase = function () {
+        if (this.phase !== "action") {
+            throw new Error("can only end action phase in action phase, current phase is " + this.phase);
+        }
+        this.phase = "buy";
+    };
     /**
      * NOTE: THIS IS *NOT* THE METHOD TO DRAW CARDS IN THE DRAW PHASE
      *
@@ -51199,92 +51010,71 @@ function () {
      * @param {boolean} addToRevealed If true, instead of adding the card to hand, add to the revealed cards
      * @returns {Card} Return the card that was drawn
      */
-
-  }, {
-    key: "drawCard",
-    value: function drawCard(playerIndex, addToRevealed) {
-      addToRevealed = addToRevealed || false;
-      var player = this.players[playerIndex];
-
-      if (player.deck.length === 0) {
-        // the player has run out of cards
-        // set the player's cards as a shuffled version of their discard pile
-        player.deck = lodash__WEBPACK_IMPORTED_MODULE_0___default.a.shuffle(player.discard);
-        player.discard = [];
-      }
-
-      if (player.deck.length === 0) {
-        return false;
-      }
-
-      var card = player.deck.pop();
-
-      if (!card) {
-        throw new Error("Drew null card from the deck");
-      }
-
-      if (addToRevealed) {
-        player.revealedCards.push(card);
-      } else {
-        player.hand.push(card);
-      }
-
-      console.debug("Player ".concat(player.name, " drew ").concat(card.name));
-      return card;
-    }
-  }, {
-    key: "dealHands",
-    value: function dealHands() {
-      for (var p = 0; p < this.numPlayers; p++) {
-        for (var i = 0; i < 5; i++) {
-          this.drawCard(p);
+    Game.prototype.drawCard = function (playerIndex, addToRevealed) {
+        addToRevealed = addToRevealed || false;
+        var player = this.players[playerIndex];
+        if (player.deck.length === 0) {
+            // the player has run out of cards
+            // set the player's cards as a shuffled version of their discard pile
+            player.deck = lodash_1.default.shuffle(player.discard);
+            player.discard = [];
         }
-      }
-    }
+        if (player.deck.length === 0) {
+            return null;
+        }
+        var card = player.deck.pop();
+        if (!card) {
+            throw new Error("Drew null card from the deck");
+        }
+        if (addToRevealed) {
+            player.revealedCards.push(card);
+        }
+        else {
+            player.hand.push(card);
+        }
+        console.debug("Player " + player.name + " drew " + card.name);
+        return card;
+    };
+    Game.prototype.dealHands = function () {
+        for (var p = 0; p < this.numPlayers; p++) {
+            for (var i = 0; i < 5; i++) {
+                this.drawCard(p);
+            }
+        }
+    };
     /**
      * @param {Player[] | null} players
      * @param {string[] | null} supplyCards
      */
-
-  }, {
-    key: "setup",
-    value: function setup(players, supplyCards) {
-      this.cards = this.initCards();
-      this.supply = this.initSupply(this.numPlayers, supplyCards);
-      this.initPlayers(players);
-      this.dealHands();
-      console.debug("Setup complete.");
-    }
+    Game.prototype.setup = function (players, supplyCards) {
+        this.cards = this.initCards();
+        this.supply = this.initSupply(this.numPlayers, supplyCards);
+        this.initPlayers(players);
+        this.dealHands();
+        console.debug("Setup complete.");
+    };
     /**
      * Same as gainCard, but check the phase and other restrictions first
      * @param {string} cardName
      * @param {number} playerIndex
      * @returns {Card}
      */
-
-  }, {
-    key: "gainCardWithCheck",
-    value: function gainCardWithCheck(cardName, playerIndex) {
-      if (this.phase !== "gain") {
-        throw new Error("Cannot gain cards outside of gain phase - phase is ".concat(this.phase));
-      }
-
-      if (this.numGain === 0) {
-        throw new Error("cannot gain any more cards");
-      }
-
-      var gainCard = this.cards[cardName];
-
-      if (gainCard.cost > this.maxGainCost) {
-        throw new Error("Action card allowed you to gain a card costing up to ".concat(this.maxGainCost, " but you tried to gain a card costing ").concat(gainCard.cost));
-      }
-
-      if (this.gainType !== "any" && gainCard.type !== this.gainType) {
-        throw new Error("Action card allowed you to gain a card of type ".concat(this.gainType, " but you tried to gain a card of type ").concat(gainCard.type));
-      }
-
-      return this.gainCard(cardName, playerIndex);
-    }
+    Game.prototype.gainCardWithCheck = function (cardName, playerIndex) {
+        if (this.phase !== "gain") {
+            throw new Error("Cannot gain cards outside of gain phase - phase is " + this.phase);
+        }
+        if (this.numGain === 0) {
+            throw new Error("cannot gain any more cards");
+        }
+        var gainCard = this.cards[cardName];
+        if (gainCard.cost > this.maxGainCost) {
+            throw new Error("Action card allowed you to gain a card costing up to " + this.maxGainCost + " but you tried to gain a card costing " + gainCard.cost);
+        }
+        if (this.gainType !== "any" && gainCard.type !== this.gainType) {
+            throw new Error("Action card allowed you to gain a card of type " + this.gainType + " but you tried to gain a card of type " + gainCard.type);
+        }
+        return this.gainCard(cardName, playerIndex);
+    };
     /**
      * Remove a card from the supply and add it to the player's discard pile
      * Only checks whether the supply has that card
@@ -51294,27 +51084,23 @@ function () {
      * @param {any} options {location: "deck-top"} supported
      * @returns {Card}
      */
-
-  }, {
-    key: "gainCard",
-    value: function gainCard(cardName, playerIndex, options) {
-      var player = this.players[playerIndex];
-      var card = this.takeCard(cardName, playerIndex);
-
-      if (card === null) {
-        throw new Error("Failed to take the card from the deck while buying/gaining");
-      }
-
-      if (options && options.location && options.location === "deck-top") {
-        player.deck.push(card);
-      } else {
-        player.discard.push(card);
-      }
-
-      console.debug("Player ".concat(player.name, " gained ").concat(card.name));
-      this.numGain--;
-      return card;
-    }
+    Game.prototype.gainCard = function (cardName, playerIndex, options) {
+        options = options || {};
+        var player = this.players[playerIndex];
+        var card = this.takeCard(cardName, playerIndex);
+        if (card === null) {
+            throw new Error("Failed to take the card from the deck while buying/gaining");
+        }
+        if (options && options.location && options.location === "deck-top") {
+            player.deck.push(card);
+        }
+        else {
+            player.discard.push(card);
+        }
+        console.debug("Player " + player.name + " gained " + card.name);
+        this.numGain--;
+        return card;
+    };
     /**
      * Buy a card with treasure pot and place it into discard pile
      * Deduct its cost from treasure pot
@@ -51323,207 +51109,141 @@ function () {
      * @param {number} playerIndex
      * @throws An error on various failures {boolean}
      */
-
-  }, {
-    key: "buyCard",
-    value: function buyCard(cardName, playerIndex) {
-      if (this.phase !== "buy") {
-        throw new Error("cannot buy cards outside of buy phase");
-      }
-
-      var card = this.cards[cardName];
-
-      if (this.treasurePot < card.cost) {
-        throw new Error("you cannot afford this card. card costs ".concat(card.cost, " but treasure pot only contains ").concat(this.treasurePot));
-      }
-
-      var player = this.players[playerIndex];
-
-      if (player.numBuys === 0) {
-        throw new Error("You have no more buys left!");
-      }
-
-      this.treasurePot -= card.cost;
-      var c = this.takeCard(cardName, playerIndex);
-
-      if (c === null) {
-        throw new Error("Failed to take the card from the deck while buying");
-      }
-
-      player.discard.push(c);
-      player.numBuys--;
-    }
+    Game.prototype.buyCard = function (cardName, playerIndex) {
+        if (this.phase !== "buy") {
+            throw new Error("cannot buy cards outside of buy phase");
+        }
+        var card = this.cards[cardName];
+        if (this.treasurePot < card.cost) {
+            throw new Error("you cannot afford this card. card costs " + card.cost + " but treasure pot only contains " + this.treasurePot);
+        }
+        var player = this.players[playerIndex];
+        if (player.numBuys === 0) {
+            throw new Error("You have no more buys left!");
+        }
+        this.treasurePot -= card.cost;
+        var c = this.takeCard(cardName, playerIndex);
+        if (c === null) {
+            throw new Error("Failed to take the card from the deck while buying");
+        }
+        player.discard.push(c);
+        player.numBuys--;
+    };
     /**
      * Current player plays a treasure card
      * @param {number} cardIndex
      */
-
-  }, {
-    key: "playTreasureCard",
-    value: function playTreasureCard(cardIndex) {
-      if (this.phase !== "buy") {
-        throw new Error("cannot play treasure cards outside the buy phase (".concat(this.phase, " phase)"));
-      }
-
-      var player = this.players[this.turn];
-
-      if (player.hand[cardIndex].type !== "treasure") {
-        throw new Error("Card type must be treasure, got ".concat(player.hand[cardIndex].type));
-      }
-
-      var card = player.hand.splice(cardIndex, 1)[0];
-
-      if (card.name in this.firstPlayBonus) {
-        this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
-        delete this.firstPlayBonus[card.name];
-      }
-
-      this.treasurePot += card.value;
-      console.debug("Player ".concat(player.name, " played treasure ").concat(card.name, ". Treasure pot now ").concat(this.treasurePot));
-      player.discard.push(card);
-    }
+    Game.prototype.playTreasureCard = function (cardIndex) {
+        if (this.phase !== "buy") {
+            throw new Error("cannot play treasure cards outside the buy phase (" + this.phase + " phase)");
+        }
+        var player = this.players[this.turn];
+        if (player.hand[cardIndex].type !== "treasure") {
+            throw new Error("Card type must be treasure, got " + player.hand[cardIndex].type);
+        }
+        var card = player.hand.splice(cardIndex, 1)[0];
+        if (card.name in this.firstPlayBonus) {
+            this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
+            delete this.firstPlayBonus[card.name];
+        }
+        this.treasurePot += card.value;
+        console.debug("Player " + player.name + " played treasure " + card.name + ". Treasure pot now " + this.treasurePot);
+        player.discard.push(card);
+    };
     /**
      * For now, this only checks the province pile
      * @returns {boolean}
      */
-
-  }, {
-    key: "checkGameEnd",
-    value: function checkGameEnd() {
-      return this.supply.province === 0;
-    }
+    Game.prototype.checkGameEnd = function () {
+        return this.supply.province === 0;
+    };
     /**
      * Run the game to completion. If the game is over, return the winning players
      */
-
-  }, {
-    key: "playGame",
-    value: function playGame() {
-      while (!this.isGameOver) {
-        this.doTurn();
-      }
-
-      return this.winArr;
-    }
-  }, {
-    key: "calculateGameEnd",
-    value: function calculateGameEnd() {
-      // trigger all the effects for cards
-      for (var playerIndex = 0; playerIndex < this.numPlayers; playerIndex++) {
-        // reset points for this player
-        var player = this.players[playerIndex];
-        player.points = 0;
-        var allCards = player.hand.concat(player.discard, player.deck);
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
-
-        try {
-          for (var _iterator3 = allCards[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-            var card = _step3.value;
-
-            if (card.type === "victory" && card.points) {
-              console.debug("Added points to player ".concat(player.name, " due to ").concat(card.name));
-              player.points += card.points;
-            }
-
-            if (card.type === "victory" && card.pointsEffect) {
-              var bonusPoints = card.pointsEffect(playerIndex);
-              console.debug("Added ".concat(bonusPoints, " points to player ").concat(player.name, " due to gardens card"));
-              player.points += bonusPoints;
-            }
-          }
-        } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
-              _iterator3["return"]();
-            }
-          } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
-            }
-          }
+    Game.prototype.playGame = function () {
+        while (!this.isGameOver) {
+            this.doTurn();
         }
-      }
-
-      var bestScore = 0;
-
-      for (var i = 0; i < this.numPlayers; i++) {
-        bestScore = Math.max(this.players[i].points, bestScore);
-      }
-
-      console.debug("**** game over ****");
-      console.debug("best score = ".concat(bestScore));
-      this.winArr = [];
-
-      for (var _i6 = 0; _i6 < this.numPlayers; _i6++) {
-        if (this.players[_i6].points === bestScore) {
-          this.winArr.push(this.players[_i6]);
+        return this.winArr;
+    };
+    Game.prototype.calculateGameEnd = function () {
+        // trigger all the effects for cards
+        for (var playerIndex = 0; playerIndex < this.numPlayers; playerIndex++) {
+            // reset points for this player
+            var player = this.players[playerIndex];
+            player.points = 0;
+            var allCards = player.hand.concat(player.discard, player.deck);
+            for (var _i = 0, allCards_1 = allCards; _i < allCards_1.length; _i++) {
+                var card = allCards_1[_i];
+                if (card.type === "victory" && card.points) {
+                    console.debug("Added points to player " + player.name + " due to " + card.name);
+                    player.points += card.points;
+                }
+                if (card.type === "victory" && card.pointsEffect) {
+                    var bonusPoints = card.pointsEffect(playerIndex);
+                    console.debug("Added " + bonusPoints + " points to player " + player.name + " due to gardens card");
+                    player.points += bonusPoints;
+                }
+            }
         }
-      }
-    }
+        var bestScore = 0;
+        for (var i = 0; i < this.numPlayers; i++) {
+            bestScore = Math.max(this.players[i].points, bestScore);
+        }
+        console.debug("**** game over ****");
+        console.debug("best score = " + bestScore);
+        this.winArr = [];
+        for (var i = 0; i < this.numPlayers; i++) {
+            if (this.players[i].points === bestScore) {
+                this.winArr.push(this.players[i]);
+            }
+        }
+    };
     /**
      * Change the phase to cleanup, then to draw for the next player
      * Perform the cleanup phase for the current player
      * Change the turn to the next player
      */
-
-  }, {
-    key: "endTurn",
-    value: function endTurn() {
-      var _player$discard, _player$discard2;
-
-      if (this.phase !== "buy") {
-        throw new Error("cannot end turn in ".concat(this.phase, " phase"));
-      }
-
-      var player = this.players[this.turn];
-      console.debug("Player ".concat(player.name, " is ending their turn. Cleaning up."));
-      this.phase = "cleanup";
-      player.numActions = 0;
-      player.numBuys = 0; // cleanup phase: discard all cards in play area
-
-      (_player$discard = player.discard).push.apply(_player$discard, _toConsumableArray(this.playArea));
-
-      this.playArea = []; // cleanup phase: discard whole hand
-
-      (_player$discard2 = player.discard).push.apply(_player$discard2, _toConsumableArray(player.hand));
-
-      player.hand = []; // draw 5 new cards
-
-      this.drawCards(this.turn, 5);
-
-      if (this.checkGameEnd()) {
-        this.isGameOver = true;
-        this.calculateGameEnd();
-      } else {
-        this.turn = (this.turn + 1) % this.numPlayers;
-        console.debug("Starting turn for player ".concat(player.name));
-      }
-
-      this.phase = "draw";
-    }
+    Game.prototype.endTurn = function () {
+        var _a, _b;
+        if (this.phase !== "buy") {
+            throw new Error("cannot end turn in " + this.phase + " phase");
+        }
+        var player = this.players[this.turn];
+        console.debug("Player " + player.name + " is ending their turn. Cleaning up.");
+        this.phase = "cleanup";
+        player.numActions = 0;
+        player.numBuys = 0;
+        // cleanup phase: discard all cards in play area
+        (_a = player.discard).push.apply(_a, this.playArea);
+        this.playArea = [];
+        // cleanup phase: discard whole hand
+        (_b = player.discard).push.apply(_b, player.hand);
+        player.hand = [];
+        // draw 5 new cards
+        this.drawCards(this.turn, 5);
+        if (this.checkGameEnd()) {
+            this.isGameOver = true;
+            this.calculateGameEnd();
+        }
+        else {
+            this.turn = (this.turn + 1) % this.numPlayers;
+            console.debug("Starting turn for player " + player.name);
+        }
+        this.phase = "draw";
+    };
     /**
      * Put entire deck into discard stack
      * @param {Player} player
      */
-
-  }, {
-    key: "discardDeck",
-    value: function discardDeck(player) {
-      var _player$discard3;
-
-      if (this.phase !== "discard-deck") {
-        throw new Error("cannot discard deck outside of discard-deck phase");
-      }
-
-      (_player$discard3 = player.discard).push.apply(_player$discard3, _toConsumableArray(player.deck));
-
-      player.deck = [];
-    }
+    Game.prototype.discardDeck = function (player) {
+        var _a;
+        if (this.phase !== "discard-deck") {
+            throw new Error("cannot discard deck outside of discard-deck phase");
+        }
+        (_a = player.discard).push.apply(_a, player.deck);
+        player.deck = [];
+    };
     /**
      * Trash the given cards from that player. Verify phase unless explicitly told not to
      *
@@ -51532,134 +51252,74 @@ function () {
      * @param {boolean} noVerify - whether to run checks
      * @returns {Card[]} trashed cards
      */
-
-  }, {
-    key: "trashCards",
-    value: function trashCards(player, cardIndexes, noVerify) {
-      noVerify = noVerify || false;
-      var runChecks = !noVerify;
-
-      if (runChecks && this.phase !== "trash") {
-        throw new Error("Cannot trash cards outside of trash phase");
-      }
-
-      if (runChecks && cardIndexes.length > this.numTrash) {
-        throw new Error("Can trash a max of ".concat(this.numTrash, " cards, tried to trash ").concat(cardIndexes.length));
-      }
-
-      var trashed = []; // sort in reverse order to not mess up indexing
-
-      cardIndexes.sort(function (a, b) {
-        return b - a;
-      });
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
-
-      try {
-        for (var _iterator4 = cardIndexes[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var cardIndex = _step4.value;
-          var card = player.hand.splice(cardIndex, 1)[0];
-
-          if (runChecks && this.trashType !== "any" && card.type !== this.trashType) {
-            throw new Error("Can only trash cards of type ".concat(this.trashType, " but tried to trash card of type ").concat(card.type));
-          }
-
-          if (runChecks && this.trashName && card.name !== this.trashName) {
-            throw new Error("Can only trash cards with name ".concat(this.trashName));
-          }
-
-          console.debug("Player ".concat(player.name, " trashed card ").concat(card.name));
-          this.trash.push(card);
-          trashed.push(card);
+    Game.prototype.trashCards = function (player, cardIndexes, noVerify) {
+        noVerify = noVerify || false;
+        var runChecks = !noVerify;
+        if (runChecks && this.phase !== "trash") {
+            throw new Error("Cannot trash cards outside of trash phase");
         }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
-            _iterator4["return"]();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
+        if (runChecks && cardIndexes.length > this.numTrash) {
+            throw new Error("Can trash a max of " + this.numTrash + " cards, tried to trash " + cardIndexes.length);
         }
-      }
-
-      return trashed;
-    }
+        var trashed = [];
+        // sort in reverse order to not mess up indexing
+        cardIndexes.sort(function (a, b) {
+            return b - a;
+        });
+        for (var _i = 0, cardIndexes_1 = cardIndexes; _i < cardIndexes_1.length; _i++) {
+            var cardIndex = cardIndexes_1[_i];
+            var card = player.hand.splice(cardIndex, 1)[0];
+            if (runChecks && this.trashType !== "any" && card.type !== this.trashType) {
+                throw new Error("Can only trash cards of type " + this.trashType + " but tried to trash card of type " + card.type);
+            }
+            if (runChecks && this.trashName && card.name !== this.trashName) {
+                throw new Error("Can only trash cards with name " + this.trashName);
+            }
+            console.debug("Player " + player.name + " trashed card " + card.name);
+            this.trash.push(card);
+            trashed.push(card);
+        }
+        return trashed;
+    };
     /**
      * Discard cards in discard phase. Check restrictions.
      * @param {Player} player
      * @param {number[]} cardIndexes
      */
-
-  }, {
-    key: "discardCards",
-    value: function discardCards(player, cardIndexes) {
-      if (this.phase !== "discard") {
-        throw new Error("Can only discard cards in discard phase");
-      }
-
-      if (cardIndexes.length > this.numDiscard) {
-        throw new Error("Tried to discard ".concat(cardIndexes.length, " but can only discard up to ").concat(this.numDiscard));
-      } // sort in reverse order to not mess up indexing
-
-
-      cardIndexes.sort(function (a, b) {
-        return b - a;
-      }); // reverse order
-
-      var _iteratorNormalCompletion5 = true;
-      var _didIteratorError5 = false;
-      var _iteratorError5 = undefined;
-
-      try {
-        for (var _iterator5 = cardIndexes[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
-          var cardIndex = _step5.value;
-
-          if (this.discardRange && (cardIndex < this.discardRange.min || cardIndex >= this.discardRange.max)) {
-            throw new Error("discard range is [".concat(this.discardRange.min, ", ").concat(this.discardRange.max, "). Tried to discard at index ").concat(cardIndex));
-          }
-
-          var card = player.hand[cardIndex];
-
-          if (this.discardType != "any" && this.discardType != card.type) {
-            throw new Error("Card was of type ".concat(card.type, " but can only discard cards of type ").concat(this.discardType));
-          }
-
-          player.discardCard(cardIndex);
+    Game.prototype.discardCards = function (player, cardIndexes) {
+        if (this.phase !== "discard") {
+            throw new Error("Can only discard cards in discard phase");
         }
-      } catch (err) {
-        _didIteratorError5 = true;
-        _iteratorError5 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
-            _iterator5["return"]();
-          }
-        } finally {
-          if (_didIteratorError5) {
-            throw _iteratorError5;
-          }
+        if (cardIndexes.length > this.numDiscard) {
+            throw new Error("Tried to discard " + cardIndexes.length + " but can only discard up to " + this.numDiscard);
         }
-      }
-    }
+        // sort in reverse order to not mess up indexing
+        cardIndexes.sort(function (a, b) {
+            return b - a;
+        });
+        // reverse order
+        for (var _i = 0, cardIndexes_2 = cardIndexes; _i < cardIndexes_2.length; _i++) {
+            var cardIndex = cardIndexes_2[_i];
+            if (this.discardRange && (cardIndex < this.discardRange.start || cardIndex >= this.discardRange.end)) {
+                throw new Error("discard range is [" + this.discardRange.start + ", " + this.discardRange.end + "). Tried to discard at index " + cardIndex);
+            }
+            var card = player.hand[cardIndex];
+            if (this.discardType != "any" && this.discardType != card.type) {
+                throw new Error("Card was of type " + card.type + " but can only discard cards of type " + this.discardType);
+            }
+            player.discardCard(cardIndex);
+        }
+    };
     /**
      * Draw multiple cards for the target player
      * @param {number} playerIndex
      * @param {number} numCards
      */
-
-  }, {
-    key: "drawCards",
-    value: function drawCards(playerIndex, numCards) {
-      for (var i = 0; i < numCards; i++) {
-        this.drawCard(playerIndex);
-      }
-    }
+    Game.prototype.drawCards = function (playerIndex, numCards) {
+        for (var i = 0; i < numCards; i++) {
+            this.drawCard(playerIndex);
+        }
+    };
     /**
      * Processes the effect of the card
      * Puts the card in the discard pile
@@ -51669,197 +51329,148 @@ function () {
      * @param {Card} card
      * @returns {any} Effect of the card
      */
-
-  }, {
-    key: "playActionCard",
-    value: function playActionCard(player, playerIndex, card) {
-      if (this.phase !== "action") {
-        throw new Error("cannot play action cards outside of action phase (".concat(this.phase, " phase)"));
-      }
-
-      if (!card) {
-        throw new Error("card cannot be null");
-      }
-
-      if (this.numActions === 0) {
-        throw new Error("no more actions!");
-      } // remove card from player's hand before triggering its effects
-
-
-      var cardIndex = player.hand.indexOf(card);
-      player.hand.splice(cardIndex, 1);
-      this.playArea.push(card);
-
-      if (card.name in this.firstPlayBonus) {
-        this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
-        delete this.firstPlayBonus[card.name];
-      }
-
-      var cardEffect = card.effect(playerIndex);
-
-      if (!cardEffect) {
-        console.log(card);
-        console.error("Failed to find effect for card ".concat(card.name));
-      }
-
-      player.numActions += cardEffect.actions || 0;
-      player.numBuys += cardEffect.buys || 0;
-      var sendToTrash = cardEffect.sendToTrash || false;
-      this.treasurePot += cardEffect.gold || 0;
-      var firstPlayBonus = cardEffect.firstPlayBonus || {};
-
-      for (var cardName in firstPlayBonus) {
-        this.firstPlayBonus[cardName] = firstPlayBonus[cardName];
-      }
-
-      if (sendToTrash) {
-        this.trash.push(card);
-        var i = this.playArea.indexOf(card);
-        this.playArea.splice(i, 1);
-      }
-
-      player.numActions--;
-      console.debug("Player ".concat(player.name, " played ").concat(card.name));
-      return cardEffect;
-    }
+    Game.prototype.playActionCard = function (player, playerIndex, card) {
+        if (this.phase !== "action") {
+            throw new Error("cannot play action cards outside of action phase (" + this.phase + " phase)");
+        }
+        if (!card) {
+            throw new Error("card cannot be null");
+        }
+        if (player.numActions === 0) {
+            throw new Error("no more actions!");
+        }
+        // remove card from player's hand before triggering its effects
+        var cardIndex = player.hand.indexOf(card);
+        player.hand.splice(cardIndex, 1);
+        this.playArea.push(card);
+        if (card.name in this.firstPlayBonus) {
+            this.treasurePot += this.firstPlayBonus[card.name].gold || 0;
+            delete this.firstPlayBonus[card.name];
+        }
+        var cardEffect = card.effect(playerIndex);
+        if (!cardEffect) {
+            console.log(card);
+            console.error("Failed to find effect for card " + card.name);
+        }
+        player.numActions += cardEffect.actions || 0;
+        player.numBuys += cardEffect.buys || 0;
+        var sendToTrash = cardEffect.sendToTrash || false;
+        this.treasurePot += cardEffect.gold || 0;
+        var firstPlayBonus = cardEffect.firstPlayBonus || {};
+        for (var cardName in firstPlayBonus) {
+            this.firstPlayBonus[cardName] = firstPlayBonus[cardName];
+        }
+        if (sendToTrash) {
+            this.trash.push(card);
+            var i = this.playArea.indexOf(card);
+            this.playArea.splice(i, 1);
+        }
+        player.numActions--;
+        console.debug("Player " + player.name + " played " + card.name);
+        return cardEffect;
+    };
     /**
      * @param {Player} player
      * @param {string} cardName
      * @param {number} maxGainCost
      * @returns {boolean}
      */
-
     /*
     canGainCard(player, cardName, maxGainCost) {
-    	if(this.supply[cardName] === 0) {
-    		return false;
-    	}
-    	let gainCard = this.cards[cardName];
-    	if(gainCard.cost > maxGainCost) {
-    		// throw new Error(`Card allowed you to gain a card costing up to ${maxGainCost} but you tried to gain a card costing ${gainCard.cost}`);
-    		return false;
-    	}
+        if(this.supply[cardName] === 0) {
+            return false;
+        }
+        let gainCard = this.cards[cardName];
+        if(gainCard.cost > maxGainCost) {
+            // throw new Error(`Card allowed you to gain a card costing up to ${maxGainCost} but you tried to gain a card costing ${gainCard.cost}`);
+            return false;
+        }
     }
     */
-
     /**
      * Run player strategy automatically
      */
-
-  }, {
-    key: "doTurn",
-    value: function doTurn() {
-      if (this.isGameOver) {
-        console.warn("Cannot do turn when the game is over - nothing to do");
-        return;
-      }
-
-      if (this.turn === this.humanPlayerIndex) {
-        throw new Error("Cannot automate human player turn");
-      }
-
-      if (this.phase !== "draw") {
-        throw new Error("Cannot call doTurn in phase ".concat(this.phase));
-      }
-
-      var p = this.turn;
-
-      if (p === 0) {
-        this.round++;
-        console.debug("");
-        console.debug("******** starting round ".concat(this.round, " *************"));
-      } // draw a card and automatically transition to next phase
-
-
-      this.drawPhase();
-      var player = this.players[p];
-
-      while (player.numActions > 0) {
-        var card = player.strategy.actionTurn(player);
-
-        if (card) {
-          console.debug("Player ".concat(player.name, " played action card ").concat(card.name, " on round ").concat(this.round));
-          var effect = this.playActionCard(player, p, card);
-
-          while (this.phase !== "action") {
-            if (this.phase === "gain") {
-              var gainCardName = player.strategy.gainCard(player, this.maxGainCost);
-
-              if (gainCardName) {
-                this.gainCardWithCheck(gainCardName, p);
-                console.debug("Player ".concat(player.name, " gained card ").concat(gainCardName));
-              }
-            } else if (this.phase === "trash") {
-              var trashCardIndexes = player.strategy.trashCardForGain(player, effect.gainBonusCost, this.trashType, effect.gainType);
-              this.trashCards(player, trashCardIndexes);
-            } else {
-              throw new Error("phase ".concat(this.phase, " not implemented"));
-            }
-
-            this.endActionCardPhase();
-          }
-        } else {
-          // no action
-          break;
+    Game.prototype.doTurn = function () {
+        if (this.isGameOver) {
+            console.warn("Cannot do turn when the game is over - nothing to do");
+            return;
         }
-      }
-
-      this.endActionPhase();
-
-      if (this.phase !== "buy") {
-        throw new Error("should be buy phase after action phase, got ".concat(this.phase, " phase"));
-      } // buy phase
-
-
-      while (player.numBuys > 0) {
-        var treasureCards = player.strategy.playTreasures(player, this.supply, this.treasurePot); // sort in reverse order, in place
-        // reverse order to keep indexes valid
-
-        treasureCards.sort(function (a, b) {
-          return b - a;
-        });
-        var _iteratorNormalCompletion6 = true;
-        var _didIteratorError6 = false;
-        var _iteratorError6 = undefined;
-
-        try {
-          for (var _iterator6 = treasureCards[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
-            var cardIndex = _step6.value;
-            this.playTreasureCard(cardIndex);
-          }
-        } catch (err) {
-          _didIteratorError6 = true;
-          _iteratorError6 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion6 && _iterator6["return"] != null) {
-              _iterator6["return"]();
-            }
-          } finally {
-            if (_didIteratorError6) {
-              throw _iteratorError6;
-            }
-          }
+        var p = this.turn;
+        var player = this.players[p];
+        if (this.turn === this.humanPlayerIndex || !player.strategy) {
+            throw new Error("Cannot automate human player turn");
         }
-
-        var cardName = player.strategy.buyTurn(player, this.supply, this.treasurePot);
-
-        if (cardName) {
-          // numBuys deducted here
-          this.buyCard(cardName, p);
-          console.debug("Player ".concat(player.name, " bought card ").concat(cardName, " on round ").concat(this.round, " (treasure pot now ").concat(this.treasurePot, ")"));
-        } else {
-          console.debug("Player ".concat(player.name, " does not buy anything this turn"));
-          break;
+        if (this.phase !== "draw") {
+            throw new Error("Cannot call doTurn in phase " + this.phase);
         }
-      }
+        if (p === 0) {
+            this.round++;
+            console.debug("");
+            console.debug("******** starting round " + this.round + " *************");
+        }
+        // draw a card and automatically transition to next phase
+        this.drawPhase();
+        while (player.numActions > 0) {
+            var card = player.strategy.actionTurn(player);
+            if (card) {
+                console.debug("Player " + player.name + " played action card " + card.name + " on round " + this.round);
+                var effect = this.playActionCard(player, p, card);
+                while (this.phase !== "action") {
+                    if (this.phase === "gain") {
+                        var gainCardName = player.strategy.gainCard(player, this.maxGainCost);
+                        if (gainCardName) {
+                            this.gainCardWithCheck(gainCardName, p);
+                            console.debug("Player " + player.name + " gained card " + gainCardName);
+                        }
+                    }
+                    else if (this.phase === "trash") {
+                        var trashCardIndexes = player.strategy.trashCardForGain(player, effect.gainBonusCost, this.trashType, effect.gainType);
+                        this.trashCards(player, trashCardIndexes);
+                    }
+                    else {
+                        throw new Error("phase " + this.phase + " not implemented");
+                    }
+                    this.endActionCardPhase();
+                }
+            }
+            else {
+                // no action
+                break;
+            }
+        }
+        this.endActionPhase();
+        if (this.phase !== "buy") {
+            throw new Error("should be buy phase after action phase, got " + this.phase + " phase");
+        }
+        // buy phase
+        while (player.numBuys > 0) {
+            var treasureCards = player.strategy.playTreasures(player, this.supply, this.cards, this.treasurePot);
+            // sort in reverse order, in place
+            // reverse order to keep indexes valid
+            treasureCards.sort(function (a, b) {
+                return b - a;
+            });
+            for (var _i = 0, treasureCards_1 = treasureCards; _i < treasureCards_1.length; _i++) {
+                var cardIndex = treasureCards_1[_i];
+                this.playTreasureCard(cardIndex);
+            }
+            var cardName = player.strategy.buyTurn(player, this.supply, this.treasurePot);
+            if (cardName) {
+                // numBuys deducted here
+                this.buyCard(cardName, p);
+                console.debug("Player " + player.name + " bought card " + cardName + " on round " + this.round + " (treasure pot now " + this.treasurePot + ")");
+            }
+            else {
+                console.debug("Player " + player.name + " does not buy anything this turn");
+                break;
+            }
+        }
+        this.endTurn();
+    };
+    return Game;
+}());
+exports.Game = Game;
 
-      this.endTurn();
-    }
-  }]);
-
-  return Game;
-}();
 
 /***/ }),
 
@@ -51939,6 +51550,9 @@ var PlayerStrategy = /** @class */ (function () {
         }
         return trash;
     };
+    PlayerStrategy.prototype.trashCardForGain = function (player, gainBonusCost, trashType, gainType) {
+        throw new Error("implement in subclass");
+    };
     /**
      * A basic implementation of gaining cards
      * @param {Player} player
@@ -51959,11 +51573,12 @@ var PlayerStrategy = /** @class */ (function () {
     };
     /**
      * @param {Player} player
-     * @param {any} supply
+     * @param {TSupplyMap} supply
+     * @param {TStringCardMap} cards
      * @param {number} treasurePot
      * @returns {number[]} array of card indexes
      */
-    PlayerStrategy.prototype.playTreasures = function (player, supply, treasurePot) {
+    PlayerStrategy.prototype.playTreasures = function (player, supply, cards, treasurePot) {
         this.buyGoalCard = this.getBuyGoal(player, supply, treasurePot);
         if (!supply) {
             throw new Error("supply not set");
@@ -51971,7 +51586,7 @@ var PlayerStrategy = /** @class */ (function () {
         var treasures = [];
         if (this.buyGoalCard) {
             console.debug("AI player " + player.name + " trying to buy " + this.buyGoalCard);
-            var buyGoalCost = supply[this.buyGoalCard].cost;
+            var buyGoalCost = cards[this.buyGoalCard].cost;
             var total = 0;
             for (var i = 0; i < player.hand.length; i++) {
                 var card = player.hand[i];
@@ -51989,7 +51604,7 @@ var PlayerStrategy = /** @class */ (function () {
     /**
      * @returns {string | null}
      */
-    PlayerStrategy.prototype.buyTurn = function () {
+    PlayerStrategy.prototype.buyTurn = function (player, supply, treasurePot) {
         return this.buyGoalCard;
     };
     PlayerStrategy.prototype.getBuyGoal = function (player, supply, treasurePot) {

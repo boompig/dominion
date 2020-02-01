@@ -1,10 +1,6 @@
 import React, {Component} from "react";
 import { SupplyCard } from "./card";
-import { ICard } from "../card";
-
-
-type TStringNumberMap = {[key: string]: number};
-type TStringCardMap = {[key: string]: ICard};
+import {TStringCardMap, TSupplyMap} from "../types";
 
 
 interface ISupplyProps {
@@ -12,7 +8,7 @@ interface ISupplyProps {
 	phase: string;
 
 	/* maps */
-	supply: TStringNumberMap;
+	supply: TSupplyMap;
 	cards: TStringCardMap;
 
 	/* functions */
