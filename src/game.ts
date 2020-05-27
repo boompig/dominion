@@ -45,7 +45,7 @@ export class Game {
 	// book-keeping & action
 	isGameOver: boolean;
 	treasurePot: number;
-	firstPlayBonus: any; // TODO
+	firstPlayBonus: {[key: string]: any}; // TODO
 	endPhaseCallback: any; // TODO
 	numGain: number;
 	numTrash: number;
@@ -202,7 +202,7 @@ export class Game {
 	 * Draw 3 cards
 	 * @param {number} playerIndex
 	 */
-	smithyCardEffect(playerIndex: number) {
+	smithyCardEffect(playerIndex: number): any {
 		this.drawCards(playerIndex, 3);
 		return {};
 	}
@@ -212,7 +212,7 @@ export class Game {
 	 * Each player (including you)
 	 * reveals the top card of his deck and either discards it or puts it back, your choice.
 	 */
-	spyCardEffect(playerIndex: number) {
+	spyCardEffect(playerIndex: number): any {
 		// +1 card
 		this.drawCards(playerIndex, 1);
 		// reveal 1 card for each player
@@ -255,7 +255,7 @@ export class Game {
 	 * They discard the other revealed cards.
 	 * @param {number} playerIndex
 	 */
-	thiefCardEffect(playerIndex: number) {
+	thiefCardEffect(playerIndex: number): any {
 		for(let i = 0; i < this.numPlayers; i++) {
 			if(i != playerIndex) {
 				// reveal top 2 cards from OTHER players
@@ -309,7 +309,7 @@ export class Game {
 	 * +1 action
 	 * @param {number} playerIndex
 	 */
-	laboratoryCardEffect(playerIndex: number) {
+	laboratoryCardEffect(playerIndex: number): any {
 		this.drawCards(playerIndex, 2);
 		return {
 			actions: 1,
@@ -321,7 +321,8 @@ export class Game {
 	 * +1 buy
 	 * +2 gold
 	 */
-	festivalCardEffect(playerIndex: number) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	festivalCardEffect(playerIndex: number): any {
 		return {
 			actions: 2,
 			buys: 1,
@@ -333,7 +334,7 @@ export class Game {
 	 * +2 actions
 	 * +1 card
 	 */
-	villageCardEffect(playerIndex: number) {
+	villageCardEffect(playerIndex: number): any {
 		this.drawCards(playerIndex, 1);
 		return {
 			actions: 2,
@@ -343,7 +344,8 @@ export class Game {
 	/**
 	 * +1 buy, +2 gold
 	 */
-	woodcutterCardEffect(playerIndex: number) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	woodcutterCardEffect(playerIndex: number): any {
 		return {
 			buys: 1,
 			gold: 2
@@ -354,7 +356,8 @@ export class Game {
 	 * Trash a card from your hand.
 	 * Gain a card costing up to $2 more than the trashed card.
 	 */
-	remodelCardEffect(playerIndex: number) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	remodelCardEffect(playerIndex: number): any {
 		this.changePhaseUsingActionCard("trash", {
 			numTrash: 1,
 			trashType: "any",
@@ -379,7 +382,7 @@ export class Game {
 	 * +1 card, +1 action, +1 buy, +1 gold
 	 * @param {number} playerIndex
 	 */
-	marketCardEffect(playerIndex: number) {
+	marketCardEffect(playerIndex: number): any {
 		this.drawCards(playerIndex, 1);
 		return {
 			actions: 1,
@@ -392,7 +395,8 @@ export class Game {
 	 * Trash a Copper from your hand. If you do, +$3.
 	 * @param {number} playerIndex
 	 */
-	moneylenderCardEffect(playerIndex: number) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	moneylenderCardEffect(playerIndex: number): any {
 		const trashCount = this.trash.length;
 		this.changePhaseUsingActionCard("trash", {
 			trashName: "copper",
@@ -413,7 +417,7 @@ export class Game {
 	 * discard the set aside cards after you finish drawing.
 	 * @param {number} playerIndex
 	 */
-	libraryCardEffect(playerIndex: number) {
+	libraryCardEffect(playerIndex: number): any {
 		const numCardsInHand = this.players[playerIndex].hand.length;
 		this.drawCards(playerIndex, 7 - numCardsInHand);
 		this.changePhaseUsingActionCard("discard", {
@@ -431,7 +435,7 @@ export class Game {
 	 * NOTE: this card is not in the standard set
 	 * +1 card, +1 action, +1 gold if you play a silver this turn
 	 */
-	merchantCardEffect(playerIndex: number) {
+	merchantCardEffect(playerIndex: number): any {
 		this.drawCards(playerIndex, 1);
 		return {
 			actions: 1,
@@ -447,7 +451,7 @@ export class Game {
 	 * +4 Cards; +1 Buy
 	 * Each other player draws a card.
 	 */
-	councilRoomCardEffect(playerIndex: number) {
+	councilRoomCardEffect(playerIndex: number): any {
 		for(let i = 0; i < this.numPlayers; i++) {
 			if(i != playerIndex) {
 				this.drawCard(i);
@@ -462,7 +466,8 @@ export class Game {
 	/**
 	 * trash 4 cards
 	 */
-	chapelCardEffect(playerIndex: number) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	chapelCardEffect(playerIndex: number): any {
 		this.changePhaseUsingActionCard("trash", {
 			numTrash: 4,
 			trashType: "any"
@@ -474,7 +479,7 @@ export class Game {
 	 * +2 Cards
 	 * Each other player gains a Curse card.
 	 */
-	witchCardEffect(playerIndex: number) {
+	witchCardEffect(playerIndex: number): any {
 		for (let i = 0; i < 2; i++) {
 			this.drawCard(playerIndex);
 		}
@@ -489,7 +494,8 @@ export class Game {
 	/**
 	 * Gain a card costing up to $4.
 	 */
-	workshopCardEffect(playerIndex: number) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	workshopCardEffect(playerIndex: number): any {
 		this.changePhaseUsingActionCard("gain", {
 			maxGainCost: 4,
 			gainType: "any",
@@ -502,7 +508,8 @@ export class Game {
 	 * Trash a Treasure card from your hand.
 	 * Gain a Treasure card costing up to $3 more; put it into your hand.
 	 */
-	mineCardEffect(playerIndex: number) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	mineCardEffect(playerIndex: number): any {
 		this.changePhaseUsingActionCard("trash", {
 			numTrash: 1,
 			trashType: "treasure"
@@ -526,7 +533,8 @@ export class Game {
 	 * Trash this card. Gain a card costing up to $5.
 	 * @param {number} playerIndex
 	 */
-	feastCardEffect(playerIndex: number) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	feastCardEffect(playerIndex: number): any {
 		this.changePhaseUsingActionCard("gain", {
 			maxGainCost: 5,
 			gainType: "any",
@@ -543,7 +551,7 @@ export class Game {
 	 * +1 Card per card discarded.
 	 * @param {number} playerIndex
 	 */
-	cellarCardEffect(playerIndex: number) {
+	cellarCardEffect(playerIndex: number): any {
 		const discardPileSizeStart = this.players[playerIndex].discard.length;
 		this.changePhaseUsingActionCard("discard", {
 			// means functionally unlimited
@@ -564,13 +572,14 @@ export class Game {
 	 * @param {number} playerIndex
 	 * @returns {number} number of points to add
 	 */
-	gardensCardEffect(playerIndex: number) {
+	gardensCardEffect(playerIndex: number): any {
 		const player = this.players[playerIndex];
 		const numCards = player.hand.length + player.discard.length + player.deck.length;
 		return Math.floor(numCards / 10);
 	}
 
-	militiaCardEffect(playerIndex: number) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	militiaCardEffect(playerIndex: number): any {
 		throw new Error("not implemented");
 	// for(let i = 0; i < this.numPlayers; i++) {
 	// 	if(i != playerIndex) {
@@ -584,7 +593,7 @@ export class Game {
 	 * Each other player reveals a Victory card from his hand and puts it on his deck
 	 * (or reveals a hand with no Victory cards).
 	 */
-	bureaucratCardEffect(playerIndex: number) {
+	bureaucratCardEffect(playerIndex: number): any {
 		this.gainCard("silver", playerIndex, {location: "deck-top"});
 
 		// TODO - right now automatically reveals the 1st victory card found in hand...
@@ -629,7 +638,8 @@ export class Game {
 	 * +$2
 	 * You may immediately put your deck into your discard pile.
 	 */
-	chancellorCardEffect(playerIndex: number) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	chancellorCardEffect(playerIndex: number): any {
 		this.changePhaseUsingActionCard("discard-deck", {}, null);
 		return {
 			gold: 2
@@ -640,7 +650,7 @@ export class Game {
 	 * Reveal cards from your deck until you reveal 2 Treasure cards.
 	 * Put those Treasure cards in your hand and discard the other revealed cards.
 	 */
-	adventurerCardEffect(playerIndex: number) {
+	adventurerCardEffect(playerIndex: number): any {
 		let numTreasures = 0;
 		while(numTreasures < 2) {
 			const card = this.drawCard(playerIndex, true);
@@ -673,7 +683,7 @@ export class Game {
 	/**
 	 * Initialize mapping of card names to cards.
 	 */
-	initCards() {
+	initCards(): any {
 		const cards = {} as TStringCardMap;
 
 		// treasures
@@ -936,7 +946,7 @@ export class Game {
 	 * @param {string[] | null} kingdomCardPiles
 	 * @returns {any} mapping of card names to their quantity
 	 */
-	initSupply(numPlayers: number, kingdomCardPiles: string[] | null) {
+	initSupply(numPlayers: number, kingdomCardPiles: string[] | null): any {
 		const supply = {} as TSupplyMap;
 		kingdomCardPiles = kingdomCardPiles || [];
 
@@ -1052,7 +1062,7 @@ export class Game {
 	 *
 	 * @param {Player[] | null} players
 	 */
-	initPlayers(players: Player[] | null) {
+	initPlayers(players: Player[] | null): void {
 		// not all of these will play
 		const aiPlayers = [
 			new Player(
@@ -1138,7 +1148,7 @@ export class Game {
 	 * @returns {Card} card object on success
 	 * @throws Error when pile empty
 	 */
-	takeCard(cardName: string, playerIndex: number) {
+	takeCard(cardName: string, playerIndex: number): ICard {
 		if (this.supply[cardName] === 0) {
 			throw new Error(`Cannot take ${cardName} from deck, pile empty`);
 		}
@@ -1163,7 +1173,7 @@ export class Game {
 	 * Initialize numActions to 1
 	 * @returns {boolean} Return false iff discard and deck are both empty
 	 */
-	drawPhase() {
+	drawPhase(): boolean {
 		if(this.phase !== "draw") {
 			throw new Error("can only call drawPhase in draw phase");
 		}
@@ -1184,7 +1194,7 @@ export class Game {
 	 * @param {any} params
 	 * @param {callable} callback
 	 */
-	changePhaseUsingActionCard(phaseName: string, params: any, callback?: any) {
+	changePhaseUsingActionCard(phaseName: string, params: any, callback?: any): void {
 		callback = callback || null;
 
 		this.canCleanupActionStack = false;
@@ -1224,7 +1234,7 @@ export class Game {
 	 * Pass options to the callback for that action card
 	 * @param {any} endPhaseOptions
 	 */
-	endActionCardPhase(endPhaseOptions?: any) {
+	endActionCardPhase(endPhaseOptions?: any): void {
 		endPhaseOptions = endPhaseOptions || {};
 
 		this.canCleanupActionStack = true;
@@ -1250,7 +1260,7 @@ export class Game {
 	 * Transition to buy phase
 	 * Initializes treasure pot
 	 */
-	endActionPhase() {
+	endActionPhase(): void {
 		if(this.phase !== "action") {
 			throw new Error(`can only end action phase in action phase, current phase is ${this.phase}`);
 		}
@@ -1296,7 +1306,7 @@ export class Game {
 		return card;
 	}
 
-	dealHands() {
+	dealHands(): void {
 		for (let p = 0; p < this.numPlayers; p++) {
 			for (let i = 0; i < 5; i++) {
 				this.drawCard(p);
@@ -1308,7 +1318,7 @@ export class Game {
 	 * @param {Player[] | null} players
 	 * @param {string[] | null} supplyCards
 	 */
-	setup(players: Player[] | null, supplyCards: string[] | null) {
+	setup(players: Player[] | null, supplyCards: string[] | null): void {
 		this.cards = this.initCards();
 		this.supply = this.initSupply(this.numPlayers, supplyCards);
 		this.initPlayers(players);
@@ -1322,7 +1332,7 @@ export class Game {
 	 * @param {number} playerIndex
 	 * @returns {Card}
 	 */
-	gainCardWithCheck(cardName: string, playerIndex: number) {
+	gainCardWithCheck(cardName: string, playerIndex: number): ICard {
 		if(this.phase !== "gain") {
 			throw new Error(`Cannot gain cards outside of gain phase - phase is ${this.phase}`);
 		}
@@ -1376,7 +1386,7 @@ export class Game {
 	 * @param {number} playerIndex
 	 * @throws An error on various failures {boolean}
 	 */
-	buyCard(cardName: string, playerIndex: number) {
+	buyCard(cardName: string, playerIndex: number): void {
 		if(this.phase !== "buy") {
 			throw new Error("cannot buy cards outside of buy phase");
 		}
@@ -1404,7 +1414,7 @@ export class Game {
 	 * Current player plays a treasure card
 	 * @param {number} cardIndex
 	 */
-	playTreasureCard(cardIndex: number) {
+	playTreasureCard(cardIndex: number): void {
 		if(this.phase !== "buy") {
 			throw new Error(`cannot play treasure cards outside the buy phase (${this.phase} phase)`);
 		}
@@ -1440,7 +1450,7 @@ export class Game {
 		return this.winArr;
 	}
 
-	calculateGameEnd() {
+	calculateGameEnd(): void {
 		// trigger all the effects for cards
 		for (let playerIndex = 0; playerIndex < this.numPlayers; playerIndex++) {
 			// reset points for this player
@@ -1486,7 +1496,7 @@ export class Game {
 	 * Perform the cleanup phase for the current player
 	 * Change the turn to the next player
 	 */
-	endTurn() {
+	endTurn(): void {
 		if(this.phase !== "buy") {
 			throw new Error(`cannot end turn in ${this.phase} phase`);
 		}
@@ -1525,7 +1535,7 @@ export class Game {
 	 * Put entire deck into discard stack
 	 * @param {Player} player
 	 */
-	discardDeck(player: Player) {
+	discardDeck(player: Player): void {
 		if(this.phase !== "discard-deck") {
 			throw new Error("cannot discard deck outside of discard-deck phase");
 		}
@@ -1575,7 +1585,7 @@ export class Game {
 	 * @param {Player} player
 	 * @param {number[]} cardIndexes
 	 */
-	discardCards(player: Player, cardIndexes: number[]) {
+	discardCards(player: Player, cardIndexes: number[]): void {
 		if(this.phase !== "discard") {
 			throw new Error("Can only discard cards in discard phase");
 		}
@@ -1605,7 +1615,7 @@ export class Game {
 	 * @param {number} playerIndex
 	 * @param {number} numCards
 	 */
-	drawCards(playerIndex: number, numCards: number) {
+	drawCards(playerIndex: number, numCards: number): void {
 		for(let i = 0; i < numCards; i++) {
 			this.drawCard(playerIndex);
 		}
@@ -1620,7 +1630,7 @@ export class Game {
 	 * @param {Card} card
 	 * @returns {any} Effect of the card
 	 */
-	playActionCard(player: Player, playerIndex: number, card: ICard) {
+	playActionCard(player: Player, playerIndex: number, card: ICard): any {
 		if(this.phase !== "action") {
 			throw new Error(`cannot play action cards outside of action phase (${this.phase} phase)`);
 		}
@@ -1692,7 +1702,7 @@ export class Game {
 	/**
 	 * Run player strategy automatically
 	 */
-	doTurn() {
+	doTurn(): void {
 		if (this.isGameOver) {
 			console.warn("Cannot do turn when the game is over - nothing to do");
 			return;

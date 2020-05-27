@@ -41,6 +41,7 @@ module.exports = {
 		"@typescript-eslint/interface-name-prefix": [
 			"error",
 			"always"
-		]
+		],
+		"@typescript-eslint/no-explicit-any": 0
 	}
 };

@@ -40,6 +40,7 @@ export class PlayerStrategy implements IPlayerStrategy {
 		return trash;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	trashCardForGain(player: Player, gainBonusCost: number, trashType: string | null, gainType: string): number[] {
 		throw new Error("implement in subclass");
 	}
@@ -60,6 +61,7 @@ export class PlayerStrategy implements IPlayerStrategy {
 	/**
 	 * @returns {Card | null}
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	actionTurn(player: Player): ICard | null {
 		throw new Error("must subclass");
 	}
@@ -101,10 +103,12 @@ export class PlayerStrategy implements IPlayerStrategy {
 	/**
 	 * @returns {string | null}
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	buyTurn(player: Player, supply: TSupplyMap, treasurePot: number): string | null {
 		return this.buyGoalCard;
 	}
 
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	getBuyGoal(player: Player, supply: TSupplyMap, treasurePot: number): string | null {
 		throw new Error("must subclass");
 	}
@@ -116,6 +120,7 @@ export class BigMoneyStrategy extends PlayerStrategy {
 	/**
 	 * @returns {Card | null}
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	actionTurn(player: Player): ICard | null {
 		return null;
 	}
@@ -147,17 +152,14 @@ export class SmartBigMoneyStrategy extends PlayerStrategy {
 	/**
 	 * @returns {Card | null}
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	actionTurn(player: Player): ICard | null {
 		return null;
 	}
 
 	/**
 	 * @param {Player} player
-<<<<<<< HEAD:src/player-strategies.js
 	 * @param {any} supply Map from card name to number of cards of that type left
-=======
-	 * @param {any} supply map from card name to number of cards of that type left
->>>>>>> react:src/player-strategies.ts
 	 * @param {number} treasurePot
 	 * @returns {string | null}
 	 */
@@ -207,11 +209,7 @@ export class SmartDuchyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-<<<<<<< HEAD:src/player-strategies.js
 	 * @param {any} supply Map from card name to number of cards of that type left
-=======
-	 * @param {any} supply map from card name to number of cards of that type left
->>>>>>> react:src/player-strategies.ts
 	 * @returns {string | null}
 	 */
 	getBuyGoal(player: Player, supply: any, treasurePot: number): string | null {
@@ -249,7 +247,7 @@ export class SmartSmithyStrategy extends PlayerStrategy {
 		this.provinceCutoff = 4;
 	}
 
-	addValue(v: number) {
+	addValue(v: number): void {
 		this.avgValue = (this.numCards * this.avgValue + v) / (this.numCards + 1);
 		this.numCards++;
 	}
@@ -271,11 +269,7 @@ export class SmartSmithyStrategy extends PlayerStrategy {
 
 	/**
 	 * @param {Player} player
-<<<<<<< HEAD:src/player-strategies.js
 	 * @param {any} supply Map from card name to number of cards of that type left
-=======
-	 * @param {any} supply map from card name to number of cards of that type left
->>>>>>> react:src/player-strategies.ts
 	 * @returns {string | null}
 	 */
 	getBuyGoal(player: Player, supply: any, treasurePot: number): string | null {
@@ -287,13 +281,9 @@ export class SmartSmithyStrategy extends PlayerStrategy {
 	/**
 	 * @param {number} money
 	 * @param {Player} player
-<<<<<<< HEAD:src/player-strategies.js
 	 * @param {any} supply Map from card name to number of cards of that type left
-=======
-	 * @param {any} supply map from card name to number of cards of that type left
->>>>>>> react:src/player-strategies.ts
 	 */
-	buyTurnWrapper(money: number, player: Player, supply: any) {
+	buyTurnWrapper(money: number, player: Player, supply: any): any {
 		// calculate the avg value of coins in my supply
 		// if the avg value is > (let's say 2)
 		//
@@ -378,6 +368,7 @@ export class PointsOnlyStrategy extends PlayerStrategy {
 	/**
 	 * @returns {Card | null}
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	actionTurn(player: Player): ICard | null {
 		return null;
 	}
